@@ -1,0 +1,1334 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-10-05",
+  "review_timezone": "Asia/Bangkok",
+  "metadata_source": "GitHub REST API read-only unauthenticated requests; repository stars observed at review time",
+  "repositories": [
+    {
+      "full_name": "openai/skills",
+      "html_url": "https://github.com/openai/skills",
+      "description": "Skills Catalog for Codex",
+      "stargazers_count": 27881,
+      "pushed_at": "2026-09-08T20:35:26Z",
+      "updated_at": "2026-10-05T01:32:50Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": null
+    },
+    {
+      "full_name": "anthropics/skills",
+      "html_url": "https://github.com/anthropics/skills",
+      "description": "Public repository for Agent Skills",
+      "stargazers_count": 179660,
+      "pushed_at": "2026-10-03T20:38:10Z",
+      "updated_at": "2026-10-05T03:03:01Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": null
+    },
+    {
+      "full_name": "vercel-labs/agent-skills",
+      "html_url": "https://github.com/vercel-labs/agent-skills",
+      "description": "Vercel's official collection of agent skills",
+      "stargazers_count": 31934,
+      "pushed_at": "2026-08-28T13:36:31Z",
+      "updated_at": "2026-10-05T02:46:28Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": null
+    },
+    {
+      "full_name": "flutter/agent-plugins",
+      "html_url": "https://github.com/flutter/agent-plugins",
+      "description": null,
+      "stargazers_count": 3026,
+      "pushed_at": "2026-10-01T09:14:31Z",
+      "updated_at": "2026-10-04T21:57:29Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": {
+        "key": "bsd-3-clause",
+        "name": "BSD 3-Clause \"New\" or \"Revised\" License",
+        "spdx_id": "BSD-3-Clause",
+        "url": "https://api.github.com/licenses/bsd-3-clause",
+        "node_id": "MDc6TGljZW5zZTU="
+      }
+    },
+    {
+      "full_name": "laravel/boost",
+      "html_url": "https://github.com/laravel/boost",
+      "description": "Laravel-focused MCP server for augmenting your AI powered local development experience.",
+      "stargazers_count": 3645,
+      "pushed_at": "2026-10-04T18:14:45Z",
+      "updated_at": "2026-10-04T14:03:18Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "laravel/docs",
+      "html_url": "https://github.com/laravel/docs",
+      "description": "The Laravel documentation.",
+      "stargazers_count": 3500,
+      "pushed_at": "2026-10-03T03:28:28Z",
+      "updated_at": "2026-10-04T07:19:10Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "13.x",
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "OWASP/API-Security",
+      "html_url": "https://github.com/OWASP/API-Security",
+      "description": "OWASP API Security Project",
+      "stargazers_count": 2374,
+      "pushed_at": "2026-09-22T14:25:04Z",
+      "updated_at": "2026-10-05T02:22:53Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "master",
+      "license": {
+        "key": "other",
+        "name": "Other",
+        "spdx_id": "NOASSERTION",
+        "url": null,
+        "node_id": "MDc6TGljZW5zZTA="
+      }
+    },
+    {
+      "full_name": "OWASP/CheatSheetSeries",
+      "html_url": "https://github.com/OWASP/CheatSheetSeries",
+      "description": "The OWASP Cheat Sheet Series was created to provide a concise collection of high value information on specific application security topics.",
+      "stargazers_count": 33421,
+      "pushed_at": "2026-10-04T23:01:34Z",
+      "updated_at": "2026-10-05T03:01:39Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "master",
+      "license": {
+        "key": "cc-by-sa-4.0",
+        "name": "Creative Commons Attribution Share Alike 4.0 International",
+        "spdx_id": "CC-BY-SA-4.0",
+        "url": "https://api.github.com/licenses/cc-by-sa-4.0",
+        "node_id": "MDc6TGljZW5zZTI2"
+      }
+    },
+    {
+      "full_name": "google/eng-practices",
+      "html_url": "https://github.com/google/eng-practices",
+      "description": "Google's Engineering Practices documentation",
+      "stargazers_count": 23301,
+      "pushed_at": "2024-09-19T05:27:52Z",
+      "updated_at": "2026-10-03T21:14:22Z",
+      "archived": true,
+      "disabled": false,
+      "default_branch": "master",
+      "license": {
+        "key": "other",
+        "name": "Other",
+        "spdx_id": "NOASSERTION",
+        "url": null,
+        "node_id": "MDc6TGljZW5zZTA="
+      }
+    },
+    {
+      "full_name": "mysql/mysql-server",
+      "html_url": "https://github.com/mysql/mysql-server",
+      "description": "MySQL Server, the world's most popular open source database, and MySQL Cluster, a real-time, open source transactional database.",
+      "stargazers_count": 12441,
+      "pushed_at": "2026-09-29T22:54:42Z",
+      "updated_at": "2026-10-04T14:21:56Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "trunk",
+      "license": {
+        "key": "other",
+        "name": "Other",
+        "spdx_id": "NOASSERTION",
+        "url": null,
+        "node_id": "MDc6TGljZW5zZTA="
+      }
+    },
+    {
+      "full_name": "github/docs",
+      "html_url": "https://github.com/github/docs",
+      "description": "The open-source repo for docs.github.com",
+      "stargazers_count": 20947,
+      "pushed_at": "2026-10-02T20:35:10Z",
+      "updated_at": "2026-10-05T01:41:27Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": {
+        "key": "cc-by-4.0",
+        "name": "Creative Commons Attribution 4.0 International",
+        "spdx_id": "CC-BY-4.0",
+        "url": "https://api.github.com/licenses/cc-by-4.0",
+        "node_id": "MDc6TGljZW5zZTI1"
+      }
+    },
+    {
+      "full_name": "w3c/wcag",
+      "html_url": "https://github.com/w3c/wcag",
+      "description": "Web Content Accessibility Guidelines",
+      "stargazers_count": 1504,
+      "pushed_at": "2026-10-04T19:03:22Z",
+      "updated_at": "2026-10-04T19:02:28Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": {
+        "key": "other",
+        "name": "Other",
+        "spdx_id": "NOASSERTION",
+        "url": null,
+        "node_id": "MDc6TGljZW5zZTA="
+      }
+    },
+    {
+      "full_name": "obra/superpowers",
+      "html_url": "https://github.com/obra/superpowers",
+      "description": "An agentic skills framework & software development methodology that works.",
+      "stargazers_count": 295315,
+      "pushed_at": "2026-09-27T02:37:47Z",
+      "updated_at": "2026-10-05T03:06:37Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "affaan-m/ECC",
+      "html_url": "https://github.com/affaan-m/ECC",
+      "description": "The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.",
+      "stargazers_count": 273025,
+      "pushed_at": "2026-10-02T02:01:14Z",
+      "updated_at": "2026-10-05T03:07:33Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "ComposioHQ/awesome-claude-skills",
+      "html_url": "https://github.com/ComposioHQ/awesome-claude-skills",
+      "description": "A curated list of awesome Claude Skills, resources, and tools for customizing Claude AI workflows",
+      "stargazers_count": 76508,
+      "pushed_at": "2026-09-18T07:16:11Z",
+      "updated_at": "2026-10-05T02:37:35Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "master",
+      "license": null
+    },
+    {
+      "full_name": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "html_url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "description": "An AI skill that provides design intelligence for building professional UI/UX across multiple platforms.",
+      "stargazers_count": 133067,
+      "pushed_at": "2026-10-03T16:05:26Z",
+      "updated_at": "2026-10-05T03:03:33Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit",
+        "node_id": "MDc6TGljZW5zZTEz"
+      }
+    },
+    {
+      "full_name": "agentskills/agentskills",
+      "html_url": "https://github.com/agentskills/agentskills",
+      "description": "Specification and documentation for Agent Skills",
+      "stargazers_count": 25911,
+      "pushed_at": "2026-08-09T20:36:04Z",
+      "updated_at": "2026-10-05T02:11:42Z",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "license": {
+        "key": "apache-2.0",
+        "name": "Apache License 2.0",
+        "spdx_id": "Apache-2.0",
+        "url": "https://api.github.com/licenses/apache-2.0",
+        "node_id": "MDc6TGljZW5zZTI="
+      }
+    }
+  ],
+  "inspected_source_files": [
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "LICENSE",
+      "revision": "0ef3972f93e2baa4156ba1cbb1e515cd53079c68",
+      "url": "https://raw.githubusercontent.com/flutter/agent-plugins/0ef3972f93e2baa4156ba1cbb1e515cd53079c68/LICENSE",
+      "bytes": 1500,
+      "sha256": "5b95696b504e162bcf775060ec416005df9969a95cda6f7d4ddb57327dd74d35"
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "README.md",
+      "revision": "0ef3972f93e2baa4156ba1cbb1e515cd53079c68",
+      "url": "https://raw.githubusercontent.com/flutter/agent-plugins/0ef3972f93e2baa4156ba1cbb1e515cd53079c68/README.md",
+      "bytes": 4970,
+      "sha256": "dd4d6aa147deeb78efb318bb0fde117c870d847549acc4dbb81232a07a1d3fa5"
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "skills/flutter-apply-architecture-best-practices/SKILL.md",
+      "revision": "0ef3972f93e2baa4156ba1cbb1e515cd53079c68",
+      "url": "https://raw.githubusercontent.com/flutter/agent-plugins/0ef3972f93e2baa4156ba1cbb1e515cd53079c68/skills/flutter-apply-architecture-best-practices/SKILL.md",
+      "bytes": 6351,
+      "sha256": "00497869976a903c83f509a59d4b6a501d409fa711eb8e1f89945921e1983b65"
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "skills/flutter-build-responsive-layout/SKILL.md",
+      "revision": "0ef3972f93e2baa4156ba1cbb1e515cd53079c68",
+      "url": "https://raw.githubusercontent.com/flutter/agent-plugins/0ef3972f93e2baa4156ba1cbb1e515cd53079c68/skills/flutter-build-responsive-layout/SKILL.md",
+      "bytes": 6805,
+      "sha256": "c7a5d18071c625137cad2def9b13f3579d9bdf0aae29621a1825f12b560394c0"
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "skills/flutter-add-widget-test/SKILL.md",
+      "revision": "0ef3972f93e2baa4156ba1cbb1e515cd53079c68",
+      "url": "https://raw.githubusercontent.com/flutter/agent-plugins/0ef3972f93e2baa4156ba1cbb1e515cd53079c68/skills/flutter-add-widget-test/SKILL.md",
+      "bytes": 6381,
+      "sha256": "6c449ebd844e331e661b12630b6ad2a218e84d1bd8ea8377ba9dbd62ffe2798a"
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "skills/flutter-add-integration-test/SKILL.md",
+      "revision": "0ef3972f93e2baa4156ba1cbb1e515cd53079c68",
+      "url": "https://raw.githubusercontent.com/flutter/agent-plugins/0ef3972f93e2baa4156ba1cbb1e515cd53079c68/skills/flutter-add-integration-test/SKILL.md",
+      "bytes": 7342,
+      "sha256": "8d81b053c5fdf5b61aa7d0165cbc35e7a9a1c5bdcd7a301b8293a108771e6bab"
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": ".agents/agents/reidbaker-agent/skills/code-review/SKILL.md",
+      "revision": "0ef3972f93e2baa4156ba1cbb1e515cd53079c68",
+      "url": "https://raw.githubusercontent.com/flutter/agent-plugins/0ef3972f93e2baa4156ba1cbb1e515cd53079c68/.agents/agents/reidbaker-agent/skills/code-review/SKILL.md",
+      "bytes": 5475,
+      "sha256": "f6a4c1d40a8c823aa8c2dabbcc38303161819fe19342cc287c46211aecbbe59c"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": "LICENSE.md",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/LICENSE.md",
+      "bytes": 1075,
+      "sha256": "7b4f9149597fbae2ce689bc9317d1869e17f1b3fa5f01c289998c108f8c37cf7"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": "README.md",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/README.md",
+      "bytes": 1744,
+      "sha256": "8160b0f524022774bd29200e84faa6237daf0723d052e5fa33012cc124140df5"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/SKILL.md",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/SKILL.md",
+      "bytes": 4644,
+      "sha256": "3eeacd93123654b2a78caf3f839bda24299d5b2d2bab02f4a1491140d0d865eb"
+    },
+    {
+      "repo": "anthropics/skills",
+      "path": "README.md",
+      "revision": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/README.md",
+      "bytes": 5552,
+      "sha256": "2fb9c4cc026366ea6e21c60cb23c908a4d27c62071819cc06beffaac102d0694"
+    },
+    {
+      "repo": "anthropics/skills",
+      "path": "skills/frontend-design/SKILL.md",
+      "revision": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/frontend-design/SKILL.md",
+      "bytes": 9390,
+      "sha256": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3"
+    },
+    {
+      "repo": "anthropics/skills",
+      "path": "skills/frontend-design/LICENSE.txt",
+      "revision": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/frontend-design/LICENSE.txt",
+      "bytes": 10174,
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "repo": "anthropics/skills",
+      "path": "skills/webapp-testing/SKILL.md",
+      "revision": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/webapp-testing/SKILL.md",
+      "bytes": 3913,
+      "sha256": "51b7349e77ec63b7744a6f63647e7566a0b4d2e301121cc10e8c2113af6556a2"
+    },
+    {
+      "repo": "anthropics/skills",
+      "path": "skills/webapp-testing/LICENSE.txt",
+      "revision": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/webapp-testing/LICENSE.txt",
+      "bytes": 11345,
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    {
+      "repo": "vercel-labs/agent-skills",
+      "path": "README.md",
+      "revision": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "url": "https://raw.githubusercontent.com/vercel-labs/agent-skills/063bee94c3f4df8453406c830b0a7df0f2860278/README.md",
+      "bytes": 7838,
+      "sha256": "7c02f64b08fc6c4eef03c01d64f3e2ed478193ccfcbd14edba379abe23304651"
+    },
+    {
+      "repo": "vercel-labs/agent-skills",
+      "path": "skills/web-design-guidelines/SKILL.md",
+      "revision": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "url": "https://raw.githubusercontent.com/vercel-labs/agent-skills/063bee94c3f4df8453406c830b0a7df0f2860278/skills/web-design-guidelines/SKILL.md",
+      "bytes": 1231,
+      "sha256": "f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f"
+    },
+    {
+      "repo": "openai/skills",
+      "path": "README.md",
+      "revision": "49f948faa9258a0c61caceaf225e179651397431",
+      "url": "https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/README.md",
+      "bytes": 1840,
+      "sha256": "0f6a07580f3c627253e15a58dd0439e135049ec38eb16cf3587f7e50abc6f590"
+    },
+    {
+      "repo": "openai/skills",
+      "path": "skills/.curated/security-best-practices/SKILL.md",
+      "revision": "49f948faa9258a0c61caceaf225e179651397431",
+      "url": "https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/SKILL.md",
+      "bytes": 8612,
+      "sha256": "7b3dae1ffc5434d890f3c65c8f552af52d0307fab3b35dec13013c9ca3844c4f"
+    },
+    {
+      "repo": "openai/skills",
+      "path": "skills/.curated/security-best-practices/LICENSE.txt",
+      "revision": "49f948faa9258a0c61caceaf225e179651397431",
+      "url": "https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/LICENSE.txt",
+      "bytes": 10776,
+      "sha256": "4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9"
+    },
+    {
+      "repo": "openai/skills",
+      "path": "skills/.curated/security-threat-model/SKILL.md",
+      "revision": "49f948faa9258a0c61caceaf225e179651397431",
+      "url": "https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-threat-model/SKILL.md",
+      "bytes": 5561,
+      "sha256": "1283c0dd62a8104d9edda4583569b5d8510b4ddaa45120687c999250fd96bad2"
+    },
+    {
+      "repo": "openai/skills",
+      "path": "skills/.curated/security-threat-model/LICENSE.txt",
+      "revision": "49f948faa9258a0c61caceaf225e179651397431",
+      "url": "https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-threat-model/LICENSE.txt",
+      "bytes": 10776,
+      "sha256": "4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9"
+    },
+    {
+      "repo": "openai/skills",
+      "path": "skills/.curated/gh-fix-ci/SKILL.md",
+      "revision": "49f948faa9258a0c61caceaf225e179651397431",
+      "url": "https://raw.githubusercontent.com/openai/skills/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-fix-ci/SKILL.md",
+      "bytes": 3651,
+      "sha256": "7b326b4a2f0f5f85122144628ec02077e48841e0e0e82efce88b3415bcfb7c26"
+    },
+    {
+      "repo": "obra/superpowers",
+      "path": "LICENSE",
+      "revision": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "url": "https://raw.githubusercontent.com/obra/superpowers/8ca22dba9a94f28898bbce59f2537ff4d87c747d/LICENSE",
+      "bytes": 1070,
+      "sha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+    },
+    {
+      "repo": "obra/superpowers",
+      "path": "README.md",
+      "revision": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "url": "https://raw.githubusercontent.com/obra/superpowers/8ca22dba9a94f28898bbce59f2537ff4d87c747d/README.md",
+      "bytes": 14389,
+      "sha256": "04fd40756d26d5f2132ddfbc5c3c35335b02bb456197308975f9d12eaa522382"
+    },
+    {
+      "repo": "obra/superpowers",
+      "path": "skills/using-superpowers/SKILL.md",
+      "revision": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "url": "https://raw.githubusercontent.com/obra/superpowers/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/using-superpowers/SKILL.md",
+      "bytes": 3192,
+      "sha256": "82c5c8866ad7f5dd4440ce66bd7806ba48a2f13771beae5cf112e53f08fe36ba"
+    },
+    {
+      "repo": "obra/superpowers",
+      "path": "skills/test-driven-development/SKILL.md",
+      "revision": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "url": "https://raw.githubusercontent.com/obra/superpowers/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/test-driven-development/SKILL.md",
+      "bytes": 9578,
+      "sha256": "64b03fce4aee5a97a93160cea8111f3ba13a17b7c001db4bd5836d67fd10705d"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "path": "LICENSE",
+      "revision": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+      "url": "https://raw.githubusercontent.com/affaan-m/ECC/ef648e01899ba3e8dc6371642deaaf64b4477775/LICENSE",
+      "bytes": 1071,
+      "sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "path": "README.md",
+      "revision": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+      "url": "https://raw.githubusercontent.com/affaan-m/ECC/ef648e01899ba3e8dc6371642deaaf64b4477775/README.md",
+      "bytes": 106621,
+      "sha256": "d21d9a528ba5bf054ff4bd76940608da7ad1c53f6da167c19677af50364e4b5c"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "path": "skills/mysql-patterns/SKILL.md",
+      "revision": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+      "url": "https://raw.githubusercontent.com/affaan-m/ECC/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/mysql-patterns/SKILL.md",
+      "bytes": 12169,
+      "sha256": "cab57c6a6d7e0bab99329945edda900811c40ec929b47aa95611f9df58f7391d"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "path": "skills/laravel-patterns/SKILL.md",
+      "revision": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+      "url": "https://raw.githubusercontent.com/affaan-m/ECC/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/laravel-patterns/SKILL.md",
+      "bytes": 10664,
+      "sha256": "6fa9d96a7b944ef9775e2ecb93a56bc29d6219e34eb5af491792638fc5cb46b4"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "path": "skills/laravel-security/SKILL.md",
+      "revision": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+      "url": "https://raw.githubusercontent.com/affaan-m/ECC/ef648e01899ba3e8dc6371642deaaf64b4477775/skills/laravel-security/SKILL.md",
+      "bytes": 26556,
+      "sha256": "0440ddff450c63a9338f15b765ec35486f3f3266b321e0b27128faa3c29784fe"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "path": "hooks/hooks.json",
+      "revision": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+      "url": "https://raw.githubusercontent.com/affaan-m/ECC/ef648e01899ba3e8dc6371642deaaf64b4477775/hooks/hooks.json",
+      "bytes": 33225,
+      "sha256": "0375d4675abee59ff38a187e5df19db50b8795d962d4c735672f305094f558d9"
+    },
+    {
+      "repo": "affaan-m/ECC",
+      "path": "scripts/install.sh",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "path": "LICENSE",
+      "revision": "477bcb28c9812b385cb51a4605ddf30d7b2266e2",
+      "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/477bcb28c9812b385cb51a4605ddf30d7b2266e2/LICENSE",
+      "bytes": 1075,
+      "sha256": "738f69dfa83db5c347c678fb9d90e560877059f0de93a327c39001bff92dc014"
+    },
+    {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "path": "README.md",
+      "revision": "477bcb28c9812b385cb51a4605ddf30d7b2266e2",
+      "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/477bcb28c9812b385cb51a4605ddf30d7b2266e2/README.md",
+      "bytes": 37133,
+      "sha256": "13957904b9999d6e367ecbb13d4df1aeb0a945d84f2da8c69c3b22e0750d2d7f"
+    },
+    {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "path": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "revision": "477bcb28c9812b385cb51a4605ddf30d7b2266e2",
+      "url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/477bcb28c9812b385cb51a4605ddf30d7b2266e2/.claude/skills/ui-ux-pro-max/SKILL.md",
+      "bytes": 15969,
+      "sha256": "ea087c341bfb5b23195c7302027268ede86da802554c18a5c4896a6017b439f9"
+    },
+    {
+      "repo": "ComposioHQ/awesome-claude-skills",
+      "path": "README.md",
+      "revision": "be2a406907dbc61b73e6827ded415c96139d13a2",
+      "url": "https://raw.githubusercontent.com/ComposioHQ/awesome-claude-skills/be2a406907dbc61b73e6827ded415c96139d13a2/README.md",
+      "bytes": 40668,
+      "sha256": "e693f2701840f26fb04c3058d55215f2c6575fff7f1c197ada5b64e2f7ee0c12"
+    },
+    {
+      "repo": "ComposioHQ/awesome-claude-skills",
+      "path": "webapp-testing/SKILL.md",
+      "revision": "be2a406907dbc61b73e6827ded415c96139d13a2",
+      "url": "https://raw.githubusercontent.com/ComposioHQ/awesome-claude-skills/be2a406907dbc61b73e6827ded415c96139d13a2/webapp-testing/SKILL.md",
+      "bytes": 3913,
+      "sha256": "51b7349e77ec63b7744a6f63647e7566a0b4d2e301121cc10e8c2113af6556a2"
+    },
+    {
+      "repo": "ComposioHQ/awesome-claude-skills",
+      "path": "webapp-testing/LICENSE.txt",
+      "revision": "be2a406907dbc61b73e6827ded415c96139d13a2",
+      "url": "https://raw.githubusercontent.com/ComposioHQ/awesome-claude-skills/be2a406907dbc61b73e6827ded415c96139d13a2/webapp-testing/LICENSE.txt",
+      "bytes": 11357,
+      "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+    },
+    {
+      "repo": "OWASP/API-Security",
+      "path": "LICENSE",
+      "revision": "master",
+      "url": "https://raw.githubusercontent.com/OWASP/API-Security/master/LICENSE",
+      "bytes": 15883,
+      "sha256": "9cff5eeb59f0a5f06d7cbe4c2435e7bbbce4edaab1d97b66324104f60a527cb7"
+    },
+    {
+      "repo": "OWASP/API-Security",
+      "path": "README.md",
+      "revision": "master",
+      "url": "https://raw.githubusercontent.com/OWASP/API-Security/master/README.md",
+      "bytes": 2555,
+      "sha256": "7a641ef58a7a8375e8d729c834187544fec061b433f9f85c52fd20fde5810399"
+    },
+    {
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "LICENSE",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "README.md",
+      "revision": "master",
+      "url": "https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/README.md",
+      "bytes": 4114,
+      "sha256": "ed0df5d11a4e8ab9afcda66b3a77332fc57ba9f4bf0cf342ce68ef94938f0f05"
+    },
+    {
+      "repo": "google/eng-practices",
+      "path": "LICENSE",
+      "revision": "master",
+      "url": "https://raw.githubusercontent.com/google/eng-practices/master/LICENSE",
+      "bytes": 19466,
+      "sha256": "11dbf7126ae9794e4a7dc54334f3c82a67efcf22df888d396dc2ed707b2a3f9b"
+    },
+    {
+      "repo": "google/eng-practices",
+      "path": "README.md",
+      "revision": "master",
+      "url": "https://raw.githubusercontent.com/google/eng-practices/master/README.md",
+      "bytes": 1568,
+      "sha256": "fc8e999b9e95bc77c1b626fd9a22508cbc6341f15fd5b03da40787165d7298c8"
+    },
+    {
+      "repo": "mysql/mysql-server",
+      "path": "LICENSE",
+      "revision": "trunk",
+      "url": "https://raw.githubusercontent.com/mysql/mysql-server/trunk/LICENSE",
+      "bytes": 268084,
+      "sha256": "9ec6888641d8308596b984ed4902cd418ffc4b00990595357c857dea7742768e"
+    },
+    {
+      "repo": "mysql/mysql-server",
+      "path": "README.md",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "repo": "github/docs",
+      "path": "LICENSE",
+      "revision": "main",
+      "url": "https://raw.githubusercontent.com/github/docs/main/LICENSE",
+      "bytes": 18620,
+      "sha256": "12d3a82a7d1378e6f597ec23d63a081aeb6ec4bc8de2a76ee9dc96c34c6d7a1b"
+    },
+    {
+      "repo": "github/docs",
+      "path": "README.md",
+      "revision": "main",
+      "url": "https://raw.githubusercontent.com/github/docs/main/README.md",
+      "bytes": 2279,
+      "sha256": "1adc06cb1008208c356da0982fc8b81ee6d006695aae02f8464370ad87d78a5d"
+    },
+    {
+      "repo": "w3c/wcag",
+      "path": "LICENSE.md",
+      "revision": "main",
+      "url": "https://raw.githubusercontent.com/w3c/wcag/main/LICENSE.md",
+      "bytes": 155,
+      "sha256": "7a3ad7d36b8855bc301276279769da4aff648ea5d7b92f3f023c0823ee948764"
+    },
+    {
+      "repo": "w3c/wcag",
+      "path": "README.md",
+      "revision": "main",
+      "url": "https://raw.githubusercontent.com/w3c/wcag/main/README.md",
+      "bytes": 21432,
+      "sha256": "fa2a43e2fa8e43fade0313289807eb11882d59c7c82e5cd76e8eaa8f640397ae"
+    },
+    {
+      "repo": "agentskills/agentskills",
+      "path": "LICENSE",
+      "revision": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "url": "https://raw.githubusercontent.com/agentskills/agentskills/69ef37e9424c0a7ea9dd2293b559e43ec8176379/LICENSE",
+      "bytes": 11344,
+      "sha256": "993da3f8d330d69108e521636555f7783ef81d46b904394c59ec5ff651331fe5"
+    },
+    {
+      "repo": "agentskills/agentskills",
+      "path": "docs/LICENSE",
+      "revision": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "url": "https://raw.githubusercontent.com/agentskills/agentskills/69ef37e9424c0a7ea9dd2293b559e43ec8176379/docs/LICENSE",
+      "bytes": 18656,
+      "sha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94"
+    },
+    {
+      "repo": "agentskills/agentskills",
+      "path": "README.md",
+      "revision": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "url": "https://raw.githubusercontent.com/agentskills/agentskills/69ef37e9424c0a7ea9dd2293b559e43ec8176379/README.md",
+      "bytes": 3361,
+      "sha256": "7ff4a9a612ab21189aa793fd43223bd854280a122ac12ce29f5bea84d5930a1d"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/rules/architecture.md",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/rules/architecture.md",
+      "bytes": 6272,
+      "sha256": "ec19c18c0d0774faa2f5da57722d17b1a6f10956520c419c4571a6a2cdffa5a7"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/rules/db-performance.md",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/rules/db-performance.md",
+      "bytes": 5535,
+      "sha256": "2e05ae18996de4514212d9b7e77cf65c0b8c4de13ebe5c213701f5ce26afd2fc"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/rules/http-client.md",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/rules/http-client.md",
+      "bytes": 4553,
+      "sha256": "4b99d3b1c4f9dac702658b2c26e6886a9b0f6ca6857dd8eaab1ea40dc16d160a"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/rules/routing.md",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/rules/routing.md",
+      "bytes": 3831,
+      "sha256": "5bbfd27366142e5a45f744c7853490ed92e0025de4f51f98e33a9010ce378751"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/rules/validation.md",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/rules/validation.md",
+      "bytes": 2977,
+      "sha256": "ab44a92d44b320f9a64986d336aff83b39182a87f6839cc1227d201eb19d4124"
+    },
+    {
+      "repo": "anthropics/skills",
+      "path": "THIRD_PARTY_NOTICES.md",
+      "revision": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/THIRD_PARTY_NOTICES.md",
+      "bytes": 46162,
+      "sha256": "a8ff7a84dee9dfb42ab448de281784387ceafdf63881b7c070ee2de7f6ed865c"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/rules/security.blade.php",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/rules/security.blade.php",
+      "bytes": 5967,
+      "sha256": "3b11c1f60eae46c6d95b9cee5a77ee6dd306d8079a12a0ad61dcd616a231dedc"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/rules/config.blade.php",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/rules/config.blade.php",
+      "bytes": 2137,
+      "sha256": "5c7af611fef14b138b4e67752c69813bfae9836e2662c7cad8717d381b858fb4"
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices/rules/migrations.blade.php",
+      "revision": "97b8da0cb8c2c1da75531a36e34adaa313a64afc",
+      "url": "https://raw.githubusercontent.com/laravel/boost/97b8da0cb8c2c1da75531a36e34adaa313a64afc/.ai/laravel/skill/laravel-best-practices/rules/migrations.blade.php",
+      "bytes": 3630,
+      "sha256": "27638b0e642911c0839fd4cd6eababc9e2e658cc6cbee2bddf6b34f36805dd28"
+    }
+  ],
+  "content_history": [
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "skills/flutter-apply-architecture-best-practices/SKILL.md",
+      "commits": [
+        {
+          "sha": "c10b79904dd9fadb75173c9afb9026bb464ab550",
+          "date": "2026-04-21T20:13:39Z",
+          "message": "Add flutter-apply-architecture-best-practices skill",
+          "url": "https://github.com/flutter/agent-plugins/commit/c10b79904dd9fadb75173c9afb9026bb464ab550"
+        }
+      ]
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "skills/flutter-build-responsive-layout/SKILL.md",
+      "commits": [
+        {
+          "sha": "f1fa13bd4639204c0cff16af6b30468818d4744e",
+          "date": "2026-04-21T20:19:45Z",
+          "message": "Add flutter-build-responsive-layout skill",
+          "url": "https://github.com/flutter/agent-plugins/commit/f1fa13bd4639204c0cff16af6b30468818d4744e"
+        }
+      ]
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": "skills/flutter-add-widget-test/SKILL.md",
+      "commits": [
+        {
+          "sha": "f289b7791b1ea68296f236109ea32996ea32f847",
+          "date": "2026-04-21T21:18:22Z",
+          "message": "Add flutter-add-widget-test skill",
+          "url": "https://github.com/flutter/agent-plugins/commit/f289b7791b1ea68296f236109ea32996ea32f847"
+        }
+      ]
+    },
+    {
+      "repo": "flutter/agent-plugins",
+      "path": ".agents/agents/reidbaker-agent/skills/code-review/SKILL.md",
+      "commits": [
+        {
+          "sha": "7712f53ba36c17c9cb022fda163d839727d26962",
+          "date": "2026-05-11T18:16:50Z",
+          "message": "Remove the writing style skill and use gregs natural-writing skill instead",
+          "url": "https://github.com/flutter/agent-plugins/commit/7712f53ba36c17c9cb022fda163d839727d26962"
+        },
+        {
+          "sha": "2e7dafeda5ba22bf7e15ee4a25222171820133ae",
+          "date": "2026-05-11T14:10:36Z",
+          "message": "Add writing style and update code-review skills to use it",
+          "url": "https://github.com/flutter/agent-plugins/commit/2e7dafeda5ba22bf7e15ee4a25222171820133ae"
+        },
+        {
+          "sha": "143a383eb01180c5bb4e9d5fdbf24d8dd9fb6e81",
+          "date": "2026-05-08T22:50:24Z",
+          "message": "Inital attempt to have custom agents",
+          "url": "https://github.com/flutter/agent-plugins/commit/143a383eb01180c5bb4e9d5fdbf24d8dd9fb6e81"
+        }
+      ]
+    },
+    {
+      "repo": "laravel/boost",
+      "path": ".ai/laravel/skill/laravel-best-practices",
+      "commits": [
+        {
+          "sha": "7f8f0456664e109e6d2a0c800b72da01b8473cd6",
+          "date": "2026-09-30T16:26:20Z",
+          "message": "Render Best Practice guidelines and skill commands with Sail's executable when needed (#1046)",
+          "url": "https://github.com/laravel/boost/commit/7f8f0456664e109e6d2a0c800b72da01b8473cd6"
+        },
+        {
+          "sha": "d9565ca01bd589244f917916cfff7fbf9786f8ae",
+          "date": "2026-09-14T15:10:16Z",
+          "message": "Use scanner-safe placeholders in config skill example (#1027)",
+          "url": "https://github.com/laravel/boost/commit/d9565ca01bd589244f917916cfff7fbf9786f8ae"
+        },
+        {
+          "sha": "18376b1e8c79d1afe99226d7fe243be5f13c3aa0",
+          "date": "2026-09-04T17:09:31Z",
+          "message": "docs(skills): align action examples to use handle (#999)",
+          "url": "https://github.com/laravel/boost/commit/18376b1e8c79d1afe99226d7fe243be5f13c3aa0"
+        }
+      ]
+    },
+    {
+      "repo": "anthropics/skills",
+      "path": "skills/frontend-design/SKILL.md",
+      "commits": [
+        {
+          "sha": "41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f",
+          "date": "2026-09-03T16:37:13Z",
+          "message": "Update frontend-design skill to avoid generic design defaults (#1713)",
+          "url": "https://github.com/anthropics/skills/commit/41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f"
+        },
+        {
+          "sha": "2235be7c60b551f5de82ade908fd3816455afcda",
+          "date": "2026-06-09T19:33:41Z",
+          "message": "Update frontend-design skill (#1293)",
+          "url": "https://github.com/anthropics/skills/commit/2235be7c60b551f5de82ade908fd3816455afcda"
+        },
+        {
+          "sha": "00756142ab04c82a447693cf373c4e0c554d1005",
+          "date": "2025-12-04T17:01:46Z",
+          "message": "Add doc-coauthoring skill and update example skills (#134)",
+          "url": "https://github.com/anthropics/skills/commit/00756142ab04c82a447693cf373c4e0c554d1005"
+        }
+      ]
+    },
+    {
+      "repo": "openai/skills",
+      "path": "skills/.curated/security-threat-model/SKILL.md",
+      "commits": [
+        {
+          "sha": "5c8f1e26803bcfaffeceef1e7accbcf7e388417a",
+          "date": "2026-02-02T15:58:27Z",
+          "message": "Add security best-practices, ownership-map, and threat-model skills (#83)",
+          "url": "https://github.com/openai/skills/commit/5c8f1e26803bcfaffeceef1e7accbcf7e388417a"
+        }
+      ]
+    },
+    {
+      "repo": "openai/skills",
+      "path": "skills/.curated/gh-fix-ci/SKILL.md",
+      "commits": [
+        {
+          "sha": "33a75a7b572867072dc0674bee8e63e06c19e67b",
+          "date": "2026-01-30T18:34:32Z",
+          "message": "Sync curated skills! (#64)",
+          "url": "https://github.com/openai/skills/commit/33a75a7b572867072dc0674bee8e63e06c19e67b"
+        },
+        {
+          "sha": "5a9bb4cbe6d79d44aa619c70edbfa1654358f69c",
+          "date": "2025-12-19T22:10:04Z",
+          "message": "Make GitHub CLI auth guidance public-friendly in curated skills (#19)",
+          "url": "https://github.com/openai/skills/commit/5a9bb4cbe6d79d44aa619c70edbfa1654358f69c"
+        },
+        {
+          "sha": "b37577b57f8f081bc9e482ea2d555844792f29cd",
+          "date": "2025-12-19T17:44:24Z",
+          "message": "Add licenses and short descriptions to gh skills (#17)",
+          "url": "https://github.com/openai/skills/commit/b37577b57f8f081bc9e482ea2d555844792f29cd"
+        }
+      ]
+    },
+    {
+      "repo": "OWASP/API-Security",
+      "path": "2023/en/src/0x11-t10.md",
+      "commits": []
+    },
+    {
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/REST_Security_Cheat_Sheet.md",
+      "commits": [
+        {
+          "sha": "e09aa4281bc34720d47a7054569ead47e39f437b",
+          "date": "2026-10-04T20:43:58Z",
+          "message": "Clarify the HTTP cache scope of no-store (#2702)",
+          "url": "https://github.com/OWASP/CheatSheetSeries/commit/e09aa4281bc34720d47a7054569ead47e39f437b"
+        },
+        {
+          "sha": "e2529d7129a854bd78073571cce3d6b65a3de087",
+          "date": "2026-10-04T20:30:28Z",
+          "message": "Correct the HTTP 405 status label (#2691)",
+          "url": "https://github.com/OWASP/CheatSheetSeries/commit/e2529d7129a854bd78073571cce3d6b65a3de087"
+        },
+        {
+          "sha": "91a83778e06dbc99afb4609df53db168071276c2",
+          "date": "2026-10-04T19:44:14Z",
+          "message": "State HSTS certificate and bootstrap limitations (#2630)",
+          "url": "https://github.com/OWASP/CheatSheetSeries/commit/91a83778e06dbc99afb4609df53db168071276c2"
+        }
+      ]
+    },
+    {
+      "repo": "github/docs",
+      "path": "content/actions/reference/security/secure-use.md",
+      "commits": [
+        {
+          "sha": "c008b66a92206bee5fbbad54ffbbde60451fb1f5",
+          "date": "2026-09-29T07:20:00Z",
+          "message": "Deprecate GitHub Enterprise Server 3.17 (#63577)",
+          "url": "https://github.com/github/docs/commit/c008b66a92206bee5fbbad54ffbbde60451fb1f5"
+        },
+        {
+          "sha": "071ed75ada2d9e80348639adfc7cca5b3902ed16",
+          "date": "2026-07-24T14:37:43Z",
+          "message": "Fix broken anchor links in Actions (#62404)",
+          "url": "https://github.com/github/docs/commit/071ed75ada2d9e80348639adfc7cca5b3902ed16"
+        },
+        {
+          "sha": "2dc8adcfe8247b8d95f6174937d75c83b960e7eb",
+          "date": "2026-07-16T15:25:48Z",
+          "message": "Update redirected internal links in actions (reference (part 1)) (#62140)",
+          "url": "https://github.com/github/docs/commit/2dc8adcfe8247b8d95f6174937d75c83b960e7eb"
+        }
+      ]
+    },
+    {
+      "repo": "vercel-labs/agent-skills",
+      "path": "skills/web-design-guidelines/SKILL.md",
+      "commits": [
+        {
+          "sha": "ba46938889d4e58635362fb8f618e1178ac3ec46",
+          "date": "2026-01-16T23:47:11Z",
+          "message": "Fix SKILL.md frontmatter formatting for web-design-guidelines (#28)",
+          "url": "https://github.com/vercel-labs/agent-skills/commit/ba46938889d4e58635362fb8f618e1178ac3ec46"
+        },
+        {
+          "sha": "42ecbef87d26daa782f5ee8c77b91e149228e9de",
+          "date": "2026-01-15T18:09:40Z",
+          "message": "Add versioning and sync the version with the build/validate script (#24)",
+          "url": "https://github.com/vercel-labs/agent-skills/commit/42ecbef87d26daa782f5ee8c77b91e149228e9de"
+        },
+        {
+          "sha": "9e2435e972fa6cca879e49aea0004028be138b40",
+          "date": "2026-01-14T20:36:13Z",
+          "message": "Rename vercel-design-guidelines to web-design-guidelines",
+          "url": "https://github.com/vercel-labs/agent-skills/commit/9e2435e972fa6cca879e49aea0004028be138b40"
+        }
+      ]
+    }
+  ],
+  "installed_skills": [
+    {
+      "path": "frontend/intentional-frontend-design",
+      "name": "Intentional frontend design",
+      "category": "Frontend Engineering",
+      "repo": "anthropics/skills",
+      "kind": "Adapted upstream skill",
+      "author": "Anthropic; adapted by Coffee Management System maintainers",
+      "license": "Apache-2.0",
+      "source_paths": [
+        "skills/frontend-design/SKILL.md"
+      ],
+      "date": "2026-09-03: substantive frontend-design revision",
+      "why": "A reputable, script-free design workflow. Scoped to explicitly requested custom web surfaces so it cannot replace Flutter or add React.",
+      "changes": "Renamed and narrowed; removed design-studio/client assumptions and mandatory novelty/two-pass rules; added existing-stack and POS usability constraints.",
+      "refs": [
+        [
+          "Agent Skills specification",
+          "https://agentskills.io/specification"
+        ]
+      ]
+    },
+    {
+      "path": "flutter/feature-first-flutter",
+      "name": "Feature-first Flutter",
+      "category": "Flutter / Mobile Development",
+      "repo": "flutter/agent-plugins",
+      "kind": "Adapted upstream skills",
+      "author": "The Flutter Authors; adapted by Coffee Management System maintainers",
+      "license": "BSD-3-Clause",
+      "source_paths": [
+        "skills/flutter-apply-architecture-best-practices/SKILL.md",
+        "skills/flutter-build-responsive-layout/SKILL.md"
+      ],
+      "date": "2026-04-21: architecture/layout skill additions; repository remains active",
+      "why": "Official Flutter separation-of-concerns and constraint-based layout guidance directly fits phone/tablet POS work.",
+      "changes": "Preserved project feature-first data/domain/presentation layout; removed mandatory ChangeNotifier, code generation and DI-package choices, model metadata and unsafe example caching assumptions; added SDK-version/state-lifecycle checks.",
+      "refs": [
+        [
+          "Flutter architecture recommendations",
+          "https://docs.flutter.dev/app-architecture/recommendations"
+        ],
+        [
+          "Adaptive layouts",
+          "https://docs.flutter.dev/ui/adaptive-responsive/general"
+        ]
+      ]
+    },
+    {
+      "path": "laravel/laravel-rest-api",
+      "name": "Laravel REST API",
+      "category": "Backend Engineering / Laravel / REST API",
+      "repo": "laravel/boost",
+      "kind": "Adapted upstream skill and rules",
+      "author": "Laravel / Taylor Otwell; adapted by Coffee Management System maintainers",
+      "license": "MIT",
+      "source_paths": [
+        ".ai/laravel/skill/laravel-best-practices/SKILL.md",
+        ".ai/laravel/skill/laravel-best-practices/rules/architecture.md",
+        ".ai/laravel/skill/laravel-best-practices/rules/security.blade.php",
+        ".ai/laravel/skill/laravel-best-practices/rules/validation.md",
+        ".ai/laravel/skill/laravel-best-practices/rules/routing.md",
+        ".ai/laravel/skill/laravel-best-practices/rules/config.blade.php",
+        ".ai/laravel/skill/laravel-best-practices/rules/db-performance.md",
+        ".ai/laravel/skill/laravel-best-practices/rules/migrations.blade.php",
+        ".ai/laravel/skill/laravel-best-practices/rules/http-client.md"
+      ],
+      "date": "2026-09-30: relevant skill-subtree command/template maintenance; 2026-09-04: action-example revision",
+      "why": "Framework-maintainer guidance covers actual Laravel boundaries without a generic repository layer. Useful validation, authorization, query and provider rules.",
+      "changes": "Removed search-docs/MCP assumptions, Blade template execution and uninstalled skill links; condensed rules to versioned REST conventions and existing Services layout. No Boost package or generator installed.",
+      "refs": [
+        [
+          "Laravel 13 validation",
+          "https://laravel.com/framework/docs/13.x/validation"
+        ],
+        [
+          "Laravel Sanctum",
+          "https://laravel.com/framework/docs/13.x/sanctum"
+        ],
+        [
+          "Laravel rate limiting",
+          "https://laravel.com/framework/docs/13.x/rate-limiting"
+        ]
+      ]
+    },
+    {
+      "path": "database/mysql-design",
+      "name": "MySQL design",
+      "category": "MySQL / Database Architecture",
+      "repo": "mysql/mysql-server",
+      "kind": "Original project skill; documentation references only",
+      "author": "Coffee Management System maintainers; references by Oracle/MySQL and Laravel",
+      "license": "MIT (original project text only)",
+      "source_paths": [],
+      "date": "Local skill created 2026-10-05. Exact manual-page meaningful update unavailable; server repository push is not a manual update.",
+      "why": "Version-aware schema/query/transaction decisions fit MySQL and financial invariants better than bulk imported database recipes.",
+      "changes": "Written for this monorepo; no upstream skill, manual excerpt, SQL account-management script or MySQL code vendored.",
+      "refs": [
+        [
+          "MySQL InnoDB transactions",
+          "https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-model.html"
+        ],
+        [
+          "MySQL exact numeric types",
+          "https://dev.mysql.com/doc/refman/8.0/en/fixed-point-types.html"
+        ],
+        [
+          "MySQL index design",
+          "https://dev.mysql.com/doc/refman/8.0/en/optimization-indexes.html"
+        ],
+        [
+          "Project database contract",
+          "../../../docs/database/README.md"
+        ]
+      ]
+    },
+    {
+      "path": "ux-ui/accessible-cambodian-pos",
+      "name": "Accessible Cambodian POS",
+      "category": "UX/UI Design / Accessibility",
+      "repo": "w3c/wcag",
+      "kind": "Original project skill; documentation references only",
+      "author": "Coffee Management System maintainers; references by W3C, Flutter Authors and National Bank of Cambodia",
+      "license": "MIT (original project text only)",
+      "source_paths": [],
+      "date": "Local skill created 2026-10-05. Normative reference is WCAG 2.2; upstream repository activity is tracked separately.",
+      "why": "Operational cashier UX, Khmer script and accessibility need a small local acceptance workflow rather than a generic style-generator database.",
+      "changes": "Local ergonomic/device scenarios and product decision boundaries. No copied WCAG/Flutter/NBC text, font, image, executable design search or final Khmer translation.",
+      "refs": [
+        [
+          "WCAG 2.2",
+          "https://www.w3.org/TR/WCAG22/"
+        ],
+        [
+          "Flutter accessibility",
+          "https://docs.flutter.dev/ui/accessibility"
+        ],
+        [
+          "Flutter internationalization",
+          "https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization"
+        ],
+        [
+          "NBC payment reference",
+          "https://bakong.nbc.gov.kh/en/download/KHQR/integration/QR%20Payment%20Integration.pdf"
+        ]
+      ]
+    },
+    {
+      "path": "architecture/practical-system-design",
+      "name": "Practical system design",
+      "category": "Software Architecture / Clean Architecture",
+      "repo": "laravel/boost",
+      "kind": "Original project skill; documentation references only",
+      "author": "Coffee Management System maintainers; references by Flutter and Laravel",
+      "license": "MIT (original project text only)",
+      "source_paths": [],
+      "date": "Local skill created 2026-10-05; no independently maintained upstream skill is claimed.",
+      "why": "Owns cross-app decisions, transactions/durability and failure boundaries while Flutter/Laravel skills own implementation details.",
+      "changes": "Original decision workflow respecting the current architecture; avoids hypothetical tenancy, offline POS and distributed systems.",
+      "refs": [
+        [
+          "Project architecture",
+          "../../../docs/architecture/README.md"
+        ],
+        [
+          "Flutter architecture recommendations",
+          "https://docs.flutter.dev/app-architecture/recommendations"
+        ],
+        [
+          "Laravel service container",
+          "https://laravel.com/framework/docs/13.x/container"
+        ]
+      ]
+    },
+    {
+      "path": "architecture/evidence-code-review",
+      "name": "Evidence-based code review",
+      "category": "Code Review",
+      "repo": "flutter/agent-plugins",
+      "kind": "Adapted upstream review workflow",
+      "author": "Flutter agent-plugins contributors (Reid Baker agent workflow); adapted by Coffee Management System maintainers",
+      "license": "BSD-3-Clause",
+      "source_paths": [
+        ".agents/agents/reidbaker-agent/skills/code-review/SKILL.md"
+      ],
+      "date": "2026-05-08: core review workflow added; 2026-05-11: related writing-reference maintenance",
+      "why": "An evidence/context/self-critique review loop helps produce actionable findings without generic praise or unsupported security claims.",
+      "changes": "Removed vendor artifact paths and uninstalled companion skills; relaxed changed-line-only restriction where impact depends on unchanged code; added staging preservation and explicit authorization before publishing reviews.",
+      "refs": [
+        [
+          "Project contribution rules",
+          "../../../docs/project/contributing.md"
+        ]
+      ]
+    },
+    {
+      "path": "testing/risk-based-qa",
+      "name": "Risk-based QA",
+      "category": "Testing / QA",
+      "repo": "flutter/agent-plugins",
+      "kind": "Adapted upstream widget-test workflow",
+      "author": "The Flutter Authors; adapted by Coffee Management System maintainers",
+      "license": "BSD-3-Clause",
+      "source_paths": [
+        "skills/flutter-add-widget-test/SKILL.md"
+      ],
+      "date": "2026-04-21: widget-test skill added; source workflow stable in an active repository",
+      "why": "Official widget interaction/testing guidance plus local negative-case matrix covers high-impact auth/payment/stock/UI defects.",
+      "changes": "Added Laravel/MySQL/provider isolation, explicit pumping and realistic risk selection. The separately inspected integration skill was not installed: mandatory Flutter Driver extension, MCP tools and broad pumpAndSettle use were removed in favor of version-aware official integration docs.",
+      "refs": [
+        [
+          "Flutter testing overview",
+          "https://docs.flutter.dev/testing/overview"
+        ],
+        [
+          "Flutter integration testing",
+          "https://docs.flutter.dev/testing/integration-tests"
+        ],
+        [
+          "Laravel HTTP tests",
+          "https://laravel.com/framework/docs/13.x/http-tests"
+        ],
+        [
+          "Project verification",
+          "../../../docs/project/verification.md"
+        ]
+      ]
+    },
+    {
+      "path": "devops/safe-ci-maintenance",
+      "name": "Safe CI maintenance",
+      "category": "DevOps / CI/CD",
+      "repo": "github/docs",
+      "kind": "Original project skill; documentation references only",
+      "author": "Coffee Management System maintainers; references by GitHub",
+      "license": "MIT (original project text only)",
+      "source_paths": [],
+      "date": "Local skill created 2026-10-05. Latest inspected GitHub page history was link/version maintenance; exact last substantive security-text edit not established.",
+      "why": "Least-privilege CI, lockfile reproducibility, runner diagnosis and no live-provider tests match the current GitHub team workflow.",
+      "changes": "Original guidance; no gh-fix-ci Python helper, mandatory approval-plan loop, GitHub credential scopes or deployment provider added.",
+      "refs": [
+        [
+          "GitHub Actions secure use",
+          "https://docs.github.com/en/actions/reference/security/secure-use"
+        ],
+        [
+          "Current pipeline",
+          "../../../.github/workflows/ci.yml"
+        ]
+      ]
+    },
+    {
+      "path": "git/preserve-git-workflow",
+      "name": "Preserve Git workflow",
+      "category": "Git / GitHub Workflow",
+      "repo": "github/docs",
+      "kind": "Original project skill; documentation references only",
+      "author": "Coffee Management System maintainers; references by GitHub",
+      "license": "MIT (original project text only)",
+      "source_paths": [],
+      "date": "Local skill created 2026-10-05; documentation meaningful update not independently established.",
+      "why": "User staging, one root repository, focused review and explicit publication boundaries are more relevant than bulk Git automation.",
+      "changes": "Original workflow referencing GitHub flow; no shell helpers, aggressive cleanup commands, hooks or automatic commit/push instructions.",
+      "refs": [
+        [
+          "GitHub flow",
+          "https://docs.github.com/en/get-started/using-github/github-flow"
+        ],
+        [
+          "Project contribution rules",
+          "../../../docs/project/contributing.md"
+        ]
+      ]
+    },
+    {
+      "path": "cybersecurity/api-payment-security",
+      "name": "API and payment security",
+      "category": "Cybersecurity / API Security / OWASP / Secure Coding / KHQR",
+      "repo": "openai/skills",
+      "kind": "Adapted upstream threat-model workflow with local domain checks",
+      "author": "OpenAI; adapted by Coffee Management System maintainers. Reference authors: OWASP and National Bank of Cambodia",
+      "license": "Apache-2.0",
+      "source_paths": [
+        "skills/.curated/security-threat-model/SKILL.md"
+      ],
+      "date": "2026-02-02: threat-model workflow added; stable source in an active repository. Local adaptation created 2026-10-05.",
+      "why": "Language-neutral, evidence-based threat modeling fits PHP/Dart better than OpenAI's language-limited security-best-practices skill; local API/KHQR checks address the highest-impact boundaries.",
+      "changes": "Removed Codex-specific reference/output dependencies and unconditional user-confirmation pause. Added bounded passive review, OWASP-linked endpoint checks and provider-neutral payment invariants without assuming signed callbacks or current endpoints.",
+      "refs": [
+        [
+          "OWASP API Top 10 (2023)",
+          "https://api-security.owasp.org/editions/2023/en/0x11-t10/"
+        ],
+        [
+          "OWASP REST security",
+          "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html"
+        ],
+        [
+          "OWASP authentication",
+          "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+        ],
+        [
+          "OWASP secrets management",
+          "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html"
+        ],
+        [
+          "NBC QR payment integration",
+          "https://bakong.nbc.gov.kh/en/download/KHQR/integration/QR%20Payment%20Integration.pdf"
+        ],
+        [
+          "NBC KHQR implementation guide",
+          "https://bakong.nbc.gov.kh/en/download/KHQR%20SDK.pdf"
+        ]
+      ]
+    }
+  ]
+}
