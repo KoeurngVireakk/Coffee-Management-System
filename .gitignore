@@ -1,0 +1,35 @@
+# Local configuration and secrets. Keep safe examples.
+.env
+.env.*
+!.env.example
+!.env.*.example
+auth.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+key.properties
+
+# Dependencies, caches, and generated output.
+**/vendor/
+**/node_modules/
+**/.dart_tool/
+**/.pub-cache/
+**/build/
+**/coverage/
+*.log
+
+# Local editor / operating system files.
+.idea/
+.vscode/
+*.iml
+*.swp
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local browser verification artifacts.
+/.playwright-cli/
+/output/playwright/

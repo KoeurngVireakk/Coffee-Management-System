@@ -1,0 +1,16 @@
+name: Bug report
+description: Report a reproducible problem.
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and reproduction
+      description: Include expected behavior, actual behavior, and steps to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: App, branch, SDK versions, device, and sanitized logs. Omit secrets.

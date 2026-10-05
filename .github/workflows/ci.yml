@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/backend
+    services:
+      mysql:
+        image: mysql:8.0
+        # Disposable runner-local database; these are not application credentials.
+        env:
+          MYSQL_DATABASE: coffee_management_ci
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: coffee_management_ci
+      DB_USERNAME: root
+      DB_PASSWORD: ""
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, dom, fileinfo, pdo_mysql, pdo_sqlite, sqlite3, curl, zip
+          coverage: none
+          tools: composer:v2
+      - name: Install locked dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Configure isolated CI environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+      - name: Validate dependency manifest
+        run: composer validate --strict
+      - name: Check PHP formatting
+        run: composer lint
+      - name: Verify default migrations on MySQL
+        run: |
+          php artisan migrate --force
+          php artisan migrate:status
+      - name: Run bootstrap tests
+        run: composer test
+
+  mobile:
+    name: Mobile checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.6"
+          channel: stable
+          cache: true
+      - name: Install locked dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Check Dart formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Analyze Dart
+        run: flutter analyze
+      - name: Run shell test
+        run: flutter test
+      - name: Build web target
+        run: flutter build web
+      - name: Build debug Android APK
+        run: flutter build apk --debug
