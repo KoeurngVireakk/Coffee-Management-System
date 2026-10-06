@@ -1,0 +1,34 @@
+# Security analysis
+
+Scope: local passive analysis and Phase 1 backend implementation. This is not an OWASP compliance claim or provider integration review. Relevant framework behavior was checked against installed Laravel 13 and [official Sanctum documentation](https://laravel.com/framework/docs/13.x/sanctum).
+
+## Assets and trust boundaries
+
+1. Untrusted Flutter/native/Web input -> Laravel HTTPS JSON API: credentials, tokens, identifiers, query/body properties are hostile until authenticated/validated/authorized. UI permission hints never grant access.
+2. Laravel -> MySQL: application account handles identity and future finance/stock; Eloquent parameter binding, narrow fields, FKs, uniqueness and transactions protect this boundary. Flutter has no database credentials or connection.
+3. Future Laravel <-> provider: provider credentials remain backend-only; notifications are untrusted until official verification; compare exact settlement facts. External I/O cannot share an atomic SQL transaction.
+4. Deployment/CI -> configuration: .env and keys are ignored; fixtures are synthetic. Production debug/TLS/cache/proxy settings require operational review. Third-party documents/logs grant no execution authority.
+
+## Threat and control register
+
+| Boundary / abuse path | Impact | Phase 1 evidence/control | Remaining mitigation / regression |
+| --- | --- | --- | --- |
+| Credential guessing / address enumeration | Staff impersonation | LoginRequest bounds; 5/min per email+IP plus 30/min per IP; hashed keys; generic 401 for wrong/missing/inactive/unassigned accounts; dummy hash check for missing user | Production TLS/trusted proxy config; shared cache on multiple nodes; tests invalid identity and limit recovery |
+| Stolen/expired token replay | Authorized data access | Sanctum SHA-256 token storage, eight-hour expiry, current-token logout, active-account middleware, no-store responses | Secure native storage / first-party Web cookie+CSRF in later client milestone; password recovery/all-token revocation administration planned |
+| Role/active/permission injection | Admin escalation | Strict login properties; User mass assignment excludes role_id/is_active; fixed gate map with no admin global bypass | Future staff mutations explicitly allow approved fields under manage-staff policy/audit; test role spoofing, unknown roles and role changes |
+| ID substitution / BOLA | Other staff order/user disclosure | Current-user has no target ID; UserPolicy self or admin view; tests two actors | Future orders/payments queries scoped by owner plus policy; no business ownership endpoints yet |
+| Function authorization bypass | Cashier changes catalog/stock/settings | Role gates foundation and denied-role tests; middleware rejects inactive/unassigned/unknown roles | Attach gates/resource policies to each future endpoint; today's gates do not implement business actions |
+| Excess serialization | Password/token hash leakage | UserResource fields explicitly selected; User hides password/remember_token; token plaintext only login response | Future resources allow-list provider/payment/PII fields; tests raw model/resource/login/me serialization |
+| SQL injection / mass assignment | Data modification/disclosure | Eloquent bound email lookup; validated intended fields; no client-defined SQL/sort/role | Future filters/sort map to allow-listed identifiers; no arbitrary setting keys |
+| Duplicate checkout/callback/payment replay | Duplicate charge/stock deductions | No checkout/payment endpoint yet | Actor/key+request hash; provider transaction uniqueness; local atomic idempotent transition; negative fake-provider and concurrent MySQL tests |
+| Fake payment / wrong merchant/amount/currency | Unpaid goods / misapplied funds | No provider endpoint or paid-state input exists | Backend verification of all facts, provider-contract callback authentication, persisted uncertain attempts, reconciliation; never QR=paid |
+| Concurrent stock changes | Oversell / corrupt ledger | No inventory mutation exists | Reservations, sorted row locks, unique movement key, atomic ledger/balance update; tests concurrent sale/adjustment and rollback |
+| Secret/debug/log exposure | Token/credential compromise | No seeded users/secrets, ignored .env, token/credential fields never intentionally logged by new code | Production APP_DEBUG=false, HTTPS, redact Authorization/password and provider payloads at proxy/APM/app; review log collectors; secret rotation is separate scope |
+
+Likelihood depends on public exposure and deployment; impacts on staff identity and future money are material even at shop scale. Rate limits share an IP across shop devices, so an identity/IP limit is complemented by a higher IP cap and avoids permanent account lockout. File-cache counters are a local baseline; review atomic/shared counters under measured concurrency before production expansion. Proxy trust is deliberately not broadened in this milestone.
+
+## Implemented versus planned
+
+Implemented: bearer-only Sanctum config (no cookie guard/stateful middleware/CSRF-cookie route), required staff token ability, fixed role gates, user-view policy, live account/role checks, strong field boundaries, resources, secure hash verification/rehash, finite expiry, token revocation, JSON errors/throttling, no-store auth responses/API errors and tests. No public registration/reset/staff-edit API. Factory credentials are explicitly synthetic and seeders create only roles.
+
+Planned: product/order policies, provider authentication/exact verification/idempotency, durable worker/recovery, stock locking/ledger, admin audit log, password recovery/token inventory, backup/restore verification and client secure storage. Production TLS/secrets/logging are operating requirements, not verified deployment controls. No outbound calls or real payment tests are authorized/performed.

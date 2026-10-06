@@ -14,6 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Add intentional seed data alongside the feature that owns it.
+        $this->call(RoleSeeder::class);
     }
 }

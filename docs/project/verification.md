@@ -1,5 +1,7 @@
 # Scaffold verification
 
+Historical foundation record. For the 2026-10-06 authentication/access milestone and current checks, see [system-analysis verification](../system-analysis/verification.md). The results below describe the earlier scaffold and have not been relabeled as current feature verification.
+
 Verified locally on **2026-10-05 (Asia/Bangkok)** on Windows. No business features were implemented.
 
 ## Toolchain

@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\StaffRole;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -28,9 +30,29 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            // Synthetic factory credentials only; seeders never create accounts.
+            'password' => static::$password ??= Hash::make('Test-only-passphrase!2026'),
+            'role_id' => fn () => Role::query()->firstOrCreate(
+                ['name' => StaffRole::Cashier->value],
+                ['label' => StaffRole::Cashier->label()],
+            )->id,
+            'is_active' => true,
             'remember_token' => Str::random(10),
         ];
+    }
+
+    public function withRole(StaffRole $role): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role_id' => fn () => Role::query()->firstOrCreate(
+                ['name' => $role->value], ['label' => $role->label()],
+            )->id,
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => ['is_active' => false]);
     }
 
     /**

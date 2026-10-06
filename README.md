@@ -2,7 +2,7 @@
 
 A team monorepo for a Flutter mobile/tablet application, a Laravel REST API, and MySQL persistence.
 
-**Status:** foundation scaffold only. The app displays a neutral startup screen; the API exposes Laravel's `/up` health endpoint. Authentication, catalog, POS, orders, payments/KHQR, inventory, reports, users/roles, and settings are planned and have no business implementation yet.
+**Status:** backend authentication/access foundations are implemented: Sanctum sign-in/sign-out/current-user, cashier/manager/admin roles and gates. The app still displays a neutral startup screen. Catalog, POS, orders, payments/KHQR, inventory, reports, staff administration and settings remain planned. See [system analysis and diagrams](docs/system-analysis/README.md) for the proposed full system and [API contract](docs/api/README.md) for actual endpoints.
 
 ## Repository layout
 
@@ -100,8 +100,8 @@ php artisan serve --host=127.0.0.1 --port=8000
 On macOS/Linux, use `cp .env.example .env` in place of `Copy-Item`. Copy the example only for first-time setup; preserve your existing local settings on later installs. `composer dev` also starts the API server.
 
 - Health: `http://localhost:8000/up` (boot check; does not test MySQL connectivity).
-- Future API base: `http://localhost:8000/api/v1`.
-- The API base currently returns JSON 404 because no business routes exist.
+- API base: `http://localhost:8000/api/v1`; authentication endpoints live under `/auth`.
+- The bare API base and unimplemented routes return JSON 404.
 - File cache/sessions and synchronous queues let the framework boot before MySQL is configured; database operations still require MySQL.
 
 For a physical device, bind Laravel to `0.0.0.0` on your trusted development network and use your computer's LAN IP in the app configuration.
@@ -152,7 +152,7 @@ GitHub Actions runs backend formatting/tests plus MySQL migrations, and Flutter 
 
 Use short-lived branches and reviewed pull requests into `main`; do not commit dependencies, local configuration, credentials, generated output, or signing keys. Commit `composer.lock` and `pubspec.lock` so the team installs consistent versions. Recommended branch protection and contribution rules are in [contributing](docs/project/contributing.md).
 
-**Next feature:** authentication with Laravel Sanctum, Flutter sign-in/session handling, and policy foundations for cashier/manager/admin access. Scope and subsequent milestones are in the [roadmap](docs/project/roadmap.md). No authentication package or role schema is installed yet.
+**Next backend feature:** Categories and Products, using the implemented access foundation. Flutter sign-in/session handling remains a separate planned client milestone. Scope and decision gates are in the [roadmap](docs/project/roadmap.md) and [backend plan](docs/system-analysis/backend-plan.md). After migrating a verified local database, run `php artisan db:seed --class=RoleSeeder` for standard roles; seeders create no accounts. Existing/new ordinary users are inactive and unassigned until deliberately provisioned through a trusted process. See [database guidance](docs/database/README.md).
 
 ## License
 

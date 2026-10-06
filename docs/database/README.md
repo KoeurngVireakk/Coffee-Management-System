@@ -23,8 +23,21 @@ php artisan migrate
 php artisan migrate:status
 ```
 
-Only Laravel's default users/password reset/session, cache, and jobs infrastructure migrations exist. The default user model/factory are retained; no authentication endpoint, role table, product table, order table, or payment schema exists. The root seeder creates no accounts. File cache/session drivers and synchronous queues do not use their database tables yet.
+Laravel's default users/password reset/session, cache, and jobs migrations remain unchanged. Phase 1 adds `roles`, nullable `users.role_id` (RESTRICT), inactive-by-default `users.is_active`, and Sanctum `personal_access_tokens`. The root seeder calls the idempotent RoleSeeder for cashier/manager/admin and creates no accounts. No product/order/payment/inventory table exists. File cache/session drivers and synchronous queues do not use their database infrastructure tables yet. The [physical TRD](../system-analysis/trd.md) separates actual tables from proposed business design.
+
+After migrating a verified dedicated development database, run `php artisan db:seed --class=RoleSeeder`. Existing users retain their name/email/password and become unassigned/inactive; do not automatically assign admin privileges. Initial synthetic local accounts can be deliberately created in Tinker with `User::factory()->withRole(StaffRole::Cashier)` or `StaffRole::Admin`, an explicit lowercase example.test email and an explicit randomly generated local password. The factory defaults active with a cashier role and a known **test-only** password; never use that default as a deployed/staff credential. Seeders contain no initial/default user or password. Real staff provisioning/recovery/admin endpoints remain Phase 6.
+
+The password hashed cast protects trusted creation. User mass assignment excludes role_id/is_active; a trusted provisioner uses explicit assignment, while factories bypass mass-assignment guarding for synthetic data only. No public registration/bootstrap-admin endpoint exists.
 
 Use migrations as the schema source of truth. Future schema changes should define foreign keys, indexes for real query patterns, and transaction boundaries. Represent monetary amounts consistently using decimal values or integer minor units after deciding supported currencies; do not use floating-point amounts. Plan immutable order price snapshots and auditable stock/payment records when those features begin.
 
-PHPUnit uses an in-memory SQLite database for fast bootstrap tests; CI also runs the default migrations against MySQL. Later MySQL-specific behavior needs tests against MySQL. Never run destructive test/migration reset commands against a developer's shared database.
+PHPUnit defaults to forced SQLite `:memory:` and testing mode. `phpunit.mysql.xml` runs the feature suite against **only** a separately provisioned local disposable database named `coffee_management_auth_test`; it forcibly clears DB_URL and sets the database/driver. TestCase checks testing mode, the exact database, local host and absence of URL/socket overrides **before** RefreshDatabase can reset tables. This is an additional guard, not proof that a database is disposable: verify the instance and use a test-only account before running it. CI uses a fresh runner-local MySQL 8.0 service.
+
+```powershell
+# Only after provisioning/verifying your disposable MySQL instance and test account:
+# Set DB_HOST/DB_PORT/DB_USERNAME/DB_PASSWORD locally if its defaults differ.
+php artisan config:clear
+php vendor/bin/phpunit --configuration phpunit.mysql.xml
+```
+
+The suite uses migrate:fresh internally and destroys tables in that test database. Never point it at production/shared data. The MySQL run in this milestone used its own data directory, 127.0.0.1:33379, MySQL 8.0.39 and synthetic data; the normal local MySQL service/database was not mutated. See [verification](../system-analysis/verification.md). Later business CHECK/locking/payment concurrency needs additional isolated MySQL tests; today's checks prove only the implemented auth schema and behavior.

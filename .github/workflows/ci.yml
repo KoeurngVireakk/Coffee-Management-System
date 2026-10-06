@@ -27,7 +27,7 @@ jobs:
         image: mysql:8.0
         # Disposable runner-local database; these are not application credentials.
         env:
-          MYSQL_DATABASE: coffee_management_ci
+          MYSQL_DATABASE: coffee_management_auth_test
           MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
         ports:
           - 3306:3306
@@ -40,7 +40,7 @@ jobs:
       DB_CONNECTION: mysql
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
-      DB_DATABASE: coffee_management_ci
+      DB_DATABASE: coffee_management_auth_test
       DB_USERNAME: root
       DB_PASSWORD: ""
     steps:
@@ -62,12 +62,14 @@ jobs:
         run: composer validate --strict
       - name: Check PHP formatting
         run: composer lint
-      - name: Verify default migrations on MySQL
+      - name: Verify migrations on isolated MySQL
         run: |
           php artisan migrate --force
           php artisan migrate:status
-      - name: Run bootstrap tests
+      - name: Run backend tests on SQLite
         run: composer test
+      - name: Run backend feature tests on isolated MySQL
+        run: php vendor/bin/phpunit --configuration phpunit.mysql.xml
 
   mobile:
     name: Mobile checks
