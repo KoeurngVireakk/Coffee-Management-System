@@ -1,6 +1,6 @@
 # Conceptual / logical entity relationship diagram
 
-Roles and staff identity were implemented in Phase 1; Category and Product are implemented in Phase 2. Order and OrderItem are implemented in Phase 3 for unpaid checkout. Phase 4 implements Payment attempts, order payment selection and immutable PaymentEvidence observations. Phase 5 implements InventoryItem, recipe components, StockReservation and StockMovement; settings/admin audit remain **proposed**. This ERD expresses business relationships; [TRD](trd.md) defines physical types, FKs and indexes.
+Roles and staff identity were implemented in Phase 1; Category and Product are implemented in Phase 2. Order and OrderItem are implemented in Phase 3 for unpaid checkout. Phase 4 implements Payment attempts, order payment selection and immutable PaymentEvidence observations. Phase 5 implements InventoryItem, recipe components, StockReservation and StockMovement; Phase 6 implements Setting and AuditEvent. Reports remain planned. This ERD expresses business relationships; [TRD](trd.md) defines physical types, FKs and indexes.
 
 ```mermaid
 erDiagram
@@ -135,9 +135,9 @@ erDiagram
 - Products and inventory items have a many-to-many relationship through recipe components. Recipes are justified for drinks and packaged stock; options, suppliers and purchase-order entities await concrete requirements.
 - Order/stock-item reservations are a many-to-many association with requirement snapshots, needed to preserve availability while external payment is pending. They are not customer carts.
 - Stock movements may have an order for a sale or no order for deliveries/waste/adjustment; the actor can be null for a trusted system operation, accompanied by an operation reference/reason. Settings and audit system actions have optional actors.
-- Audit events are proposed for sensitive administrative changes. They supplement finance/stock records and contain allow-listed metadata, not a generic raw-request log.
-- Settings have a unique key and typed approved value. Credentials are deliberately excluded. Framework token/reset/session/cache/job tables are infrastructure, not conceptual business entities; the TRD records their actual status separately.
+- Audit events are implemented in Phase 6 for sensitive administrative changes (staff provisioning, role change, activation/deactivation, password reset, token revocation, settings updates). They supplement finance/stock records and contain allow-listed metadata, not a generic raw-request log. Eloquent updates and deletions are strictly blocked via model hooks.
+- Settings have a unique key and typed approved value (`shop_name`, `shop_timezone`). Credentials and deployment configurations are deliberately excluded. Framework token/reset/session/cache/job tables are infrastructure, not conceptual business entities; the TRD records their actual status separately.
 
 The operational catalog, role, recipe and stock entities are normalized toward 3NF. Order snapshots intentionally duplicate historical product facts; persisted order aggregates and stock balances are deliberate derived data maintained transactionally and reconciled. No customer, store/tenant, loyalty, printer or delivery table is inferred.
 
-Phase 5 recipe components physically use product_ingredients(product_id,inventory_item_id), and reservations use stock_reservations(order_id,inventory_item_id), each a composite PK. StockMovement manual actor/key/hash fields enforce intent replay; deterministic sale keys link consumed snapshots to paid tracked orders. All history FKs use RESTRICT and model instance deletion is denied.
+Phase 5 recipe components physically use product_ingredients(product_id,inventory_item_id), and reservations use stock_reservations(order_id,inventory_item_id), each a composite PK. StockMovement manual actor/key/hash fields enforce intent replay; deterministic sale keys link consumed snapshots to paid tracked orders. All history FKs use RESTRICT and model instance deletion is denied. Phase 6 settings use VARCHAR(64) PK and audit_events use BIGINT PK with composite query indexes.

@@ -1,6 +1,6 @@
 # System requirements
 
-Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication, Categories/Products and checkout/order history and cash settlement are executable; provider-neutral external workflows are fake-tested and real provider traffic remains gated. Phase 5 exact inventory/recipes/ledger/reservations/consumption/manual cancellation are executable; other acceptance criteria remain target behavior.
+Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication, Categories/Products and checkout/order history and cash settlement are executable; provider-neutral external workflows are fake-tested and real provider traffic remains gated. Phase 5 exact inventory/recipes/ledger/reservations/consumption/manual cancellation are executable; Phase 6 staff administration, typed settings, and immutable audit events are executable; other acceptance criteria remain target behavior.
 
 ## Functional requirements
 
@@ -10,7 +10,7 @@ Status legend: **implemented** means backend behavior exists in this milestone; 
 | FR-AUTH-002 | Sign out revokes only the calling token; reuse returns 401; other device tokens survive | Implemented |
 | FR-AUTH-003 | Current-user returns allow-listed identity, role and permission names for the caller; no credential hashes | Implemented |
 | FR-AUTH-004 | Laravel enforces a fixed cashier/manager/admin access map; unassigned/inactive accounts and unknown roles fail closed | Foundation; authentication checks implemented |
-| FR-USER-001 | Admin creates/updates/deactivates staff and assigns approved roles; no public registration; audit sensitive changes and revoke tokens on password recovery | Planned |
+| FR-USER-001 | Admin creates/updates/deactivates staff and assigns approved roles; no public registration; audit sensitive changes and revoke tokens on password recovery | Implemented Phase 6 backend |
 | FR-CAT-001 | Manager/admin creates, renames and retires categories; retire/reactivate without deleting financial history | Implemented; restrictive historical order/payment FKs retain records |
 | FR-PROD-001 | Manager/admin maintains SKU, name, category, exact price and active status; category is required | Implemented, USD cents |
 | FR-PROD-002 | Staff browse/search active menu with bounded pagination and stable order; unavailable/retired products cannot be added | Catalog and backend sellability revalidation implemented; Flutter cart/stock availability remain planned |
@@ -31,7 +31,7 @@ Status legend: **implemented** means backend behavior exists in this milestone; 
 | FR-INV-003 | Authorized staff sees item available/low-stock information computed from on-hand minus reservations and reorder thresholds | Item API implemented; per-product client availability remains planned |
 | FR-INV-004 | Ledger links sale to order and actor; corrections are compensating movements, never overwritten history | Implemented Phase 5 backend |
 | FR-REP-001 | Manager/admin views paid-sales, payment-method and stock summaries from authoritative records within a bounded date range | Planned |
-| FR-SET-001 | Admin updates approved store settings; manager reads operational settings; never store secrets in editable settings | Planned |
+| FR-SET-001 | Admin updates approved store settings; manager reads operational settings; never store secrets in editable settings | Implemented Phase 6 backend |
 
 Product options/variants are not approved. Phase 3 accepts product and quantity only; a later option model must price and validate selections on Laravel before it can be sold. Refunds/void permissions and lifecycle require approval before exposing those mutations.
 
@@ -45,8 +45,8 @@ Product options/variants are not approved. Phase 3 accepts product and quantity 
 | NFR-API-001 | Consistent JSON / versioning | `/api/v1`; Laravel message/errors for failures; Resources with data envelope; meaningful status codes; synchronized implemented contract |
 | NFR-PERF-001 | Appropriate shop performance | Proposed initial acceptance: 10 simultaneous staff, catalog/current-user p95 <500 ms, local checkout p95 <1 s excluding provider I/O; benchmark with realistic data before promising an SLA |
 | NFR-REL-001 | Reliable checkout and payment | Atomic local state; replay keys; provider timeouts become pending reconciliation; recovery after crash between request and confirmation |
-| NFR-CON-001 | Concurrent integrity | Stable row lock order, bounded deadlock retry; no negative available stock/duplicate settlement under concurrent tests |
-| NFR-AUD-001 | Traceability | Immutable order snapshots/payment identities/stock movements; admin/discount adjustments include actor, reason and UTC timestamp; no raw credentials |
+| NFR-CON-001 | Concurrent integrity | Stable row lock order, bounded deadlock retry; no negative available stock/duplicate settlement under concurrent tests; row-locked last operational admin protection |
+| NFR-AUD-001 | Traceability | Immutable order snapshots/payment identities/stock movements; append-only audit_events with actor, polymorphic subject, action and UTC timestamp; model mutation hooks prevent edits/deletions; no raw credentials |
 | NFR-MAINT-001 | Maintainability | Laravel conventions, focused feature tests, locked dependencies, no Eloquent repository wrappers; preserve Flutter domain boundaries |
 | NFR-ACC-001 | Future accessible clients | Khmer/English labels, touch targets, keyboard/screen-reader access, text scaling and explicit payment/error states; API sends stable codes/data; no UI implementation now |
 | NFR-SCALE-001 | Shop-scale deployment | One API and MySQL initially; pagination/query-driven indexes before caching; shared throttle cache if multiple API instances; durable worker only for real payment recovery |
@@ -59,7 +59,9 @@ Performance, backup targets and business timezone are proposals, not measured pr
 
 FR-PAY-* -> [payment API](../api/payments.md), CashPaymentTest, ExternalPaymentTest, PaymentSchemaTest, PaymentConcurrencyTest and [Phase 4 evidence](phase-4-verification.md). Fake-only tests are not real bank/KHQR validation; tracked consumption is Phase 5; no public callback/automatic worker behavior is claimed.
 
-FR-AUTH-* -> [implemented auth contract](../api/README.md) -> AuthTest, AccessControlTest, AuthSchemaTest. FR-POS/ORD -> [Orders contract](../api/orders.md), OrderSchemaTest, CheckoutTest, OrderHistoryTest, OrderConcurrencyTest and [Phase 3 evidence](phase-3-verification.md). FR-INV and payment-stock atomicity are Phase 5; paid receipt printing remains future work. FR-USER/REP/SET -> access matrix and future action/resource policy tests.
+FR-AUTH-* -> [implemented auth contract](../api/README.md) -> AuthTest, AccessControlTest, AuthSchemaTest. FR-POS/ORD -> [Orders contract](../api/orders.md), OrderSchemaTest, CheckoutTest, OrderHistoryTest, OrderConcurrencyTest and [Phase 3 evidence](phase-3-verification.md). FR-INV and payment-stock atomicity are Phase 5; paid receipt printing remains future work.
+
+FR-USER-001, FR-SET-001, NFR-AUD-001 -> [staff API](../api/staff.md), [settings API](../api/settings.md), [audit API](../api/audit.md), StaffApiTest, SettingApiTest, AuditEventApiTest, StaffSecurityTest, StaffSchemaTest, StaffConcurrencyTest, StaffWriteRaceTest, and [Phase 6 verification](phase-6-verification.md).
 
 FR-CAT/PROD -> [catalog API contract](../api/README.md), `CategorySchemaTest`, `CategoryApiTest`, `ProductSchemaTest`, `ProductApiTest`, `CatalogQueryTest`, `ProductWriteRaceTest`; [Phase 2 verification](phase-2-verification.md) separates SQLite results from MySQL production constraints. Fixed ordering is name+id, page sizes 1-100, bounded literal search, and eager category loading. No caching, Flutter POS or stock capability is implied.
 

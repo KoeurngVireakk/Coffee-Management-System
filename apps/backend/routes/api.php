@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AuditEventController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\InventoryItemController;
@@ -7,6 +8,8 @@ use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\RecipeController;
+use App\Http\Controllers\Api\V1\SettingController;
+use App\Http\Controllers\Api\V1\StaffController;
 use App\Http\Controllers\Api\V1\StockMovementController;
 use App\Http\Middleware\EnsureActiveStaff;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +40,21 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/', [PaymentController::class, 'index'])->name('payments.index');
             Route::post('{payment}/reconcile', [PaymentController::class, 'reconcile'])->whereNumber('payment')->name('payments.reconcile');
         });
+
+        Route::middleware('can:manage-staff')->group(function (): void {
+            Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
+            Route::post('staff', [StaffController::class, 'store'])->name('staff.store');
+            Route::get('staff/{user}', [StaffController::class, 'show'])->whereNumber('user')->name('staff.show');
+            Route::patch('staff/{user}', [StaffController::class, 'update'])->whereNumber('user')->name('staff.update');
+            Route::post('staff/{user}/password', [StaffController::class, 'resetPassword'])->whereNumber('user')->name('staff.password');
+            Route::post('staff/{user}/revoke-tokens', [StaffController::class, 'revokeTokens'])->whereNumber('user')->name('staff.revoke-tokens');
+
+            Route::get('audit-events', [AuditEventController::class, 'index'])->name('audit-events.index');
+        });
+
+        Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::get('settings/{key}', [SettingController::class, 'show'])->where('key', '[a-zA-Z0-9_]{1,64}')->name('settings.show');
+        Route::put('settings/{key}', [SettingController::class, 'update'])->where('key', '[a-zA-Z0-9_]{1,64}')->name('settings.update');
     });
 
     Route::prefix('auth')->name('auth.')->group(function (): void {

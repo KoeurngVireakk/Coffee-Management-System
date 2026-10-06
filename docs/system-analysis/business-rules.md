@@ -19,11 +19,11 @@ Authentication, catalog, unpaid checkout and scoped order reads are implemented.
 | Stock read (`view-inventory`) | Yes | Yes | Yes | Inventory API implemented |
 | Stock adjustment (`adjust-inventory`) | No | Yes | Yes | Inventory API implemented |
 | Reports (`view-reports`) | No | Yes | Yes | Gate only; endpoint planned |
-| Staff administration (`manage-staff`) | No | No | Yes | Gate and other-user view policy only |
-| Operational settings read (`view-settings`) | No | Yes | Yes | Gate only; endpoint planned |
-| Settings write (`manage-settings`) | No | No | Yes | Gate only; endpoint planned |
+| Staff administration (`manage-staff`) | No | No | Yes | Implemented endpoints and UserPolicy |
+| Operational settings read (`view-settings`) | No | Yes | Yes | Implemented endpoints and SettingPolicy |
+| Settings write (`manage-settings`) | No | No | Yes | Implemented endpoints and SettingPolicy |
 
-Managers do not inherit staff administration. OrderPolicy now restricts cashier reads by created_by; future payment/admin policies must still protect objects, transitions and properties. Catalog and unpaid orders use enforced action/object scoping; paid acceptance now uses narrow locked payment workflows; administration remains unimplemented. Staff can process authorized cash payments and the provider-neutral foundation; real KHQR remains gated; refunds/voids remain unapproved.
+Managers do not inherit staff administration or settings write authority. OrderPolicy restricts cashier reads by created_by; PaymentPolicy protects payment attempts and reconciliation; UserPolicy and SettingPolicy restrict staff management, password resets, token revocation, settings modification and administrative audit queries to admins. Managers may view operational settings; cashiers fail closed on all administrative endpoints. Staff can process authorized cash payments and the provider-neutral foundation; real KHQR remains gated; refunds/voids remain unapproved.
 
 ## Catalog and money
 
@@ -58,8 +58,13 @@ Managers do not inherit staff administration. OrderPolicy now restricts cashier 
 - BR-INV-002: available=on_hand-reserved. Checkout reserves under item locks if tracking is enabled; cannot reserve more than available. Payment confirms consume reserved stock with movement; safe manual cancellation releases reservation; automatic expiry remains future policy. Locks use sorted stock-item IDs.
 - BR-INV-003: movements are immutable and contain reason, actor/source, quantity and unique operation key. Corrections append compensating records. Cached balances update atomically with ledger; periodic ledger reconciliation detects drift.
 - BR-INV-004: recipes/required quantities are snapshotted into per-order reservations; recipe edits cannot alter a pending order's stock requirement. Manual negative adjustments cannot reduce on_hand below reserved.
+- BR-STAFF-001: Staff provisioning is admin-only (`manage-staff`). Admin creates name, email, role (`cashier`, `manager`, `admin`), active status, and initial password. Roles are resolved via approved role enum/table; unknown properties and direct role_id/permissions are rejected. Emails are trimmed, lowercased, and RFC-validated; duplicate email collisions are caught via database unique constraints with 422 response. No DELETE endpoint exists; staff records are retained for financial/audit integrity.
+- BR-STAFF-002: Staff modification is admin-only. Allows deliberate updates to name, email, role, and is_active. Unknown properties are rejected. Token revocation rules: name-only changes preserve existing tokens; role change, email change, or deactivation revokes all Sanctum personal access tokens for the account. Account reactivation does not automatically issue a new token.
+- BR-STAFF-003: Last operational admin protection. The system must never reduce active operational admins (`is_active = true`, `role = admin`) from 1 to 0 through deactivation, demotion, or role unassignment. Concurrent deactivation/demotion races are strictly serialized by locking the `admin` role row (`lockForUpdate()`), returning 409 Conflict if violated. Self-actions do not bypass this protection.
+- BR-STAFF-004: Admin-controlled password reset and token revocation endpoints (`POST /api/v1/staff/{user}/password` and `POST /api/v1/staff/{user}/tokens/revoke`). Password resets require minimum 12 characters and confirmation, hash securely, revoke all tokens, and emit audit events with zero password/hash data. Token revocation immediately removes all tokens and records the audit reason.
+- BR-SET-001: Store settings use an allow-listed typed registry (`shop_name`: string 1..120; `shop_timezone`: valid IANA timezone string). Manager and admin may read settings (`view-settings`); admin only may update settings (`manage-settings`). Arbitrary setting keys and secret keys (`APP_KEY`, `DB_PASSWORD`, `INVENTORY_TRACKING_ENABLED`) are strictly rejected (422). Currency changes cannot be made via settings and cannot alter existing financial records.
+- BR-AUDT-001: Administrative audit events (`audit_events`) are immutable and append-only. Eloquent update and delete operations throw `LogicException`. Events record actor_id (FK RESTRICT), polymorphic subject, action, structured metadata (JSON), and UTC `created_at`. No passwords, tokens, or secrets are ever recorded. Audit log queries are admin-only (`manage-staff`) and support filtering by actor, action, subject, and date ranges.
 - BR-REP-001: reports derive from paid orders and accepted verified payments, with reconciliation exceptions shown separately. Define refund treatment before adding refunds. Stock reports derive from ledger/balances. Use UTC timestamps and explicitly configured shop-day boundaries; never the host timezone.
-- BR-SET-001: store settings use an allow-listed typed schema and admin gate; provider secrets stay in backend secret configuration. Currency changes cannot reinterpret existing money snapshots.
 
 ## Open decisions and blockers
 
