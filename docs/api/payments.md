@@ -1,6 +1,6 @@
 # Payment settlement foundation (Phase 4)
 
-Base `/api/v1`. Existing Sanctum bearer/staff ability and active cashier/manager/admin identity required. Cashier operates on own orders; manager/admin may operate on shop orders. Scoped order lookup plus OrderPolicy/PaymentPolicy enforce object access. No Inventory or Flutter implementation, no refunds/split/partial payments, no receipt-printing endpoint.
+Base `/api/v1`. Existing Sanctum bearer/staff ability and active cashier/manager/admin identity required. Cashier operates on own orders; manager/admin may operate on shop orders. Scoped order lookup plus OrderPolicy/PaymentPolicy enforce object access. Phase 5 integrates [tracked inventory finalization](inventory.md); no Flutter implementation, no refunds/split/partial payments, no receipt-printing endpoint.
 
 ## Actual endpoints
 
@@ -31,7 +31,7 @@ tender_minor is canonical integer-cent string 0-9999999999. No floats/JSON numbe
 
 Only tender_minor is writable. Expected amount, currency, status, change, owner/initiated_by, paid_at, provider/transaction IDs, signatures, discount/tax and arbitrary fields are rejected with 422. USD total/currency and change are derived from immutable order records, not current catalog/UI totals. Cash confirmation is an authorized staff action; client paid flags are never proof.
 
-Order row locks precede Payment locks. One transaction creates a confirmed cash attempt, stores initiator and verified time, selects its owning-order accepted FK and moves pending_payment -> paid with paid_at. Snapshot items/totals/creator remain unchanged. Inventory stays untracked; tracked orders are not eligible until Phase 5 integration. A controlled failure rolls back payment and accepted state together.
+Order row locks precede Payment locks. One transaction creates a confirmed cash attempt, stores initiator and verified time, selects its owning-order accepted FK and moves pending_payment -> paid with paid_at. Snapshot items/totals/creator remain unchanged. Shared OrderSettlementService consumes valid tracked reservation snapshots and appends deterministic sale movements in that same transaction; untracked orders retain their original no-stock path. A controlled failure rolls back payment, accepted state and all local stock effects together.
 
 Example 201 result for order total 325 cents:
 
@@ -84,3 +84,7 @@ Payment list defaults 25, max 100/page, page 1-10000; order created_at DESC/id D
 Paid OrderResource adds accepted_payment using the same safe Resource and paid_at; pending order response remains compatible. These are persisted settlement summaries, not a final printed receipt. No ordinary Order PUT/PATCH/DELETE route; narrow transaction-only selection methods enforce owning payment, eligibility and optimistic current-state predicates. Immutable amounts/items/creator cannot change; paid selection cannot be replaced by a stale model.
 
 401/403/404 retain auth/scope behavior; 422 uses message/errors (header failures under idempotency_key). 409 uses message for already-settled/active-attempt/conflicting-intent errors. 429 includes Retry-After. 503 clearly reports external provider unavailable. API errors use no-store/private; deployment requires HTTPS and APP_DEBUG=false. See [Phase 4 verification](../system-analysis/phase-4-verification.md) for actual test/concurrency/upgrade results; [OpenAPI](openapi.json) is synchronized with implemented routes.
+
+## Phase 5 settlement integration
+
+Payment confirmation, stock consumption and paid transition share one local transaction. Configuration changes never disable consumption for already-tracked orders. Tracked reservations must exist, remain reserved and have matching sale evidence before acceptance. A confirmed payment requiring reconciliation is ineligible for finalization; distinct/mismatched observations retain review state and cannot bypass inventory. Safe order cancellation requires verified no-settlement state and releases stock once. Late received funds after cancellation are quarantined without consuming released stock. Production external adapter remains disabled; all integration verification uses the test fake.

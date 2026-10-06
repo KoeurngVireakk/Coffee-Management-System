@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Orders\CancelOrderRequest;
 use App\Http\Requests\Orders\CheckoutRequest;
 use App\Http\Requests\Orders\OrderIndexRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Services\OrderCancellationService;
 use App\Services\OrderCheckoutService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +23,13 @@ class OrderController extends Controller
         $order = $checkout->checkout($request->user(), $request->validated('items'), $request->header('Idempotency-Key'));
 
         return (new OrderResource($order))->response()->setStatusCode($order->wasRecentlyCreated ? 201 : 200);
+    }
+
+    public function cancel(CancelOrderRequest $request, string $order, OrderCancellationService $cancellation): OrderResource
+    {
+        $target = Order::query()->visibleTo($request->user())->where('public_reference', $order)->firstOrFail();
+
+        return new OrderResource($cancellation->cancel($request->user(), $target));
     }
 
     public function index(OrderIndexRequest $request): AnonymousResourceCollection

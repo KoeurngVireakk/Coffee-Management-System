@@ -1,6 +1,6 @@
 # Workflow flowcharts
 
-Authentication below reflects implemented backend behavior. Unpaid cart validation/calculation/order creation is implemented in Phase 3; Cash/payment attempt/verified acceptance branches now have Phase 4 implementations, with fake-only provider evidence. Real KHQR, stock and receipt-printing branches remain proposed. No Flutter screens are implemented here.
+Authentication below reflects implemented backend behavior. Unpaid cart validation/calculation/order creation is implemented in Phase 3; Cash/payment attempt/verified acceptance branches now have Phase 4 implementations, with fake-only provider evidence. Phase 5 implements gated stock reservation, shared consumption and manual release. Real KHQR and receipt-printing branches remain proposed; no automatic expiry. No Flutter screens are implemented here.
 
 ## Staff authentication
 
@@ -33,7 +33,7 @@ flowchart TD
 
 Malformed login attempts also count against the IP/identity limits. Successful login does not reset them. Current-user retrieves only the caller; logout does not revoke other device tokens. An inactive account cannot use protected APIs even if a previously issued token still exists.
 
-## POS checkout (planned)
+## POS checkout and gated stock completion
 
 ```mermaid
 flowchart TD
@@ -58,11 +58,11 @@ flowchart TD
     N --> P[Server verification / reconcile uncertainty]
     P --> O
     O -->|Pending / uncertain| R
-    O -->|Verified no payment / safe expiry| S[Release reservation once / expire order]
+    O -->|Verified no payment / authorized manual cancellation| S[Release reservation once / cancel order]
     O -->|Confirmed| T[Atomic payment + paid order + stock consumption / ledger]
     T --> U{Local commit succeeded?}
     U -->|No| V[Retry local transition / reconcile external funds]
-    U -->|Yes| W[Return persisted receipt]
+    U -->|Yes| W[Return persisted order/payment summary]
     W --> Z([Complete])
 ```
 
@@ -93,4 +93,21 @@ flowchart TD
     Q --> R[Confirmed backend payment / persisted receipt]
 ```
 
-Signatures, status names, polling intervals and expiry semantics come from the eventual provider contract. QR hashes are correlation values, not proof or authentication. Failed/expired results require verified no-settlement before releasing stock. Provider verification and durable recovery are unimplemented.
+Signatures, status names, polling intervals and expiry semantics come from the eventual provider contract. QR hashes are correlation values, not proof or authentication. Failed/expired results require verified no-settlement before releasing stock. Provider-neutral verification/manual recovery are fake-tested; real network verification and durable recovery workers remain unimplemented.
+
+## Safe manual cancellation (Phase 5)
+
+```mermaid
+flowchart TD
+    A[Authorized own or shop pending order] --> B[Lock order then payment state]
+    B --> C{Paid or active unresolved review payment?}
+    C -->|Yes| D[409 preserve order and reservations]
+    C -->|No| E{Already cancelled?}
+    E -->|Yes| F[200 original cancelled order]
+    E -->|No| G[Lock tracked inventory IDs ascending]
+    G --> H[Release reserved snapshots; on_hand unchanged]
+    H --> I[Atomically mark cancelled]
+    I --> F
+```
+
+No automatic reservation timeout is implied. A late trusted provider success records funds/review without paying the cancelled order or consuming released stock.

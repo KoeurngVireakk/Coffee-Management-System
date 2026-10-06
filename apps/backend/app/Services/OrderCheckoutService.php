@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class OrderCheckoutService
 {
+    public function __construct(private StockReservationService $stock) {}
+
     /** @param list<array{product_id:int, quantity:int}> $items Validated checkout intent */
     public function checkout(User $actor, array $items, string $key): Order
     {
@@ -70,15 +72,25 @@ class OrderCheckoutService
                         'subtotal_minor' => $lineTotal, 'discount_minor' => 0, 'tax_minor' => 0, 'line_total_minor' => $lineTotal];
                 }
 
+                $tracked = (bool) config('inventory.tracking_enabled', false);
+                $requirements = $tracked ? $this->stock->requirements($intent) : [];
+                if ($tracked) {
+                    $this->stock->lockAvailable($requirements);
+                }
+
                 $order = new Order;
                 $order->forceFill(['public_reference' => 'ORD-'.Str::ulid(), 'created_by' => $actor->id,
                     'status' => OrderStatus::PendingPayment, 'currency' => Product::CURRENCY,
                     'subtotal_minor' => $subtotal, 'discount_minor' => 0, 'tax_minor' => 0, 'total_minor' => $subtotal,
-                    'checkout_key' => $key, 'request_hash' => $hash, 'inventory_tracked' => false])->save();
+                    'checkout_key' => $key, 'request_hash' => $hash, 'inventory_tracked' => $tracked])->save();
                 foreach ($lines as $line) {
                     $item = new OrderItem;
                     $item->forceFill($line);
                     $order->items()->save($item);
+                }
+
+                if ($tracked) {
+                    $this->stock->reserve($order, $requirements);
                 }
 
                 return $order;

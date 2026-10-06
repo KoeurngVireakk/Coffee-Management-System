@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Inventory\Quantity;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
@@ -91,14 +92,15 @@ class Order extends Model
     public function acceptPayment(Payment $payment): void
     {
         $this->assertPaymentTransaction($payment);
-        if ($this->status !== OrderStatus::PendingPayment || $this->accepted_payment_id !== null || $this->inventory_tracked
+        if ($this->status !== OrderStatus::PendingPayment || $this->accepted_payment_id !== null
             || ($this->active_payment_id !== null && $this->active_payment_id !== $payment->id)
-            || $payment->status !== PaymentStatus::Confirmed || $payment->expected_amount_minor !== $this->total_minor
+            || $payment->status !== PaymentStatus::Confirmed || $payment->reconciliation_required || $payment->expected_amount_minor !== $this->total_minor
             || $payment->currency !== $this->currency) {
             throw new LogicException('Order/payment is not eligible for acceptance.');
         }
+        $this->assertStockFinalized('consumed');
         $changed = DB::table('orders')->where('id', $this->id)->where('status', 'pending_payment')->whereNull('accepted_payment_id')
-            ->where('inventory_tracked', false)->where('total_minor', $payment->expected_amount_minor)->where('currency', $payment->currency)
+            ->where('inventory_tracked', $this->inventory_tracked)->where('total_minor', $payment->expected_amount_minor)->where('currency', $payment->currency)
             ->where(fn ($query) => $query->whereNull('active_payment_id')->orWhere('active_payment_id', $payment->id))
             ->update(['status' => 'paid', 'accepted_payment_id' => $payment->id,
                 'active_payment_id' => null, 'paid_at' => now(), 'updated_at' => now()]);
@@ -106,6 +108,45 @@ class Order extends Model
             throw new LogicException('Order was already settled or changed concurrently.');
         }
         $this->refresh();
+    }
+
+    public function cancelPending(): void
+    {
+        if (DB::transactionLevel() < 1 || $this->status !== OrderStatus::PendingPayment || $this->accepted_payment_id !== null || $this->active_payment_id !== null) {
+            throw new LogicException('Cancellation requires an eligible order transaction.');
+        }
+        $this->assertStockFinalized('released');
+        $changed = DB::table('orders')->where('id', $this->id)->where('status', 'pending_payment')
+            ->whereNull('accepted_payment_id')->whereNull('active_payment_id')
+            ->where('inventory_tracked', $this->inventory_tracked)
+            ->update(['status' => 'cancelled', 'updated_at' => now()]);
+        if ($changed !== 1) {
+            throw new LogicException('Order changed before cancellation.');
+        }
+        $this->refresh();
+    }
+
+    private function assertStockFinalized(string $status): void
+    {
+        if (! $this->inventory_tracked) {
+            return;
+        }
+        $reservations = DB::table('stock_reservations')->where('order_id', $this->id)->lockForUpdate()->get();
+        if ($reservations->isEmpty()) {
+            throw new LogicException('Tracked order requires finalized reservation snapshots.');
+        }
+        foreach ($reservations as $reservation) {
+            if ($reservation->status !== $status) {
+                throw new LogicException('Tracked order cannot bypass stock finalization.');
+            }
+            if ($status === 'consumed') {
+                $movement = DB::table('stock_movements')->where('operation_key', 'sale:'.$this->id.':'.$reservation->inventory_item_id)->first();
+                if (! $movement || $movement->order_id !== $this->id || $movement->inventory_item_id !== $reservation->inventory_item_id
+                    || $movement->reason !== 'sale' || Quantity::parse((string) $movement->quantity_delta, true) !== -Quantity::parse((string) $reservation->quantity)) {
+                    throw new LogicException('Consumed reservation requires its exact sale movement.');
+                }
+            }
+        }
     }
 
     private function assertPaymentTransaction(Payment $payment): void

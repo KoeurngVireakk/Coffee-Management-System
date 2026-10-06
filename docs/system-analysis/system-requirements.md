@@ -1,6 +1,6 @@
 # System requirements
 
-Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication, Categories/Products and checkout/order history and cash settlement are executable; provider-neutral external workflows are fake-tested and real provider traffic remains gated. Other acceptance criteria remain target behavior.
+Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication, Categories/Products and checkout/order history and cash settlement are executable; provider-neutral external workflows are fake-tested and real provider traffic remains gated. Phase 5 exact inventory/recipes/ledger/reservations/consumption/manual cancellation are executable; other acceptance criteria remain target behavior.
 
 ## Functional requirements
 
@@ -14,10 +14,10 @@ Status legend: **implemented** means backend behavior exists in this milestone; 
 | FR-CAT-001 | Manager/admin creates, renames and retires categories; retire/reactivate without deleting financial history | Implemented; restrictive historical order/payment FKs retain records |
 | FR-PROD-001 | Manager/admin maintains SKU, name, category, exact price and active status; category is required | Implemented, USD cents |
 | FR-PROD-002 | Staff browse/search active menu with bounded pagination and stable order; unavailable/retired products cannot be added | Catalog and backend sellability revalidation implemented; Flutter cart/stock availability remain planned |
-| FR-POS-001 | All staff construct a client cart from product IDs and bounded positive quantities; server rechecks availability | Backend cart intent/sellability implemented (50 lines, qty 1-99); Flutter cart/stock still planned |
+| FR-POS-001 | All staff construct a client cart from product IDs and bounded positive quantities; server rechecks availability | Backend cart intent/sellability implemented (50 lines, qty 1-99); tracked stock validation implemented; Flutter cart planned |
 | FR-POS-002 | Server builds immutable item name/unit-price/quantity/line-total snapshots and authoritative order totals; submitted prices are rejected | Implemented for unpaid orders, exact USD cents; zero discount/tax |
 | FR-POS-003 | Replay of a checkout key returns the original order; altered payload with same key conflicts | Implemented, Idempotency-Key header per actor; canonical intent; MySQL race verified |
-| FR-ORD-001 | Pending order has items, owner, currency and unique public reference; transitions follow business rules | Pending creation and paid settlement implemented; cancel/refund/void/expiry transitions planned |
+| FR-ORD-001 | Pending order has items, owner, currency and unique public reference; transitions follow business rules | Pending creation and paid settlement implemented; safe pending cancellation implemented; refund/void/automatic expiry planned |
 | FR-ORD-002 | Cashier views own order history; manager/admin views shop history; date filters and pagination are bounded | Implemented with absolute UTC boundaries, bounded pages and scoped opaque references |
 | FR-ORD-003 | Final receipt comes from persisted paid order and confirmed payment; no client-generated financial truth | Planned |
 | FR-DISC-001 | Discounts/tax disabled until rules are approved; later privileged discounts are validated and snapshotted with actor/reason | Phase 3 zero values enforced; future discount/tax workflows planned |
@@ -25,11 +25,11 @@ Status legend: **implemented** means backend behavior exists in this milestone; 
 | FR-PAY-002 | Cash tender is validated in exact units; tender >= due; server calculates change and atomically completes sale | Implemented, no inventory/receipt printing |
 | FR-PAY-003 | Backend initiates generic KHQR attempt, persists correlation/expiry and returns display data; displaying QR leaves order pending | Provider-neutral persistence/display foundation fake-tested; real KHQR planned |
 | FR-PAY-004 | Provider verification checks transaction identity, attempt, merchant, currency and exact amount before confirming payment | Core verification/evidence/acceptance implemented and fake-tested; real provider authentication pending |
-| FR-PAY-005 | Duplicate/replayed callback/poll applies payment/stock once; uncertain outcomes and late settlements are reconciled | Payment replay/quarantine/manual recovery implemented; public callback, durable worker and stock planned |
-| FR-INV-001 | Manager/admin records receipts, waste and reasoned adjustments; append movements and maintain reconciled balance | Planned |
-| FR-INV-002 | Recipes map products to stock items and positive base-unit quantities; checkout reserves and completion consumes stock if enabled | Planned |
-| FR-INV-003 | Authorized staff sees unavailable/low-stock information computed from on-hand minus reservations and reorder thresholds | Planned |
-| FR-INV-004 | Ledger links sale to order and actor; corrections are compensating movements, never overwritten history | Planned |
+| FR-PAY-005 | Duplicate/replayed callback/poll applies payment/stock once; uncertain outcomes and late settlements are reconciled | Payment replay/quarantine/manual recovery implemented; tracked consumption implemented; public callback and durable worker planned |
+| FR-INV-001 | Manager/admin records receipts, waste and reasoned adjustments; append movements and maintain reconciled balance | Implemented Phase 5 backend |
+| FR-INV-002 | Recipes map products to stock items and positive base-unit quantities; checkout reserves and completion consumes stock if enabled | Implemented Phase 5 backend |
+| FR-INV-003 | Authorized staff sees item available/low-stock information computed from on-hand minus reservations and reorder thresholds | Item API implemented; per-product client availability remains planned |
+| FR-INV-004 | Ledger links sale to order and actor; corrections are compensating movements, never overwritten history | Implemented Phase 5 backend |
 | FR-REP-001 | Manager/admin views paid-sales, payment-method and stock summaries from authoritative records within a bounded date range | Planned |
 | FR-SET-001 | Admin updates approved store settings; manager reads operational settings; never store secrets in editable settings | Planned |
 
@@ -57,8 +57,10 @@ Performance, backup targets and business timezone are proposals, not measured pr
 
 ## Dependencies and acceptance trace
 
-FR-PAY-* -> [payment API](../api/payments.md), CashPaymentTest, ExternalPaymentTest, PaymentSchemaTest, PaymentConcurrencyTest and [Phase 4 evidence](phase-4-verification.md). Fake-only tests are not real bank/KHQR validation; no callback/stock/automatic worker behavior is claimed.
+FR-PAY-* -> [payment API](../api/payments.md), CashPaymentTest, ExternalPaymentTest, PaymentSchemaTest, PaymentConcurrencyTest and [Phase 4 evidence](phase-4-verification.md). Fake-only tests are not real bank/KHQR validation; tracked consumption is Phase 5; no public callback/automatic worker behavior is claimed.
 
-FR-AUTH-* -> [implemented auth contract](../api/README.md) -> AuthTest, AccessControlTest, AuthSchemaTest. FR-POS/ORD -> [Orders contract](../api/orders.md), OrderSchemaTest, CheckoutTest, OrderHistoryTest, OrderConcurrencyTest and [Phase 3 evidence](phase-3-verification.md). FR-PAY/INV and paid receipt acceptance remain future milestones; stock/payment effects are not claimed. FR-USER/REP/SET -> access matrix and future action/resource policy tests.
+FR-AUTH-* -> [implemented auth contract](../api/README.md) -> AuthTest, AccessControlTest, AuthSchemaTest. FR-POS/ORD -> [Orders contract](../api/orders.md), OrderSchemaTest, CheckoutTest, OrderHistoryTest, OrderConcurrencyTest and [Phase 3 evidence](phase-3-verification.md). FR-INV and payment-stock atomicity are Phase 5; paid receipt printing remains future work. FR-USER/REP/SET -> access matrix and future action/resource policy tests.
 
 FR-CAT/PROD -> [catalog API contract](../api/README.md), `CategorySchemaTest`, `CategoryApiTest`, `ProductSchemaTest`, `ProductApiTest`, `CatalogQueryTest`, `ProductWriteRaceTest`; [Phase 2 verification](phase-2-verification.md) separates SQLite results from MySQL production constraints. Fixed ordering is name+id, page sizes 1-100, bounded literal search, and eager category loading. No caching, Flutter POS or stock capability is implied.
+
+FR-INV-* -> [inventory API](../api/inventory.md), InventorySchemaTest, InventoryApiTest, RecipeApiTest, MovementApiTest, InventoryWorkflowTest, InventoryConcurrencyTest, InventoryConsistencyTest and [Phase 5 verification](phase-5-verification.md). Item availability/low_stock reads, exact ledger/recipes, deployment-gated reservations, paid consumption and safe release are implemented. Per-product catalog availability display and automatic reservation expiry remain future contracts.

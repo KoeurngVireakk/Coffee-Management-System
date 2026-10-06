@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class ExternalPaymentService
 {
-    public function __construct(private PaymentProvider $provider) {}
+    public function __construct(private PaymentProvider $provider, private OrderSettlementService $settlement) {}
 
     public function initiate(User $actor, Order $target, string $key): Payment
     {
@@ -41,7 +41,7 @@ class ExternalPaymentService
             if ($existing) {
                 return $this->replay($existing, $hash);
             }
-            if ($order->status !== OrderStatus::PendingPayment || $order->accepted_payment_id !== null || $order->active_payment_id !== null || $order->inventory_tracked
+            if ($order->status !== OrderStatus::PendingPayment || $order->accepted_payment_id !== null || $order->active_payment_id !== null
                 || $order->currency !== 'USD' || $order->total_minor < 0 || $order->total_minor > Order::MAX_SUBTOTAL_MINOR) {
                 throw new ConflictHttpException('Order is not eligible for a new payment attempt.');
             }
@@ -169,13 +169,16 @@ class ExternalPaymentService
             $wasTerminal = in_array($payment->status, [PaymentStatus::Failed, PaymentStatus::Expired], true);
             $payment->forceFill(['status' => 'confirmed', 'external_transaction_id' => $reply->transactionId, 'verified_at' => now()])->save();
             if ($wasTerminal || $order->status !== OrderStatus::PendingPayment || $order->accepted_payment_id !== null
-                || $order->inventory_tracked || ($order->active_payment_id !== null && $order->active_payment_id !== $payment->id)) {
+                || ($order->active_payment_id !== null && $order->active_payment_id !== $payment->id)) {
                 return $this->flag($payment, 'late_or_second_settlement');
             }
             $additionalEvidence = $payment->evidence()->count() > 1;
             $payment->forceFill(['reconciliation_required' => $additionalEvidence,
                 'reconciliation_reason' => $additionalEvidence ? 'additional_received_payment' : null])->save();
-            $order->acceptPayment($payment);
+            if ($additionalEvidence) {
+                return $payment; // Retain every observation; human review precedes inventory finalization.
+            }
+            $this->settlement->finalize($order, $payment);
 
             return $payment;
         }, 3);

@@ -1,6 +1,6 @@
 # Implemented Orders / POS checkout API (Phase 3)
 
-Base `/api/v1`. Auth remains the existing Sanctum bearer token with staff ability, active assigned cashier/manager/admin account. Checkout still creates **unpaid pending orders** and scoped history. Phase 4 now separately implements [payment attempts/cash settlement and verification foundation](payments.md), moving eligible orders to paid. No real KHQR adapter, stock, cancellation/refund/void, generic mutation route or paid receipt printing exists.
+Base `/api/v1`. Auth remains the existing Sanctum bearer token with staff ability, active assigned cashier/manager/admin account. Checkout still creates **unpaid pending orders** and scoped history. Phase 4 now separately implements [payment attempts/cash settlement and verification foundation](payments.md), moving eligible orders to paid. Phase 5 adds optional tracked reservations, shared atomic payment/stock finalization and safe manual cancellation; see [inventory contract](inventory.md). No real KHQR adapter, refund/void, generic order mutation route or paid receipt printing exists.
 
 ## Operations and permissions
 
@@ -36,7 +36,7 @@ Idempotency-Key: 6583ca16-7074-48ae-83a9-5b01b0d6a981
 - Invalid headers produce errors.idempotency_key. Structural failures use message/errors keyed by items or its line fields. Forbidden input includes client price/name/SKU/subtotal/discount/tax/total/currency/status/created_by/role/paid/inventory/options, at the top level or inside a line.
 - Laravel reloads products and category status under shared locks. Unknown/retired/inactive-category/invalid-authoritative-currency-or-price items return 422 with a generic items error; nothing is persisted.
 - Prices come from catalog, USD cents only. Each line is unit_price_minor * quantity; discount/tax are zero; subtotal=total. Maximum possible cart total is 4949995050 cents from the line/quantity/catalog caps. Checked integer multiplication/addition never use float, decimal rounding or currency conversion.
-- All writes commit together in one local transaction. inventory_tracked=false, status=pending_payment; no payment/stock I/O. No final paid receipt is produced.
+- All writes commit together in one local transaction. status=pending_payment; inventory_tracked is the immutable deployment cutover decision. Tracking disabled has no stock locks/reservations; enabled requires active recipes and atomically reserves exact quantities. No payment/provider I/O. No final paid receipt is produced.
 
 ## Replay semantics
 
@@ -83,7 +83,7 @@ All monetary fields are strings of exact cents. Product ID is a retained histori
 
 | Parameter | Contract |
 | --- | --- |
-| status | pending_payment/paid/cancelled/expired enum values; checkout creates pending_payment and Phase 4 settlement creates paid; cancel/expiry transitions remain unimplemented |
+| status | pending_payment/paid/cancelled/expired enum values; checkout creates pending_payment and Phase 4 settlement creates paid; safe pending cancellation is implemented in Phase 5; automatic expiry remains unimplemented |
 | created_from | Inclusive lower timestamp boundary |
 | created_to | Inclusive upper timestamp boundary, >= created_from |
 | per_page | Integer 1-100, default 25 |
@@ -98,3 +98,7 @@ Examples: GET `/orders?status=pending_payment&per_page=25`, GET `/orders?created
 401/403 use existing auth/account/ability behavior. 422 uses Laravel message/errors; 409 returns `{"message":"This Idempotency-Key was already used for a different checkout intent."}`. 404 hides unowned/missing order identity. API errors use no-store/private; deployment requires HTTPS and APP_DEBUG=false.
 
 MySQL 8.0.16+ enforces FK/unique/money/quantity/status/currency CHECKs. SQLite fast tests omit MySQL CHECK and locking guarantees. Laravel MySQL sessions now explicitly use +00:00 so physical TIMESTAMP epochs match UTC application values. Before rollout, audit legacy timestamps if a previous server/session timezone was non-UTC; this task performs no shared-data backfill or reinterpretation. New migration down operations delete order data and are not an allowed order-cancellation workflow. See [Phase 3 verification](../system-analysis/phase-3-verification.md) for real MySQL race/upgrade/query-plan evidence and remaining limits.
+
+## Phase 5 cancellation and tracked checkout
+
+POST `/orders/{order}/cancel` accepts no client properties, returns the persisted OrderResource with200, and is repeat-safe for cancelled orders. Cashier owns the order or management has shop access. Paid orders and active/unresolved/review payments return409. Tracked snapshots release exactly once; on_hand is unchanged. Tracking config is not client input; missing/inactive/insufficient recipes/stock return422 under items, with no partial order/reservation. Payment settlement consumes snapshots, not the current recipe. Existing checkout keys replay their original tracking flag across configuration changes. See [Phase 5 evidence](../system-analysis/phase-5-verification.md).

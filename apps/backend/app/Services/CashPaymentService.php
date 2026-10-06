@@ -13,6 +13,8 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class CashPaymentService
 {
+    public function __construct(private OrderSettlementService $settlement) {}
+
     public function settle(User $actor, Order $target, mixed $tender, string $key): Payment
     {
         Gate::forUser($actor)->authorize('pay', $target);
@@ -31,7 +33,7 @@ class CashPaymentService
 
                 return $existing;
             }
-            if ($order->status !== OrderStatus::PendingPayment || $order->accepted_payment_id !== null || $order->active_payment_id !== null || $order->inventory_tracked) {
+            if ($order->status !== OrderStatus::PendingPayment || $order->accepted_payment_id !== null || $order->active_payment_id !== null) {
                 throw new ConflictHttpException('Order is not eligible for a new settlement.');
             }
             if ($order->currency !== 'USD' || $order->total_minor < 0 || $order->total_minor > Order::MAX_SUBTOTAL_MINOR
@@ -43,7 +45,7 @@ class CashPaymentService
                 'status' => 'confirmed', 'expected_amount_minor' => $order->total_minor, 'currency' => $order->currency,
                 'tender_minor' => $tender, 'change_minor' => $tender - $order->total_minor, 'verified_at' => now(),
                 'reconciliation_required' => false])->save();
-            $order->acceptPayment($payment);
+            $this->settlement->finalize($order, $payment);
 
             return $payment;
         }, 3);

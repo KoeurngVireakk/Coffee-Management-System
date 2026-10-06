@@ -100,14 +100,14 @@ class OrderHistoryTest extends TestCase
         }
     }
 
-    public function test_order_mutation_payment_and_receipt_endpoints_are_absent(): void
+    public function test_arbitrary_order_mutation_legacy_payment_refund_and_receipt_endpoints_are_absent(): void
     {
         $order = Order::factory()->create();
         $this->staff($order->creator);
         foreach (['PUT', 'PATCH', 'DELETE'] as $method) {
             $this->json($method, '/api/v1/orders/'.$order->public_reference, ['status' => 'paid'])->assertStatus(405);
         }
-        foreach (['pay', 'cancel', 'refund', 'receipt'] as $path) {
+        foreach (['pay', 'refund', 'receipt'] as $path) {
             $this->postJson('/api/v1/orders/'.$order->public_reference.'/'.$path)->assertNotFound();
         }
         $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'pending_payment']);

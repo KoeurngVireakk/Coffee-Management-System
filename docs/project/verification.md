@@ -51,3 +51,5 @@ No Android device/emulator was connected during validation, so device launch was
 The initial Android build installed a required SDK build-tools component and emitted an SDK metadata warning. The web build emitted an icon-font diagnostic. Both completed successfully. Build artifacts and browser session logs remain local and ignored.
 
 All API/browser/MySQL verification servers and the Playwright browser session were stopped after verification. GitHub Actions is configured and YAML-validated locally, but has not run on GitHub because no changes were pushed. Production app identifiers, release signing, production URLs, and payment provider credentials are not configured.
+
+Current inventory checks and complete Phase 5 manifest are recorded in [Phase 5 verification](../system-analysis/phase-5-verification.md); the scaffold results above remain historical.

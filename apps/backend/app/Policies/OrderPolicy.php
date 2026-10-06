@@ -24,6 +24,11 @@ class OrderPolicy
             ? Response::allow() : Response::denyAsNotFound();
     }
 
+    public function cancel(User $user, Order $order): Response
+    {
+        return $this->pay($user, $order);
+    }
+
     public function pay(User $user, Order $order): Response
     {
         return $user->can('process-pos') && $this->view($user, $order)->allowed()

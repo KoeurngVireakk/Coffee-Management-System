@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(User::class, UserPolicy::class);
+        RateLimiter::for('inventory-writes', fn (Request $request) => Limit::perMinute(60)->by(
+            'inventory:'.($request->user()?->id ?? hash('sha256', $request->ip() ?? '')),
+        ));
         RateLimiter::for('payment-operations', fn (Request $request) => Limit::perMinute(30)->by(
             'payment:'.($request->user()?->id ?? hash('sha256', $request->ip() ?? '')),
         ));

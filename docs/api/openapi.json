@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Coffee Management API - payment settlement foundation",
-    "version": "1.3.0",
-    "description": "Auth/catalog/orders plus atomic cash settlement and provider-neutral external verification/reconciliation. External adapter unconfigured by default (503); fake exists only in tests. No real KHQR/bank callbacks, Inventory, refund or split payment."
+    "title": "Coffee Management API - inventory and settlement",
+    "version": "1.4.0",
+    "description": "Auth/catalog/orders/payments plus exact inventory, recipes, manual ledger, tracked reservations, atomic settlement and safe cancellation. Inventory deployment gate defaults false; historical flags immutable. Real external provider adapter remains unconfigured (503); no real KHQR/callback, refund or split payment."
   },
   "servers": [
     {
@@ -1076,7 +1076,7 @@
       "post": {
         "operationId": "checkout",
         "summary": "Atomically create an unpaid pending order",
-        "description": "All active staff with process-pos. USD server prices, zero discount/tax, inventory_tracked=false. New actor/key =201; same semantic cart =200 original immutable result even after catalog changes; changed cart =409. Canonical hash sorts distinct product IDs/quantities; no names/prices/secrets in intent hash. No payment or inventory I/O.",
+        "description": "All active POS staff. Authoritative USD prices, zero tax/discount. Deployment inventory.tracking_enabled defaults false; new tracked orders require active recipes/available stock and atomically snapshot/reserve. Old key replays original order/tracking even after config changes. Same intent200, changed intent409; invalid/insufficient stock422; no payment/provider I/O.",
         "security": [
           {
             "bearerAuth": []
@@ -1361,7 +1361,7 @@
       "post": {
         "operationId": "cashSettlement",
         "summary": "Authorize and atomically accept cash settlement",
-        "description": "Cashier own; manager/admin shop. Only tender intent; server USD amount/change/status/owner. Order then Payment locks. Same key/tender replay precedes paid check; distinct key cannot settle paid/active external order. No stock I/O.",
+        "description": "Cashier own, manager/admin shop. Exact server amount/change and idempotency. Shared local finalization atomically confirms payment, consumes valid tracked reservations with one sale per ingredient, and marks order paid. Untracked orders have no stock effects.",
         "security": [
           {
             "bearerAuth": []
@@ -1773,7 +1773,7 @@
       "post": {
         "operationId": "reconcileExternalPayment",
         "summary": "Query trusted provider evidence and apply once",
-        "description": "Authorized own/shop POS staff. Empty body; never accepts client transaction/status proof. Current adapter default 503. Verify outside transactions, then lock Order/Payment. Exact provider/merchant/correlation/order/amount/currency matching and global transaction uniqueness. Mismatch/late/second evidence retained and flagged; no double acceptance. Manual recovery is not a durable worker or public callback contract.",
+        "description": "Trusted provider status I/O outside SQL transaction. Matching eligible proof alone can confirm, consume tracked reservations and accept settlement atomically. Replays do not consume again; late/cancelled/extra funds retain review evidence. Production adapter unconfigured503; fake test-only.",
         "security": [
           {
             "bearerAuth": []
@@ -1879,6 +1879,1002 @@
             }
           }
         }
+      }
+    },
+    "/inventory/items": {
+      "get": {
+        "operationId": "inventoryIndex",
+        "summary": "Browse exact available stock (all staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemCollection"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "all"
+              ],
+              "default": "active"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            }
+          },
+          {
+            "name": "low_stock",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "0",
+                "1"
+              ]
+            }
+          }
+        ],
+        "description": "Fixed name ASC/id ASC, literal bound search; low stock available<=reorder. Unknown query fields rejected."
+      },
+      "post": {
+        "operationId": "inventoryCreate",
+        "summary": "Create zero-balance item (management)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Changed movement-key intent, prohibited opening, reserved-stock floor, unsafe cancellation or invalid finalization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "60 inventory writes/cancellations per minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreInventoryItemRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory/items/{inventoryItem}": {
+      "parameters": [
+        {
+          "name": "inventoryItem",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      ],
+      "get": {
+        "operationId": "inventoryShow",
+        "summary": "Read stock item (all staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "inventoryUpdatePut",
+        "summary": "Update metadata (management); balances/base unit immutable",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Changed movement-key intent, prohibited opening, reserved-stock floor, unsafe cancellation or invalid finalization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "60 inventory writes/cancellations per minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInventoryItemRequest"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "inventoryUpdatePatch",
+        "summary": "Update metadata (management); retire via is_active",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Changed movement-key intent, prohibited opening, reserved-stock floor, unsafe cancellation or invalid finalization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "60 inventory writes/cancellations per minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInventoryItemRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory/items/{inventoryItem}/movements": {
+      "parameters": [
+        {
+          "name": "inventoryItem",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      ],
+      "get": {
+        "operationId": "movementIndex",
+        "summary": "Read append-only stock ledger (management)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMovementCollection"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          }
+        ],
+        "description": "created_at DESC/id DESC; no unrestricted cashier ledger access."
+      },
+      "post": {
+        "operationId": "movementCreate",
+        "summary": "Atomically append manual movement and change balance (management)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Changed movement-key intent, prohibited opening, reserved-stock floor, unsafe cancellation or invalid finalization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "60 inventory writes/cancellations per minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMovementResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMovementResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreStockMovementRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{7,63}$"
+            },
+            "description": "One actor-scoped key across all inventory items. Same normalized item/reason/delta/note returns200; changed intent409."
+          }
+        ]
+      }
+    },
+    "/products/{product}/recipe": {
+      "parameters": [
+        {
+          "name": "product",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      ],
+      "get": {
+        "operationId": "recipeShow",
+        "summary": "Read complete recipe (management)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "recipeReplace",
+        "summary": "Replace complete recipe under parent product lock (management)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Changed movement-key intent, prohibited opening, reserved-stock floor, unsafe cancellation or invalid finalization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "60 inventory writes/cancellations per minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceRecipeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{order}/cancel": {
+      "parameters": [
+        {
+          "name": "order",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^ORD-[0-9A-HJKMNP-TV-Z]{26}$",
+            "description": "Server-generated opaque public ULID reference"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "orderCancel",
+        "summary": "Cancel safe pending own/shop order and release reservations once",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing item/product or missing/hidden scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Changed movement-key intent, prohibited opening, reserved-stock floor, unsafe cancellation or invalid finalization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields, keys, quantities or recipe; insufficient/inactive recipe stock during checkout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "60 inventory writes/cancellations per minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          },
+          "200": {
+            "description": "Persisted result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyCancelRequest"
+              }
+            }
+          }
+        },
+        "description": "Cashier own, manager/admin shop. Repeat cancelled result200. Paid/active/unresolved/review payment409. Tracked reserved decreases and snapshots released; on_hand unchanged. No automatic expiry/client proof."
       }
     }
   },
@@ -2650,7 +3646,7 @@
           },
           "inventory_tracked": {
             "type": "boolean",
-            "const": false
+            "description": "Immutable checkout cutover decision. False historical/default orders have no stock effects; true orders reserve and consume/release snapshots regardless of later configuration."
           },
           "created_at": {
             "type": [
@@ -3085,6 +4081,571 @@
         "additionalProperties": false,
         "maxProperties": 0,
         "description": "No client proof, price, owner, currency/status/provider/transaction/signature fields."
+      },
+      "InventoryItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "sku",
+          "name",
+          "base_unit",
+          "on_hand",
+          "reserved",
+          "available",
+          "reorder_level",
+          "is_active",
+          "low_stock",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sku": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "base_unit": {
+            "type": "string",
+            "enum": [
+              "g",
+              "ml",
+              "unit"
+            ]
+          },
+          "on_hand": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,9})\\.[0-9]{4}$"
+          },
+          "reserved": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,9})\\.[0-9]{4}$"
+          },
+          "available": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,9})\\.[0-9]{4}$"
+          },
+          "reorder_level": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,9})\\.[0-9]{4}$"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "low_stock": {
+            "type": "boolean",
+            "description": "available <= reorder_level"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "StoreInventoryItemRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sku",
+          "name",
+          "base_unit"
+        ],
+        "properties": {
+          "sku": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+            "description": "Trimmed/uppercased, case-insensitively unique."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "reorder_level": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,4})?$",
+            "description": "Exact base-unit decimal input; maximum9999999999.9999; normalize four places; JSON numbers rejected."
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "base_unit": {
+            "type": "string",
+            "enum": [
+              "g",
+              "ml",
+              "unit"
+            ]
+          }
+        }
+      },
+      "UpdateInventoryItemRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "sku": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+            "description": "Trimmed/uppercased, case-insensitively unique."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "reorder_level": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,4})?$",
+            "description": "Exact base-unit decimal input; maximum9999999999.9999; normalize four places; JSON numbers rejected."
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        },
+        "minProperties": 1
+      },
+      "StockMovement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "inventory_item_id",
+          "order_id",
+          "actor_id",
+          "quantity_delta",
+          "reason",
+          "note",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "inventory_item_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "order_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "actor_id": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "quantity_delta": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,9})\\.[0-9]{4}$"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "opening_balance",
+              "receipt",
+              "waste",
+              "adjustment",
+              "sale"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "StoreStockMovementRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reason",
+          "quantity_delta"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": [
+              "opening_balance",
+              "receipt",
+              "waste",
+              "adjustment"
+            ]
+          },
+          "quantity_delta": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,9})(\\.[0-9]{1,4})?$",
+            "description": "Exact base-unit decimal input; maximum9999999999.9999; normalize four places; JSON numbers rejected."
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          }
+        },
+        "description": "Nonzero delta. Positive opening/receipt, negative waste, +/-adjustment with nonblank note; no sale/actor/order/balance input. Opening only before any stock movement. Negative balance below reserved forbidden."
+      },
+      "RecipeIngredient": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "inventory_item_id",
+          "quantity"
+        ],
+        "properties": {
+          "inventory_item_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?:[1-9][0-9]{0,9}(?:\\.[0-9]{1,4})?|0\\.(?=[0-9]{0,3}[1-9])[0-9]{1,4})$",
+            "description": "Exact base-unit decimal input; maximum9999999999.9999; normalize four places; JSON numbers rejected."
+          }
+        },
+        "description": "Positive exact quantity per one sold unit; unique inventory item."
+      },
+      "ReplaceRecipeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ingredients"
+        ],
+        "properties": {
+          "ingredients": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/RecipeIngredient"
+            },
+            "description": "Complete replacement; empty clears recipe; each referenced item active."
+          }
+        }
+      },
+      "Recipe": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "product_id",
+          "ingredients"
+        ],
+        "properties": {
+          "product_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "inventory_item_id",
+                "sku",
+                "name",
+                "base_unit",
+                "is_active",
+                "quantity"
+              ],
+              "properties": {
+                "inventory_item_id": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "sku": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "base_unit": {
+                  "type": "string",
+                  "enum": [
+                    "g",
+                    "ml",
+                    "unit"
+                  ]
+                },
+                "is_active": {
+                  "type": "boolean"
+                },
+                "quantity": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]{0,9})\\.[0-9]{4}$"
+                }
+              }
+            }
+          }
+        }
+      },
+      "EmptyCancelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {}
+      },
+      "InventoryItemResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/InventoryItem"
+          }
+        }
+      },
+      "StockMovementResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/StockMovement"
+          }
+        }
+      },
+      "RecipeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Recipe"
+          }
+        }
+      },
+      "InventoryItemCollection": {
+        "type": "object",
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryItem"
+            }
+          },
+          "links": {
+            "type": "object",
+            "required": [
+              "first",
+              "last",
+              "prev",
+              "next"
+            ],
+            "properties": {
+              "first": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "last": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prev": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "next": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "current_page",
+              "from",
+              "last_page",
+              "path",
+              "per_page",
+              "to",
+              "total"
+            ],
+            "properties": {
+              "current_page": {
+                "type": "integer"
+              },
+              "from": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "last_page": {
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "to": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "total": {
+                "type": "integer"
+              },
+              "links": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "StockMovementCollection": {
+        "type": "object",
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockMovement"
+            }
+          },
+          "links": {
+            "type": "object",
+            "required": [
+              "first",
+              "last",
+              "prev",
+              "next"
+            ],
+            "properties": {
+              "first": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "last": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prev": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "next": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "current_page",
+              "from",
+              "last_page",
+              "path",
+              "per_page",
+              "to",
+              "total"
+            ],
+            "properties": {
+              "current_page": {
+                "type": "integer"
+              },
+              "from": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "last_page": {
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "to": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "total": {
+                "type": "integer"
+              },
+              "links": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
