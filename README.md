@@ -2,7 +2,7 @@
 
 A team monorepo for a Flutter mobile/tablet application, a Laravel REST API, and MySQL persistence.
 
-**Status:** backend authentication/access foundations are implemented: Sanctum sign-in/sign-out/current-user, cashier/manager/admin roles and gates. The app still displays a neutral startup screen. Categories/Products are implemented with authorized management, active menu reads and exact USD-cent prices. POS, orders, payments/KHQR, inventory, reports, staff administration and settings remain planned. See [system analysis and diagrams](docs/system-analysis/README.md) for the proposed full system and [API contract](docs/api/README.md) for actual endpoints.
+**Status:** backend authentication/access foundations are implemented: Sanctum sign-in/sign-out/current-user, cashier/manager/admin roles and gates. The app still displays a neutral startup screen. Categories/Products are implemented with authorized management, active menu reads and exact USD-cent prices. Phase 3 adds unpaid POS checkout and role-scoped order history with immutable snapshots and actor-scoped replay keys. Payments/KHQR, inventory, paid receipts, reports, staff administration and settings remain planned. See [system analysis and diagrams](docs/system-analysis/README.md) for the proposed full system and [API contract](docs/api/README.md) for actual endpoints.
 
 ## Repository layout
 
@@ -152,7 +152,7 @@ GitHub Actions runs backend formatting/tests plus MySQL migrations, and Flutter 
 
 Use short-lived branches and reviewed pull requests into `main`; do not commit dependencies, local configuration, credentials, generated output, or signing keys. Commit `composer.lock` and `pubspec.lock` so the team installs consistent versions. Recommended branch protection and contribution rules are in [contributing](docs/project/contributing.md).
 
-**Next backend feature:** Phase 3 Orders + POS Checkout, as a separate milestone; settle tax/discount/rounding rules first. Categories/Products are implemented with USD cents and no conversion. Flutter sign-in/session handling remains a separate planned client milestone. Scope and decision gates are in the [roadmap](docs/project/roadmap.md) and [backend plan](docs/system-analysis/backend-plan.md). After migrating a verified local database, run `php artisan db:seed --class=RoleSeeder` for standard roles; seeders create no accounts. Existing/new ordinary users are inactive and unassigned until deliberately provisioned through a trusted process. See [database guidance](docs/database/README.md).
+**Next backend feature:** Phase 4 Payments/Cash/KHQR as a separate milestone; define settlement/provider/reconciliation rules first. Phase 3 unpaid checkout/history is implemented with zero tax/discount and inventory enforcement off. Categories/Products are implemented with USD cents and no conversion. Flutter sign-in/session handling remains a separate planned client milestone. Scope and decision gates are in the [roadmap](docs/project/roadmap.md) and [backend plan](docs/system-analysis/backend-plan.md). After migrating a verified local database, run `php artisan db:seed --class=RoleSeeder` for standard roles; seeders create no accounts. Existing/new ordinary users are inactive and unassigned until deliberately provisioned through a trusted process. See [database guidance](docs/database/README.md).
 
 ## License
 

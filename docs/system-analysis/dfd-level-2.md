@@ -1,6 +1,6 @@
 # DFD level 2: POS order + checkout + payment
 
-**Proposed**, not implemented. This decomposes the combined P3/P4 boundary from level 1; P5 remains the inventory collaborator. External inputs/outputs preserve checkout, payment selection, history, receipts and provider exchanges. P2 catalog browsing precedes cart submission and is not repeated here.
+Phase 3 implements 3.1-3.5 unpaid order creation and 3.8 scoped history; stock enforcement is disabled (inventory_tracked=false), with no P5 calls. Payment processes, paid receipts and finalization remain **proposed**. The diagram shows the full target flow, not completed payment/stock behavior. This decomposes the combined P3/P4 boundary from level 1; P5 remains the inventory collaborator. External inputs/outputs preserve checkout, payment selection, history, receipts and provider exchanges. P2 catalog browsing precedes cart submission and is not repeated here.
 
 ```mermaid
 flowchart TB
@@ -70,7 +70,7 @@ flowchart TB
 
 ## Integrity and failure interpretation
 
-- 3.2-3.5 form one local checkout transaction when stock tracking is enabled. Catalog and stock are revalidated inside locks; any invalidity rolls back the order/reservation. The cart and client prechecks are not trusted.
+- 3.2-3.5 now form one local checkout transaction without stock tracking. Shared locks cover product PKs ascending then their actual category PKs ascending; authoritative snapshots are persisted atomically. The diagram's reservation exchange will only activate in Phase 5. Catalog and stock are revalidated inside locks; any invalidity rolls back the order/reservation. The cart and client prechecks are not trusted.
 - 4.1 persists attempt before external I/O; 4.3 never holds SQL locks during provider requests. Remote timeout/crash leaves a recoverable initiated/uncertain record. The QR is display data only.
 - 4.4 authenticates according to the actual provider contract or treats callbacks as hints and verifies by server query. Match amount/currency/merchant/correlation/unique transaction before settlement.
 - 4.5 + 3.6 + P5 stock consumption form one database completion transaction. Same verified result is idempotent; second settlement/mismatch is quarantined for reconciliation. A provider success can require manual recovery if local commit fails.

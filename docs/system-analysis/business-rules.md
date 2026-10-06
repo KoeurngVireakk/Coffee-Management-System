@@ -1,6 +1,6 @@
 # Business rules and access model
 
-Authentication and catalog rules below are implemented; order/payment/inventory rules are proposed invariants for future phases.
+Authentication, catalog, unpaid checkout and scoped order reads are implemented. Payment transitions, inventory and reports remain future-phase invariants.
 
 ## Identity and access
 
@@ -13,9 +13,9 @@ Authentication and catalog rules below are implemented; order/payment/inventory 
 | --- | --- | --- | --- | --- |
 | Current user / own user policy view | Yes | Yes | Yes | Implemented endpoint and policy |
 | Catalog read (`view-catalog`) | Yes | Yes | Yes | Category/Product policies and endpoints implemented |
-| POS and own orders (`process-pos`, `view-own-orders`) | Yes | Yes | Yes | Gates only |
+| POS and own orders (`process-pos`, `view-own-orders`) | Yes | Yes | Yes | Unpaid checkout and OrderPolicy/scoped history implemented |
 | Catalog management (`manage-catalog`) | No | Yes | Yes | Category/Product policies and endpoints implemented |
-| All shop orders (`view-all-orders`) | No | Yes | Yes | Gate only |
+| All shop orders (`view-all-orders`) | No | Yes | Yes | OrderPolicy and scoped history implemented |
 | Stock read (`view-inventory`) | Yes | Yes | Yes | Gate only |
 | Stock adjustment (`adjust-inventory`) | No | Yes | Yes | Gate only |
 | Reports (`view-reports`) | No | Yes | Yes | Gate only |
@@ -23,7 +23,7 @@ Authentication and catalog rules below are implemented; order/payment/inventory 
 | Operational settings read (`view-settings`) | No | Yes | Yes | Gate only |
 | Settings write (`manage-settings`) | No | No | Yes | Gate only |
 
-Managers do not inherit staff administration. Future resource policies must additionally restrict objects (e.g. cashier orders by created_by), transitions and properties. These gates enforce catalog policies; orders and administration remain unimplemented. All staff can process cash/KHQR on their authorized orders; refunds/voids remain unapproved.
+Managers do not inherit staff administration. OrderPolicy now restricts cashier reads by created_by; future payment/admin policies must still protect objects, transitions and properties. Catalog and unpaid orders use enforced action/object scoping; paid transitions and administration remain unimplemented. Planned Phase 4 permissions will allow staff to process cash/KHQR on authorized orders; refunds/voids remain unapproved.
 
 ## Catalog and money
 
@@ -32,13 +32,13 @@ Managers do not inherit staff administration. Future resource policies must addi
 - BR-CAT-003 (Phase 2 implemented): staff reads default to active categories/sellable products. Only managers/admins can request status=all/inactive or view retired records; cashier detail requests for non-sellable records return 404. Retirement is an is_active update, never DELETE. Category/product flags are independent: reactivating a product under an inactive category does not make it sellable.
 - BR-CAT-004 (Phase 2 implemented): SKU is normalized to uppercase ASCII, 1-64 characters from letters/digits/hyphen/underscore (first character letter/digit); unique case-insensitively on MySQL and SQLite. Category names are not assumed unique. Lists order by name then id, with bounded page/search input and no client-controlled sorting.
 - BR-MONEY-001: monetary columns are signed BIGINT minor units with currency CHAR(3). Never FLOAT/DOUBLE. API money is an integer string plus currency; reject amounts outside supported bounds. The user approved USD with scale 2 for the catalog on 2026-10-06. Product price_minor accepts/returns canonical integer-cent strings, from 0 through 999999 ($0.00 through $9,999.99), an explicit administrative input cap. Fractional cents are rejected, never rounded. Currency is exactly USD; no conversion exists.
-- BR-MONEY-002: Laravel calculates subtotal, discount, tax and total. Submitted checkout prices/paid flags will be invalid. Manager/admin catalog endpoints can deliberately set product prices; cashiers cannot. Item name, SKU, price, quantity and computed totals are historical snapshots. Changes to product prices do not rewrite existing orders.
-- BR-MONEY-003: subtotal=sum(line subtotals); total=subtotal-discount+tax; all totals nonnegative; discount <= subtotal. Discounts/tax initially zero, until approved rules specify scope, rounding, authority and snapshot data. No currency conversion is implied.
+- BR-MONEY-002: Laravel calculates subtotal, discount, tax and total. Submitted checkout prices/paid flags are rejected. Manager/admin catalog endpoints can deliberately set product prices; cashiers cannot. Item name, SKU, price, quantity and computed totals are historical snapshots. Changes to product prices do not rewrite existing orders.
+- BR-MONEY-003: subtotal=sum(line subtotals); total=subtotal-discount+tax; all totals nonnegative; discount <= subtotal. Phase 3 freezes discount/tax at zero and total=subtotal; no options, rounding or conversion. Future tax/discount rules need approval. No currency conversion is implied.
 
 ## Orders and payments
 
-- BR-ORD-001: proposed lifecycle is pending_payment -> paid OR cancelled/expired. Paid/cancelled/expired orders cannot be edited. Refunds need a later explicit model. Orders have at least one positive-quantity item and a unique public reference.
-- BR-ORD-002: a unique checkout key per actor plus canonical request hash prevents duplicate orders. Repeated same intent returns original order; changed intent with same key returns 409. The stored hash includes item selection/currency and accepted options, never secrets.
+- BR-ORD-001: Phase 3 creates pending_payment only, with 1-50 distinct lines and strict JSON integer quantity 1-99. URI identity is server-generated ORD-ULID; amount snapshots and history are immutable in model/API workflows. No update/delete/cancel/pay/receipt endpoint. The enum/DB allow planned paid/cancelled/expired states, whose transitions belong to later approved workflows. Refunds need a later explicit model.
+- BR-ORD-002: a unique checkout key per actor plus canonical request hash prevents duplicate orders. Repeated same intent returns original order; changed intent with same key returns 409. Idempotency-Key is a required 8-64-character case-sensitive ASCII header (first alphanumeric; rest alphanumeric/dot/underscore/hyphen), not a body field. Version-1 hash contains sorted product IDs/quantities and USD context, never prices/credentials/options. Reordered input is equivalent; original snapshots replay after catalog changes. Concurrent loser reloads the committed winner after rollback, including catalog-retirement races.
 - BR-PAY-001: orders have multiple payment attempts, but at most one accepted full settlement. Split/partial payments are excluded for now. Pending order has at most one current attempt, enforced by order lock/active_payment_id; decline/expiry permits a new attempt only after uncertainty is resolved.
 - BR-PAY-002: cash tender >= due; change=tender-due in order currency. Cash confirmation and paid order commit together. A chosen method, QR display, client success or screenshot never proves external payment.
 - BR-PAY-003: backend verification matches merchant, order/attempt correlation, exact amount/currency and provider transaction ID. Authenticated callbacks follow selected provider contract; unsigned callbacks are hints requiring server verification.
@@ -46,6 +46,9 @@ Managers do not inherit staff administration. Future resource policies must addi
 - BR-PAY-005: attempt states: initiated -> pending -> confirmed/failed/expired; provider timeout -> uncertain -> verified terminal outcome. Do not retry state-changing remote I/O blindly. Expiry/cancellation requires verified no-settlement or quarantine. A late success after an order expired records settlement and manual-review requirement without automatically changing already released stock.
 
 ## Inventory and reporting
+
+- BR-ORD-003 (Phase 3): all monetary fields use checked integer arithmetic and exact string output; subtotal/total cap 4949995050 cents from existing product cap x 99 x 50. Every creation is pending_payment/untracked. Shared product locks (ascending IDs), then shared category locks (ascending IDs) prevent inconsistent snapshots; transaction retries at most three times on deadlock.
+- BR-ORD-004 (Phase 3): cashier history is scoped to created_by before lookup; manager/admin can see all shop orders, with policy defense. Fixed created_at DESC/id DESC; 25 default, 100 max/page, page max 10000. ISO boundaries require explicit UTC offset and valid calendar/time; normalize to UTC, no business-day inference. Raw query-builder/SQL can bypass model immutability guards and is trusted maintenance, not an API capability.
 
 - BR-INV-001: stock tracking is explicitly disabled until inventory rollout. When enabled, every sellable tracked product has a valid recipe, or checkout fails. Packaged products map to one stock item. Use one base unit per item; quantities DECIMAL(14,4), positive recipe quantities and signed ledger deltas.
 - BR-INV-002: available=on_hand-reserved. Checkout reserves under item locks if tracking is enabled; cannot reserve more than available. Payment confirms consume reserved stock with movement; verified cancellation/expiry releases reservation. Locks use sorted stock-item IDs.
@@ -58,7 +61,7 @@ Managers do not inherit staff administration. Future resource policies must addi
 
 | Decision | Proposed position / gate |
 | --- | --- |
-| Currency / scale / rounding | USD / scale 2 approved for catalog; fractional cents rejected; tax/discount/checkout rounding still unresolved before Phase 3 |
+| Currency / scale / rounding | USD / scale 2 approved for catalog; fractional cents rejected; Phase 3 tax/discount zero, integer quantities and no rounding/options frozen; future changes need approval |
 | Tax / discount / modifiers | Disabled initially; approve rules and schema extension before use |
 | Shop timezone / receipt numbering | Candidate Asia/Phnom_Penh, immutable public reference; owner confirms |
 | Inventory scope / units / overselling | Ingredients + packaged goods; no negative available stock proposed; confirm before Phase 5 |

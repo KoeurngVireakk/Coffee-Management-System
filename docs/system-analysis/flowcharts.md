@@ -1,6 +1,6 @@
 # Workflow flowcharts
 
-Authentication below reflects implemented backend behavior. POS/KHQR diagrams are proposed workflows for later milestones. No Flutter screens are implemented here.
+Authentication below reflects implemented backend behavior. Unpaid cart validation/calculation/order creation is implemented in Phase 3; POS payment/stock/receipt branches and KHQR remain proposed workflows for later milestones. No Flutter screens are implemented here.
 
 ## Staff authentication
 

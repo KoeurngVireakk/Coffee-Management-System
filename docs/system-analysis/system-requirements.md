@@ -1,6 +1,6 @@
 # System requirements
 
-Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication and Categories/Products are executable. Other acceptance criteria remain target behavior.
+Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication, Categories/Products and unpaid checkout/order history are executable. Other acceptance criteria remain target behavior.
 
 ## Functional requirements
 
@@ -13,14 +13,14 @@ Status legend: **implemented** means backend behavior exists in this milestone; 
 | FR-USER-001 | Admin creates/updates/deactivates staff and assigns approved roles; no public registration; audit sensitive changes and revoke tokens on password recovery | Planned |
 | FR-CAT-001 | Manager/admin creates, renames and retires categories; retire/reactivate without deleting financial history | Implemented lifecycle; financial tables remain planned |
 | FR-PROD-001 | Manager/admin maintains SKU, name, category, exact price and active status; category is required | Implemented, USD cents |
-| FR-PROD-002 | Staff browse/search active menu with bounded pagination and stable order; unavailable/retired products cannot be added | Catalog implemented; cart/checkout and stock availability remain planned |
-| FR-POS-001 | All staff construct a client cart from product IDs and bounded positive quantities; server rechecks availability | Planned |
-| FR-POS-002 | Server builds immutable item name/unit-price/quantity/line-total snapshots and authoritative order totals; submitted prices are rejected | Planned |
-| FR-POS-003 | Replay of a checkout key returns the original order; altered payload with same key conflicts | Planned |
-| FR-ORD-001 | Pending order has items, owner, currency and unique public reference; transitions follow business rules | Planned |
-| FR-ORD-002 | Cashier views own order history; manager/admin views shop history; date filters and pagination are bounded | Planned |
+| FR-PROD-002 | Staff browse/search active menu with bounded pagination and stable order; unavailable/retired products cannot be added | Catalog and backend sellability revalidation implemented; Flutter cart/stock availability remain planned |
+| FR-POS-001 | All staff construct a client cart from product IDs and bounded positive quantities; server rechecks availability | Backend cart intent/sellability implemented (50 lines, qty 1-99); Flutter cart/stock still planned |
+| FR-POS-002 | Server builds immutable item name/unit-price/quantity/line-total snapshots and authoritative order totals; submitted prices are rejected | Implemented for unpaid orders, exact USD cents; zero discount/tax |
+| FR-POS-003 | Replay of a checkout key returns the original order; altered payload with same key conflicts | Implemented, Idempotency-Key header per actor; canonical intent; MySQL race verified |
+| FR-ORD-001 | Pending order has items, owner, currency and unique public reference; transitions follow business rules | Pending creation implemented; later lifecycle transitions planned |
+| FR-ORD-002 | Cashier views own order history; manager/admin views shop history; date filters and pagination are bounded | Implemented with absolute UTC boundaries, bounded pages and scoped opaque references |
 | FR-ORD-003 | Final receipt comes from persisted paid order and confirmed payment; no client-generated financial truth | Planned |
-| FR-DISC-001 | Discounts/tax disabled until rules are approved; later privileged discounts are validated and snapshotted with actor/reason | Planned; decision open |
+| FR-DISC-001 | Discounts/tax disabled until rules are approved; later privileged discounts are validated and snapshotted with actor/reason | Phase 3 zero values enforced; future discount/tax workflows planned |
 | FR-PAY-001 | Staff selects cash or supported external method for an unpaid order; currency and due amount come from order | Planned |
 | FR-PAY-002 | Cash tender is validated in exact units; tender >= due; server calculates change and atomically completes sale | Planned |
 | FR-PAY-003 | Backend initiates generic KHQR attempt, persists correlation/expiry and returns display data; displaying QR leaves order pending | Planned |
@@ -57,6 +57,6 @@ Performance, backup targets and business timezone are proposals, not measured pr
 
 ## Dependencies and acceptance trace
 
-FR-AUTH-* -> [implemented auth contract](../api/README.md) -> `tests/Feature/AuthTest.php`, `AccessControlTest.php`, `AuthSchemaTest.php`. FR-POS/ORD/PAY/INV -> [rules](business-rules.md), [TRD transactions](trd.md), [level 2 DFD](dfd-level-2.md); acceptance tests belong to their future milestones. FR-USER/REP/SET -> access matrix and future action/resource policy tests. No test coverage is claimed for planned modules.
+FR-AUTH-* -> [implemented auth contract](../api/README.md) -> AuthTest, AccessControlTest, AuthSchemaTest. FR-POS/ORD -> [Orders contract](../api/orders.md), OrderSchemaTest, CheckoutTest, OrderHistoryTest, OrderConcurrencyTest and [Phase 3 evidence](phase-3-verification.md). FR-PAY/INV and paid receipt acceptance remain future milestones; stock/payment effects are not claimed. FR-USER/REP/SET -> access matrix and future action/resource policy tests.
 
-FR-CAT/PROD -> [catalog API contract](../api/README.md), `CategorySchemaTest`, `CategoryApiTest`, `ProductSchemaTest`, `ProductApiTest`, `CatalogQueryTest`, `ProductWriteRaceTest`; [Phase 2 verification](phase-2-verification.md) separates SQLite results from MySQL production constraints. Fixed ordering is name+id, page sizes 1-100, bounded literal search, and eager category loading. No caching, POS or stock capability is implied.
+FR-CAT/PROD -> [catalog API contract](../api/README.md), `CategorySchemaTest`, `CategoryApiTest`, `ProductSchemaTest`, `ProductApiTest`, `CatalogQueryTest`, `ProductWriteRaceTest`; [Phase 2 verification](phase-2-verification.md) separates SQLite results from MySQL production constraints. Fixed ordering is name+id, page sizes 1-100, bounded literal search, and eager category loading. No caching, Flutter POS or stock capability is implied.

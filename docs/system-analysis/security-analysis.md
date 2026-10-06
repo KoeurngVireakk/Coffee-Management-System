@@ -1,6 +1,6 @@
 # Security analysis
 
-Scope: local passive analysis, Phase 1 authentication and Phase 2 catalog implementation. This is not an OWASP compliance claim or provider integration review. Relevant framework behavior was checked against installed Laravel 13 and [official Sanctum documentation](https://laravel.com/framework/docs/13.x/sanctum).
+Scope: local passive analysis, Phase 1 authentication, Phase 2 catalog and Phase 3 unpaid orders implementation. This is not an OWASP compliance claim or provider integration review. Relevant framework behavior was checked against installed Laravel 13 and [official Sanctum documentation](https://laravel.com/framework/docs/13.x/sanctum).
 
 ## Assets and trust boundaries
 
@@ -29,8 +29,10 @@ Likelihood depends on public exposure and deployment; impacts on staff identity 
 
 ## Implemented versus planned
 
+Phase 3 adds process-pos checkout and OrderPolicy plus scoped queries (hidden/missing refs share 404). Only validated product IDs/quantities reach the service; both top-level and nested property injection are denied. Header keys are bounded ASCII and actor-scoped; canonical hash excludes prices/credentials. Shared catalog locks, unique winner comparison after rollback, checked exact cents and all-or-nothing item writes are verified on MySQL. Resources expose only authoritative snapshots and authorized creator id/name, never key/hash/credentials. History limits, strict absolute boundaries and eager relationships address input/query abuse. No payment, inventory or receipt control is claimed. The MySQL session now explicitly uses UTC; legacy timestamp interpretation must be audited before rollout where old sessions were non-UTC.
+
 Implemented: bearer-only Sanctum config (no cookie guard/stateful middleware/CSRF-cookie route), required staff token ability, fixed role gates, user-view policy, live account/role checks, strong field boundaries, resources, secure hash verification/rehash, finite expiry, token revocation, JSON errors/throttling, no-store auth responses/API errors and tests. No public registration/reset/staff-edit API. Factory credentials are explicitly synthetic and seeders create only roles.
 
-Planned: order policies, provider authentication/exact verification/idempotency, durable worker/recovery, stock locking/ledger, admin audit log, password recovery/token inventory, backup/restore verification and client secure storage. Production TLS/secrets/logging are operating requirements, not verified deployment controls. No outbound calls or real payment tests are authorized/performed.
+Implemented Phase 3 order policies and query scoping are detailed below. Planned: provider authentication/exact verification/idempotency, durable worker/recovery, stock locking/ledger, admin audit log, password recovery/token inventory, backup/restore verification and client secure storage. Production TLS/secrets/logging are operating requirements, not verified deployment controls. No outbound calls or real payment tests are authorized/performed.
 
 Phase 2 implemented: Category/Product Policies reuse view-catalog/manage-catalog gates; every catalog route uses existing Sanctum/active-staff/staff-ability middleware. Strict create/update/query Requests reject privilege/owner/internal fields. Cashiers cannot mutate any catalog ID and cannot read retired details; managers/admins can manage the shared shop catalog. Products belong to categories via RESTRICT FK. Resources serialize only approved catalog fields and a minimal eager-loaded category summary. Integer-cent string validation rejects floats, negative/oversized/noncanonical prices and unsupported currency. SKU database uniqueness is authoritative, including a collision after request validation (422). Search binds escaped literal patterns; sort is fixed; pages are capped at 100 items and page 10000. No caching or raw client SQL identifiers. See [Phase 2 checks](phase-2-verification.md).

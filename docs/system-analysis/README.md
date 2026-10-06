@@ -6,7 +6,7 @@ Analysis date: 2026-10-06 (Asia/Bangkok). Scope: a single coffee shop, online st
 
 Before this milestone, inspection found a clean `main`, Laravel 13.34.0, PHP 8.4.4, default framework migrations/User/factory, `/up`, empty `/api/v1`, and three bootstrap tests. Flutter contains feature boundaries and a startup screen. No business modules existed.
 
-Phase 1 implemented backend authentication/access foundations. Phase 2 now implements Categories and Products: role-authorized management, retirement/reactivation, active menu browsing, strict inputs, bounded pagination/search and exact USD-cent prices. These documents distinguish implemented authentication/catalog from the **proposed** remaining system. See [actual API contract](../api/README.md), [Phase 1 verification](verification.md) and [Phase 2 verification](phase-2-verification.md). Flutter authentication and POS/order/payment/inventory/report/settings endpoints remain unimplemented.
+Phase 1 implemented backend authentication/access foundations. Phase 2 now implements Categories and Products: role-authorized management, retirement/reactivation, active menu browsing, strict inputs, bounded pagination/search and exact USD-cent prices. Phase 3 adds atomic unpaid checkout and scoped order history: server prices, immutable snapshots, actor-scoped replay and UTC time. These documents distinguish implemented authentication/catalog/unpaid orders from the **proposed** remaining system. See [actual API contract](../api/README.md), [Phase 1 verification](verification.md) and [Phase 2 verification](phase-2-verification.md). Flutter authentication, paid POS settlement/receipts and payment/inventory/report/settings endpoints remain unimplemented.
 
 ## Documents
 
@@ -24,6 +24,7 @@ Phase 1 implemented backend authentication/access foundations. Phase 2 now imple
 | [Backend plan](backend-plan.md) | Ordered milestones, rollout and acceptance gates |
 | [Verification and review](verification.md) | Phase 1 checks, review findings and limits |
 | [Phase 2 verification](phase-2-verification.md) | Incremental catalog checks, approved USD decision, MySQL plans and reviews |
+| [Phase 3 verification](phase-3-verification.md) | Unpaid checkout/history, replay, UTC, real MySQL races and review evidence |
 
 Mermaid blocks are the diagram source of truth. No renderer or diagram dependency is required. DFD arrows represent data, while flowchart arrows represent execution. The level 2 diagram decomposes level 1 processes 3 and 4 as one checkout boundary, retaining process 5 as an external collaborator.
 
@@ -32,7 +33,7 @@ Mermaid blocks are the diagram source of truth. No renderer or diagram dependenc
 - Laravel owns prices, permissions, order/payment transitions and inventory. Flutter sends intent over HTTPS JSON; MySQL is reachable only by the backend.
 - One role per staff account is sufficient for cashier/manager/admin. A normalized roles table and a fixed, code-reviewed permission map avoid a permission editor/package. Missing/unknown roles fail closed. Role changes take effect on the next request.
 - Native authentication uses expiring Sanctum bearer tokens. No refresh endpoint, public registration or default seeded accounts. First-party browser cookie/CSRF authentication and secure client storage are a later Flutter/Web milestone, following [Sanctum's distinction between API tokens and SPA authentication](https://laravel.com/framework/docs/13.x/sanctum).
-- Phase 2 currency decision: the user approved USD with scale 2 on 2026-10-06. Product prices use signed BIGINT cents with an exact string API. Fractional cents are rejected; no conversion or exchange rate exists. Checkout tax/discount/rounding rules remain decisions for Phase 3.
+- Phase 2 currency decision: the user approved USD with scale 2 on 2026-10-06. Product prices use signed BIGINT cents with an exact string API. Fractional cents are rejected; no conversion or exchange rate exists. Phase 3 freezes tax/discount to zero, accepts integer quantity without options and performs no rounding. Later tax/discount/option changes need approval.
 - Proposed inventory uses ingredients/stock items, recipes and an append-only movement ledger. Packaged products can have a one-item recipe. Reservations prevent overselling during external payment; confirmed sales consume reserved stock exactly once. Inventory deployment is optional until Phase 5 but must be enabled explicitly, never silently half-enforced.
 - Payment I/O stays outside short database transactions. Durable pending attempts and recovery scans precede real provider integration. Timeouts are uncertain outcomes, not failed payments.
 
