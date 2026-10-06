@@ -7,8 +7,8 @@ import 'features/auth/data/auth_api.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/data/auth_token_store.dart';
 import 'features/auth/presentation/auth_controller.dart';
-import 'features/auth/presentation/authenticated_placeholder_page.dart';
 import 'features/auth/presentation/login_page.dart';
+import 'features/shell/presentation/adaptive_app_shell.dart';
 import 'shared/theme/app_spacing.dart';
 import 'shared/theme/app_theme.dart';
 import 'shared/theme/app_typography.dart';
@@ -100,9 +100,16 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
           }
 
           if (state is Authenticated) {
-            return AuthenticatedPlaceholderPage(
-              session: state.session,
+            return AdaptiveAppShell(
               authController: _authController,
+              currentThemeMode: _themeMode,
+              onToggleTheme: () {
+                setState(() {
+                  _themeMode = _themeMode == ThemeMode.dark
+                      ? ThemeMode.light
+                      : ThemeMode.dark;
+                });
+              },
             );
           }
 
