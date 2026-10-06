@@ -93,4 +93,3 @@ try {
         'message' => $e->getMessage(),
     ]).PHP_EOL;
 }
-

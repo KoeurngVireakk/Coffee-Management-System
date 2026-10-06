@@ -27,4 +27,3 @@ class StaffIndexRequest extends FormRequest
         ];
     }
 }
-

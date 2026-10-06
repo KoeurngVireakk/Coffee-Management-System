@@ -72,4 +72,3 @@ class StaffSchemaTest extends TestCase
         $user->delete();
     }
 }
-

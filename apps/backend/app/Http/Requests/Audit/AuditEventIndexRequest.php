@@ -50,4 +50,3 @@ class AuditEventIndexRequest extends FormRequest
         }];
     }
 }
-

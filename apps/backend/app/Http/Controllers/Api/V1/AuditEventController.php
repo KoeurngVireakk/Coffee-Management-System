@@ -52,4 +52,3 @@ class AuditEventController extends Controller
         return AuditEventResource::collection($query->paginate($perPage, ['*'], 'page', $page)->withQueryString());
     }
 }
-

@@ -386,4 +386,3 @@ class StaffApiTest extends TestCase
         $this->assertSame('Device reported lost at counter', $audit->metadata['reason']);
     }
 }
-

@@ -25,4 +25,3 @@ class StaffResource extends JsonResource
         ];
     }
 }
-

@@ -46,4 +46,3 @@ class CreateStaffRequest extends FormRequest
         ];
     }
 }
-

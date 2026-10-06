@@ -28,4 +28,3 @@ class AuditEventResource extends JsonResource
         ];
     }
 }
-

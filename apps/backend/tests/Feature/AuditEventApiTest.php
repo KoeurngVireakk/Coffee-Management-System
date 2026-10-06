@@ -111,4 +111,3 @@ class AuditEventApiTest extends TestCase
         $event->delete();
     }
 }
-

@@ -25,4 +25,3 @@ class SettingResource extends JsonResource
         ];
     }
 }
-

@@ -25,4 +25,3 @@ class ResetStaffPasswordRequest extends FormRequest
         ];
     }
 }
-
