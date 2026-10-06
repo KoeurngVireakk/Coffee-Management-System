@@ -1,10 +1,10 @@
 # Implementation roadmap
 
-Backend Phase 1 authentication/access foundations are implemented. Flutter remains scaffolded; the remaining business modules below are planned. See [system analysis](../system-analysis/README.md) and [backend implementation plan](../system-analysis/backend-plan.md) for requirements, diagrams and acceptance gates.
+Backend Phase 1 authentication/access foundations and Phase 2 Categories/Products are implemented. Flutter remains scaffolded; the remaining business modules below are planned. See [system analysis](../system-analysis/README.md) and [backend implementation plan](../system-analysis/backend-plan.md) for requirements, diagrams and acceptance gates.
 
 1. **Auth and access foundations:** backend complete for this milestone: Sanctum bearer login/logout/me, eight-hour expiry, live staff-account checks, fixed roles/gates, user-view policy, validation/resources/throttling and negative-path tests. No staff administration or public registration. Flutter sign-in/session handling, native secure storage, first-party Web cookie/CSRF flow and state-management selection remain planned; cross-app expiry handling is not verified.
-2. **Categories and Products:** catalog schema, API resources, authorized management, and tablet-friendly browsing.
-3. **Orders and POS:** order/cart contract, server-authoritative totals, order item price snapshots, and transactional checkout. Decide tax/discount/currency rules first.
+2. **Categories and Products:** backend implemented: schemas, policies, Resources, strict manager/admin management, retirement/reactivation, paginated literal search and exact USD-cent prices. Flutter/tablet browsing remains planned. See [Phase 2 verification](../system-analysis/phase-2-verification.md).
+3. **Orders and POS:** order/cart contract, server-authoritative totals, order item price snapshots, and transactional checkout. USD/scale 2 is approved; decide tax/discount/checkout rounding rules first.
 4. **Payments/KHQR:** choose a provider and sandbox; implement server-side payment verification, idempotency, callbacks, and reconciliation. A displayed QR or client response must not alone mark an order paid.
 5. **Inventory:** stock movement ledger and adjustments tied to order/payment lifecycle decisions.
 6. **Users/Roles and Settings:** administration UI and store configuration building on the access foundation.

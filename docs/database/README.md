@@ -1,6 +1,6 @@
 # Database setup and conventions
 
-The application targets MySQL 8.0+. The example environment uses `127.0.0.1:3306`, database `coffee_management`, and a dedicated `coffee_management` account. No real credentials are committed.
+The catalog now requires MySQL 8.0.16+ with enforced CHECK constraints. The example environment uses `127.0.0.1:3306`, database `coffee_management`, and a dedicated `coffee_management` account. No real credentials are committed.
 
 Connect as your local database administrator (`mysql -u root -p`, adjusting host/port if needed). For a new local development database, run the following after replacing the example password locally:
 
@@ -23,7 +23,7 @@ php artisan migrate
 php artisan migrate:status
 ```
 
-Laravel's default users/password reset/session, cache, and jobs migrations remain unchanged. Phase 1 adds `roles`, nullable `users.role_id` (RESTRICT), inactive-by-default `users.is_active`, and Sanctum `personal_access_tokens`. The root seeder calls the idempotent RoleSeeder for cashier/manager/admin and creates no accounts. No product/order/payment/inventory table exists. File cache/session drivers and synchronous queues do not use their database infrastructure tables yet. The [physical TRD](../system-analysis/trd.md) separates actual tables from proposed business design.
+Laravel's default users/password reset/session, cache, and jobs migrations remain unchanged. Phase 1 adds `roles`, nullable `users.role_id` (RESTRICT), inactive-by-default `users.is_active`, and Sanctum `personal_access_tokens`. The root seeder calls the idempotent RoleSeeder for cashier/manager/admin and creates no accounts. Phase 2 adds categories/products and a RESTRICT category FK. No order/payment/inventory table exists. File cache/session drivers and synchronous queues do not use their database infrastructure tables yet. The [physical TRD](../system-analysis/trd.md) separates actual tables from proposed business design.
 
 After migrating a verified dedicated development database, run `php artisan db:seed --class=RoleSeeder`. Existing users retain their name/email/password and become unassigned/inactive; do not automatically assign admin privileges. Initial synthetic local accounts can be deliberately created in Tinker with `User::factory()->withRole(StaffRole::Cashier)` or `StaffRole::Admin`, an explicit lowercase example.test email and an explicit randomly generated local password. The factory defaults active with a cashier role and a known **test-only** password; never use that default as a deployed/staff credential. Seeders contain no initial/default user or password. Real staff provisioning/recovery/admin endpoints remain Phase 6.
 
@@ -40,4 +40,4 @@ php artisan config:clear
 php vendor/bin/phpunit --configuration phpunit.mysql.xml
 ```
 
-The suite uses migrate:fresh internally and destroys tables in that test database. Never point it at production/shared data. The MySQL run in this milestone used its own data directory, 127.0.0.1:33379, MySQL 8.0.39 and synthetic data; the normal local MySQL service/database was not mutated. See [verification](../system-analysis/verification.md). Later business CHECK/locking/payment concurrency needs additional isolated MySQL tests; today's checks prove only the implemented auth schema and behavior.
+The suite uses migrate:fresh internally and destroys tables in that test database. Never point it at production/shared data. The MySQL run in this milestone used its own data directory, 127.0.0.1:33379, MySQL 8.0.39 and synthetic data; the normal local MySQL service/database was not mutated. See [verification](../system-analysis/verification.md). [Phase 2 verification](../system-analysis/phase-2-verification.md) adds catalog FK/SKU/index/money CHECK tests, query plans and upgrade preservation. Future order/payment/inventory locking still requires its own tests; catalog results do not prove checkout concurrency.

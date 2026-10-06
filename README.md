@@ -2,7 +2,7 @@
 
 A team monorepo for a Flutter mobile/tablet application, a Laravel REST API, and MySQL persistence.
 
-**Status:** backend authentication/access foundations are implemented: Sanctum sign-in/sign-out/current-user, cashier/manager/admin roles and gates. The app still displays a neutral startup screen. Catalog, POS, orders, payments/KHQR, inventory, reports, staff administration and settings remain planned. See [system analysis and diagrams](docs/system-analysis/README.md) for the proposed full system and [API contract](docs/api/README.md) for actual endpoints.
+**Status:** backend authentication/access foundations are implemented: Sanctum sign-in/sign-out/current-user, cashier/manager/admin roles and gates. The app still displays a neutral startup screen. Categories/Products are implemented with authorized management, active menu reads and exact USD-cent prices. POS, orders, payments/KHQR, inventory, reports, staff administration and settings remain planned. See [system analysis and diagrams](docs/system-analysis/README.md) for the proposed full system and [API contract](docs/api/README.md) for actual endpoints.
 
 ## Repository layout
 
@@ -72,7 +72,7 @@ See [architecture](docs/architecture/README.md), [API boundaries](docs/api/READM
 
 - Git and Composer 2.x.
 - PHP **8.4+** with Laravel's required extensions, including `pdo_mysql`; `pdo_sqlite` is used by the isolated test configuration. The committed dependency lock targets PHP 8.4.
-- MySQL **8.0+**, a dedicated database, and a dedicated application account.
+- MySQL **8.0.16+**, a dedicated database, and a dedicated application account.
 - Flutter **3.44.6 stable** / Dart **3.12.2** (the CI baseline).
 - Android Studio, Android SDK, its bundled JDK, accepted Android licenses, and an emulator or device for Android development.
 - macOS and Xcode to build/run iOS. Web preview requires Chrome or Edge.
@@ -152,7 +152,7 @@ GitHub Actions runs backend formatting/tests plus MySQL migrations, and Flutter 
 
 Use short-lived branches and reviewed pull requests into `main`; do not commit dependencies, local configuration, credentials, generated output, or signing keys. Commit `composer.lock` and `pubspec.lock` so the team installs consistent versions. Recommended branch protection and contribution rules are in [contributing](docs/project/contributing.md).
 
-**Next backend feature:** Categories and Products, using the implemented access foundation. Flutter sign-in/session handling remains a separate planned client milestone. Scope and decision gates are in the [roadmap](docs/project/roadmap.md) and [backend plan](docs/system-analysis/backend-plan.md). After migrating a verified local database, run `php artisan db:seed --class=RoleSeeder` for standard roles; seeders create no accounts. Existing/new ordinary users are inactive and unassigned until deliberately provisioned through a trusted process. See [database guidance](docs/database/README.md).
+**Next backend feature:** Phase 3 Orders + POS Checkout, as a separate milestone; settle tax/discount/rounding rules first. Categories/Products are implemented with USD cents and no conversion. Flutter sign-in/session handling remains a separate planned client milestone. Scope and decision gates are in the [roadmap](docs/project/roadmap.md) and [backend plan](docs/system-analysis/backend-plan.md). After migrating a verified local database, run `php artisan db:seed --class=RoleSeeder` for standard roles; seeders create no accounts. Existing/new ordinary users are inactive and unassigned until deliberately provisioned through a trusted process. See [database guidance](docs/database/README.md).
 
 ## License
 

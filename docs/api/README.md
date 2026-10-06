@@ -1,6 +1,6 @@
 # Implemented API contract
 
-Versioned base `/api/v1`; send `Accept: application/json` and JSON bodies with `Content-Type: application/json`. Errors under `/api/*` also render JSON when Accept is omitted. Unknown paths, including bare `/api/v1`, return JSON 404. No catalog/order/payment/inventory/report/staff-edit/settings endpoints exist. [OpenAPI](openapi.json) describes the three implemented auth operations.
+Versioned base `/api/v1`; send `Accept: application/json` and JSON bodies with `Content-Type: application/json`. Errors under `/api/*` also render JSON when Accept is omitted. Unknown paths, including bare `/api/v1`, return JSON 404. Authentication and Categories/Products are implemented. No order/payment/inventory/report/staff-edit/settings endpoints exist. [OpenAPI](openapi.json) describes auth, catalog and framework health operations. See [catalog contract](catalog.md) for complete Category/Product requests, lifecycle and query examples.
 
 ## Authentication contract
 

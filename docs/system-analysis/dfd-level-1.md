@@ -1,6 +1,6 @@
 # DFD level 1
 
-Target logical decomposition. Data stores are conceptual groups, not new databases/services. P1 has implemented backend foundations; P2-P7 are planned. Requests to protected processes carry identity established by P1; every process still authorizes its action/object.
+Target logical decomposition. Data stores are conceptual groups, not new databases/services. P1 has implemented backend foundations; P2 Category/Product management and reads are implemented. P3-P7 and recipes remain planned. Requests to protected processes carry identity established by P1; every process still authorizes its action/object.
 
 ```mermaid
 flowchart TB

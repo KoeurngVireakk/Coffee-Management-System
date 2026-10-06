@@ -1,6 +1,6 @@
 # System requirements
 
-Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; only authentication is currently executable.
+Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication and Categories/Products are executable. Other acceptance criteria remain target behavior.
 
 ## Functional requirements
 
@@ -11,9 +11,9 @@ Status legend: **implemented** means backend behavior exists in this milestone; 
 | FR-AUTH-003 | Current-user returns allow-listed identity, role and permission names for the caller; no credential hashes | Implemented |
 | FR-AUTH-004 | Laravel enforces a fixed cashier/manager/admin access map; unassigned/inactive accounts and unknown roles fail closed | Foundation; authentication checks implemented |
 | FR-USER-001 | Admin creates/updates/deactivates staff and assigns approved roles; no public registration; audit sensitive changes and revoke tokens on password recovery | Planned |
-| FR-CAT-001 | Manager/admin creates, renames and retires categories; retire/reactivate without deleting financial history | Planned |
-| FR-PROD-001 | Manager/admin maintains SKU, name, category, exact price and active status; category is required | Planned |
-| FR-PROD-002 | Staff browse/search active menu with bounded pagination and stable order; unavailable/retired products cannot be added | Planned |
+| FR-CAT-001 | Manager/admin creates, renames and retires categories; retire/reactivate without deleting financial history | Implemented lifecycle; financial tables remain planned |
+| FR-PROD-001 | Manager/admin maintains SKU, name, category, exact price and active status; category is required | Implemented, USD cents |
+| FR-PROD-002 | Staff browse/search active menu with bounded pagination and stable order; unavailable/retired products cannot be added | Catalog implemented; cart/checkout and stock availability remain planned |
 | FR-POS-001 | All staff construct a client cart from product IDs and bounded positive quantities; server rechecks availability | Planned |
 | FR-POS-002 | Server builds immutable item name/unit-price/quantity/line-total snapshots and authoritative order totals; submitted prices are rejected | Planned |
 | FR-POS-003 | Replay of a checkout key returns the original order; altered payload with same key conflicts | Planned |
@@ -58,3 +58,5 @@ Performance, backup targets and business timezone are proposals, not measured pr
 ## Dependencies and acceptance trace
 
 FR-AUTH-* -> [implemented auth contract](../api/README.md) -> `tests/Feature/AuthTest.php`, `AccessControlTest.php`, `AuthSchemaTest.php`. FR-POS/ORD/PAY/INV -> [rules](business-rules.md), [TRD transactions](trd.md), [level 2 DFD](dfd-level-2.md); acceptance tests belong to their future milestones. FR-USER/REP/SET -> access matrix and future action/resource policy tests. No test coverage is claimed for planned modules.
+
+FR-CAT/PROD -> [catalog API contract](../api/README.md), `CategorySchemaTest`, `CategoryApiTest`, `ProductSchemaTest`, `ProductApiTest`, `CatalogQueryTest`, `ProductWriteRaceTest`; [Phase 2 verification](phase-2-verification.md) separates SQLite results from MySQL production constraints. Fixed ordering is name+id, page sizes 1-100, bounded literal search, and eager category loading. No caching, POS or stock capability is implied.

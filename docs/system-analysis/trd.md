@@ -1,6 +1,6 @@
 # TRD: Table Relationship Diagram
 
-This physical design is derived from the [conceptual ERD](erd.md). **Only roles, user access columns and personal_access_tokens are added in Phase 1.** Remaining business tables/constraints are proposed; their migrations do not exist. Infrastructure users/password reset/sessions/cache/jobs migrations already existed.
+This physical design is derived from the [conceptual ERD](erd.md). **Phase 1 added roles, user access columns and personal_access_tokens; Phase 2 adds categories/products.** Other business tables/constraints remain proposed; their migrations do not exist. Infrastructure users/password reset/sessions/cache/jobs migrations already existed.
 
 ## Physical relationships
 
@@ -58,12 +58,12 @@ InnoDB, utf8mb4 / utf8mb4_unicode_ci for text, unsigned BIGINT auto-increment ID
 
 Email lookup uses the existing unique index. Trusted future provisioning normalizes lowercase/trimmed email to match LoginRequest; MySQL collation must be considered for Unicode/address equality. Role assignment is nullable to preserve legacy rows without guessing privileges. No active-role index is needed for current-user/login by PK/email; FK index covers role_id.
 
-### Proposed catalog / order / payment dictionary
+### Implemented catalog / proposed order and payment dictionary
 
 | Table | Important columns, constraints and purpose |
 | --- | --- |
-| categories | id PK; name VARCHAR(120); is_active BOOLEAN DEFAULT true; timestamps. Index `(is_active, name, id)` for active category browse. Name uniqueness is not assumed without owner approval |
-| products | id PK; category_id FK RESTRICT; sku VARCHAR(64) UQ; name VARCHAR(160); description TEXT NULL; price_minor BIGINT; currency CHAR(3); is_active BOOLEAN DEFAULT true; timestamps. CHECK price_minor>=0. Index `(category_id, is_active, name, id)` for filtered menu; bounded name search initially, measure before FULLTEXT |
+| categories (implemented) | id PK; name VARCHAR(120); is_active BOOLEAN DEFAULT true; timestamps. Index `(is_active, name, id)` for active category browse. Name uniqueness is not assumed without owner approval |
+| products (implemented) | id PK; category_id FK RESTRICT; sku VARCHAR(64) case-insensitive UQ (canonical uppercase ASCII API); name VARCHAR(160); description TEXT NULL (API max 2000); price_minor signed BIGINT; currency CHAR(3) case-sensitive utf8mb4_bin; is_active BOOLEAN DEFAULT true; timestamps. MySQL CHECK price_minor BETWEEN 0 AND 999999 and currency='USD'. API money is a canonical cent string. Index `(category_id, is_active, name, id)` for category-filtered menu plus `(is_active, name, id)` for unfiltered menu; both verified by EXPLAIN on synthetic shop-scale data. Literal bounded name/SKU substring search; measure before FULLTEXT |
 | orders | id PK; public_reference VARCHAR(40) UQ; created_by FK users RESTRICT; status VARCHAR(24); currency CHAR(3); subtotal_minor/discount_minor/tax_minor/total_minor BIGINT; checkout_key VARCHAR(64); request_hash CHAR(64); accepted_payment_id/active_payment_id BIGINT UNSIGNED NULL; inventory_tracked BOOLEAN; expires_at/paid_at TIMESTAMP NULL; timestamps. UQ `(created_by, checkout_key)`; composite FKs described above; unique accepted_payment_id/active_payment_id; CHECK all amounts>=0, discount<=subtotal, total=subtotal-discount+tax. Indices `(created_by, created_at, id)`, `(status, created_at, id)`; `(status, expires_at, id)` for recovery. Paid-order selected-payment consistency enforced transactionally |
 | order_items | id PK; order_id FK RESTRICT; line_number SMALLINT UNSIGNED; product_id FK RESTRICT; product_name VARCHAR(160), product_sku VARCHAR(64); unit_price_minor BIGINT; quantity SMALLINT UNSIGNED; subtotal_minor/discount_minor/tax_minor/line_total_minor BIGINT. UQ `(order_id, line_number)`; CHECK quantity>0, price/amounts>=0, subtotal=unit_price*quantity, discount<=subtotal, line_total=subtotal-discount+tax. Order snapshots immutable; currency inherited from parent |
 | payments | id PK; order_id FK RESTRICT; attempt_key VARCHAR(64); method VARCHAR(16); status VARCHAR(24); provider VARCHAR(64) NULL; external_transaction_id VARCHAR(191) NULL binary; correlation_reference VARCHAR(191) NULL; expected_amount_minor BIGINT; currency CHAR(3); merchant_reference VARCHAR(191) NULL; tender_minor/change_minor BIGINT NULL; reconciliation_required BOOLEAN DEFAULT false; expires_at/verified_at TIMESTAMP NULL; timestamps. UQ `(order_id, attempt_key)`, UQ `(provider, external_transaction_id)`, UQ `(order_id,id)` for reverse FKs. CHECK amount>=0; cash tender/change relation validated; external confirmed identity/merchant mandatory via state transition. Index `(status, updated_at, id)` for retry/reconciliation; `(verified_at,id)` for bounded reports |
@@ -83,7 +83,7 @@ MySQL permits multiple NULLs in unique indexes: before provider identity is know
 
 Proposed business migrations additionally CHECK allowed order, attempt, method and reservation status values from the business rules. Cross-row sums, accepted-payment terminal state and amount/currency/merchant matching remain transaction-code invariants; simple CHECK expressions cannot enforce them. Inventory tracked orders require reservations before becoming paid.
 
-CHECK enforcement requires MySQL >=8.0.16; this stricter version is a **future business-migration prerequisite**, not a change to Phase 1's MySQL 8.0+ baseline. Verify state checks/decimal arithmetic/identity collation and representative query plans on isolated MySQL when these migrations exist. Primary/FK/unique indexes already serving a query should not be duplicated.
+Phase 2 now requires **MySQL >=8.0.16** for enforced product CHECKs; the Product migration rejects older MySQL before creating its table. SQLite tests mirror columns/FKs/unique indexes but omit those MySQL CHECKs; four direct invalid-money tests execute only on MySQL. State/decimal/locking constraints for future business tables still need their own isolated MySQL verification. Primary/FK/unique indexes already serving a query should not be duplicated.
 
 ## Transactions and concurrency (proposed)
 
@@ -98,4 +98,4 @@ Bound deadlock retries (proposed three) only around repeatable local transaction
 
 ## Rollout
 
-Phase 1 adds new migrations rather than rewriting old ones. Run migrations on a verified dedicated environment, then idempotent role seeding; provision accounts through a trusted process. Existing users retain identity/passwords but remain unassigned/inactive. Future stock rollout needs initial auditable opening-balance movements, recipes, reconciliation and a cutover with no unresolved untracked orders. Back up and review destructive down migrations; fresh SQLite tests are not proof of MySQL locks/collations or a deployed migration path.
+Phase 1 adds new migrations rather than rewriting old ones. Run migrations on a verified dedicated environment, then idempotent role seeding; provision accounts through a trusted process. Existing users retain identity/passwords but remain unassigned/inactive. Future stock rollout needs initial auditable opening-balance movements, recipes, reconciliation and a cutover with no unresolved untracked orders. Phase 2 migration upgrade was verified with existing active staff/role/token rows retained. Catalog APIs never expose DELETE; retirement/reactivation uses is_active. Back up and review destructive down migrations; fresh SQLite tests are not proof of MySQL locks/collations or a deployed migration path.

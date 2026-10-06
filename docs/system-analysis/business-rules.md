@@ -1,6 +1,6 @@
 # Business rules and access model
 
-Authentication foundation rules below are implemented; order/payment/inventory rules are proposed invariants for future phases.
+Authentication and catalog rules below are implemented; order/payment/inventory rules are proposed invariants for future phases.
 
 ## Identity and access
 
@@ -12,9 +12,9 @@ Authentication foundation rules below are implemented; order/payment/inventory r
 | Action / gate | Cashier | Manager | Admin | Enforcement status |
 | --- | --- | --- | --- | --- |
 | Current user / own user policy view | Yes | Yes | Yes | Implemented endpoint and policy |
-| Catalog read (`view-catalog`) | Yes | Yes | Yes | Gate only |
+| Catalog read (`view-catalog`) | Yes | Yes | Yes | Category/Product policies and endpoints implemented |
 | POS and own orders (`process-pos`, `view-own-orders`) | Yes | Yes | Yes | Gates only |
-| Catalog management (`manage-catalog`) | No | Yes | Yes | Gate only |
+| Catalog management (`manage-catalog`) | No | Yes | Yes | Category/Product policies and endpoints implemented |
 | All shop orders (`view-all-orders`) | No | Yes | Yes | Gate only |
 | Stock read (`view-inventory`) | Yes | Yes | Yes | Gate only |
 | Stock adjustment (`adjust-inventory`) | No | Yes | Yes | Gate only |
@@ -23,14 +23,16 @@ Authentication foundation rules below are implemented; order/payment/inventory r
 | Operational settings read (`view-settings`) | No | Yes | Yes | Gate only |
 | Settings write (`manage-settings`) | No | No | Yes | Gate only |
 
-Managers do not inherit staff administration. Future resource policies must additionally restrict objects (e.g. cashier orders by created_by), transitions and properties. These gates alone do not implement catalog, orders or administration. All staff can process cash/KHQR on their authorized orders; refunds/voids remain unapproved.
+Managers do not inherit staff administration. Future resource policies must additionally restrict objects (e.g. cashier orders by created_by), transitions and properties. These gates enforce catalog policies; orders and administration remain unimplemented. All staff can process cash/KHQR on their authorized orders; refunds/voids remain unapproved.
 
 ## Catalog and money
 
 - BR-CAT-001: each product belongs to one category. Retire categories/products using is_active; archive rather than cascade-delete referenced history.
 - BR-CAT-002: inactive product/category is not normally sellable. Checkout reloads the catalog; client menu cache is advisory.
-- BR-MONEY-001: monetary columns are signed BIGINT minor units with currency CHAR(3). Never FLOAT/DOUBLE. API money is an integer string plus currency; reject amounts outside supported bounds. Currency scale must be configured/validated before orders exist.
-- BR-MONEY-002: Laravel calculates subtotal, discount, tax and total. Submitted authoritative prices/paid flags are invalid. Item name, SKU, price, quantity and computed totals are historical snapshots. Changes to product prices do not rewrite existing orders.
+- BR-CAT-003 (Phase 2 implemented): staff reads default to active categories/sellable products. Only managers/admins can request status=all/inactive or view retired records; cashier detail requests for non-sellable records return 404. Retirement is an is_active update, never DELETE. Category/product flags are independent: reactivating a product under an inactive category does not make it sellable.
+- BR-CAT-004 (Phase 2 implemented): SKU is normalized to uppercase ASCII, 1-64 characters from letters/digits/hyphen/underscore (first character letter/digit); unique case-insensitively on MySQL and SQLite. Category names are not assumed unique. Lists order by name then id, with bounded page/search input and no client-controlled sorting.
+- BR-MONEY-001: monetary columns are signed BIGINT minor units with currency CHAR(3). Never FLOAT/DOUBLE. API money is an integer string plus currency; reject amounts outside supported bounds. The user approved USD with scale 2 for the catalog on 2026-10-06. Product price_minor accepts/returns canonical integer-cent strings, from 0 through 999999 ($0.00 through $9,999.99), an explicit administrative input cap. Fractional cents are rejected, never rounded. Currency is exactly USD; no conversion exists.
+- BR-MONEY-002: Laravel calculates subtotal, discount, tax and total. Submitted checkout prices/paid flags will be invalid. Manager/admin catalog endpoints can deliberately set product prices; cashiers cannot. Item name, SKU, price, quantity and computed totals are historical snapshots. Changes to product prices do not rewrite existing orders.
 - BR-MONEY-003: subtotal=sum(line subtotals); total=subtotal-discount+tax; all totals nonnegative; discount <= subtotal. Discounts/tax initially zero, until approved rules specify scope, rounding, authority and snapshot data. No currency conversion is implied.
 
 ## Orders and payments
@@ -56,7 +58,7 @@ Managers do not inherit staff administration. Future resource policies must addi
 
 | Decision | Proposed position / gate |
 | --- | --- |
-| Currency / scale / rounding | Choose supported currency first; no assumed KHR/USD conversion; blocker for Phase 3 |
+| Currency / scale / rounding | USD / scale 2 approved for catalog; fractional cents rejected; tax/discount/checkout rounding still unresolved before Phase 3 |
 | Tax / discount / modifiers | Disabled initially; approve rules and schema extension before use |
 | Shop timezone / receipt numbering | Candidate Asia/Phnom_Penh, immutable public reference; owner confirms |
 | Inventory scope / units / overselling | Ingredients + packaged goods; no negative available stock proposed; confirm before Phase 5 |

@@ -1,6 +1,6 @@
 # Security analysis
 
-Scope: local passive analysis and Phase 1 backend implementation. This is not an OWASP compliance claim or provider integration review. Relevant framework behavior was checked against installed Laravel 13 and [official Sanctum documentation](https://laravel.com/framework/docs/13.x/sanctum).
+Scope: local passive analysis, Phase 1 authentication and Phase 2 catalog implementation. This is not an OWASP compliance claim or provider integration review. Relevant framework behavior was checked against installed Laravel 13 and [official Sanctum documentation](https://laravel.com/framework/docs/13.x/sanctum).
 
 ## Assets and trust boundaries
 
@@ -11,13 +11,13 @@ Scope: local passive analysis and Phase 1 backend implementation. This is not an
 
 ## Threat and control register
 
-| Boundary / abuse path | Impact | Phase 1 evidence/control | Remaining mitigation / regression |
+| Boundary / abuse path | Impact | Implemented evidence/control | Remaining mitigation / regression |
 | --- | --- | --- | --- |
 | Credential guessing / address enumeration | Staff impersonation | LoginRequest bounds; 5/min per email+IP plus 30/min per IP; hashed keys; generic 401 for wrong/missing/inactive/unassigned accounts; dummy hash check for missing user | Production TLS/trusted proxy config; shared cache on multiple nodes; tests invalid identity and limit recovery |
 | Stolen/expired token replay | Authorized data access | Sanctum SHA-256 token storage, eight-hour expiry, current-token logout, active-account middleware, no-store responses | Secure native storage / first-party Web cookie+CSRF in later client milestone; password recovery/all-token revocation administration planned |
 | Role/active/permission injection | Admin escalation | Strict login properties; User mass assignment excludes role_id/is_active; fixed gate map with no admin global bypass | Future staff mutations explicitly allow approved fields under manage-staff policy/audit; test role spoofing, unknown roles and role changes |
 | ID substitution / BOLA | Other staff order/user disclosure | Current-user has no target ID; UserPolicy self or admin view; tests two actors | Future orders/payments queries scoped by owner plus policy; no business ownership endpoints yet |
-| Function authorization bypass | Cashier changes catalog/stock/settings | Role gates foundation and denied-role tests; middleware rejects inactive/unassigned/unknown roles | Attach gates/resource policies to each future endpoint; today's gates do not implement business actions |
+| Function authorization bypass | Cashier changes catalog/stock/settings | Category/Product policies enforce manage-catalog writes; middleware rejects inactive/unassigned/unknown-role staff and missing ability | Order/stock/settings policies remain future work; denied catalog writes and hidden retired reads tested |
 | Excess serialization | Password/token hash leakage | UserResource fields explicitly selected; User hides password/remember_token; token plaintext only login response | Future resources allow-list provider/payment/PII fields; tests raw model/resource/login/me serialization |
 | SQL injection / mass assignment | Data modification/disclosure | Eloquent bound email lookup; validated intended fields; no client-defined SQL/sort/role | Future filters/sort map to allow-listed identifiers; no arbitrary setting keys |
 | Duplicate checkout/callback/payment replay | Duplicate charge/stock deductions | No checkout/payment endpoint yet | Actor/key+request hash; provider transaction uniqueness; local atomic idempotent transition; negative fake-provider and concurrent MySQL tests |
@@ -31,4 +31,6 @@ Likelihood depends on public exposure and deployment; impacts on staff identity 
 
 Implemented: bearer-only Sanctum config (no cookie guard/stateful middleware/CSRF-cookie route), required staff token ability, fixed role gates, user-view policy, live account/role checks, strong field boundaries, resources, secure hash verification/rehash, finite expiry, token revocation, JSON errors/throttling, no-store auth responses/API errors and tests. No public registration/reset/staff-edit API. Factory credentials are explicitly synthetic and seeders create only roles.
 
-Planned: product/order policies, provider authentication/exact verification/idempotency, durable worker/recovery, stock locking/ledger, admin audit log, password recovery/token inventory, backup/restore verification and client secure storage. Production TLS/secrets/logging are operating requirements, not verified deployment controls. No outbound calls or real payment tests are authorized/performed.
+Planned: order policies, provider authentication/exact verification/idempotency, durable worker/recovery, stock locking/ledger, admin audit log, password recovery/token inventory, backup/restore verification and client secure storage. Production TLS/secrets/logging are operating requirements, not verified deployment controls. No outbound calls or real payment tests are authorized/performed.
+
+Phase 2 implemented: Category/Product Policies reuse view-catalog/manage-catalog gates; every catalog route uses existing Sanctum/active-staff/staff-ability middleware. Strict create/update/query Requests reject privilege/owner/internal fields. Cashiers cannot mutate any catalog ID and cannot read retired details; managers/admins can manage the shared shop catalog. Products belong to categories via RESTRICT FK. Resources serialize only approved catalog fields and a minimal eager-loaded category summary. Integer-cent string validation rejects floats, negative/oversized/noncanonical prices and unsupported currency. SKU database uniqueness is authoritative, including a collision after request validation (422). Search binds escaped literal patterns; sort is fixed; pages are capped at 100 items and page 10000. No caching or raw client SQL identifiers. See [Phase 2 checks](phase-2-verification.md).

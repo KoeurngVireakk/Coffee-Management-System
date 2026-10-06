@@ -1,6 +1,6 @@
 # Conceptual / logical entity relationship diagram
 
-Roles and staff identity are implemented in Phase 1. All business entities below are **proposed**, derived from the requirements. This ERD expresses business relationships; [TRD](trd.md) defines physical types, FKs and indexes.
+Roles and staff identity were implemented in Phase 1; Category and Product are implemented in Phase 2. Order/payment/inventory/settings/audit entities remain **proposed**, derived from the requirements. This ERD expresses business relationships; [TRD](trd.md) defines physical types, FKs and indexes.
 
 ```mermaid
 erDiagram

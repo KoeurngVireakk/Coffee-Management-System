@@ -1,6 +1,6 @@
 # Scaffold verification
 
-Historical foundation record. For the 2026-10-06 authentication/access milestone and current checks, see [system-analysis verification](../system-analysis/verification.md). The results below describe the earlier scaffold and have not been relabeled as current feature verification.
+Historical foundation record. Current catalog checks are in [Phase 2 verification](../system-analysis/phase-2-verification.md). For the 2026-10-06 authentication/access milestone and current checks, see [system-analysis verification](../system-analysis/verification.md). The results below describe the earlier scaffold and have not been relabeled as current feature verification.
 
 Verified locally on **2026-10-05 (Asia/Bangkok)** on Windows. No business features were implemented.
 
