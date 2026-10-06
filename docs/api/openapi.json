@@ -1,9 +1,9 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "Coffee Management API - staff administration, typed settings and immutable audit",
-        "version": "1.5.0",
-        "description": "Auth/catalog/orders/payments/inventory plus admin staff management, token revocation, last-operational-admin protection, allow-listed typed operational settings, and immutable administrative audit logging. Inventory deployment gate defaults false; historical flags immutable. Real external provider adapter remains unconfigured (503); no real KHQR/callback, refund, report or split payment."
+        "title": "Coffee Management API - reporting and analytics foundation",
+        "version": "1.6.0",
+        "description": "Auth/catalog/orders/payments/inventory/staff/settings/audit plus operational reporting and analytics foundation. Read-only projections over authoritative transactional data. Inventory deployment gate defaults false; historical flags immutable. Real external provider adapter remains unconfigured (503); no real KHQR/callback, refund, or split payment."
     },
     "servers": [
         {
@@ -3662,6 +3662,578 @@
                     }
                 }
             }
+        },
+        "/reports/overview": {
+            "get": {
+                "operationId": "getReportOverview",
+                "summary": "Executive KPI summary",
+                "description": "Aggregates revenue, paid order count, AOV, current low stock count, and reconciliation exceptions for the specified business period.",
+                "tags": [
+                    "Reports"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-10-01"
+                        },
+                        "description": "Start date of business period (Y-m-d). Required if to_date is provided."
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-10-06"
+                        },
+                        "description": "End date of business period (Y-m-d). Required if from_date is provided. Maximum 366 days after from_date."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Executive KPI summary metrics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportOverviewResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Requires view-reports permission (Manager or Admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - Shop timezone not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "message": "The shop timezone is not configured. An administrator must set shop_timezone before generating reports."
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/sales-trend": {
+            "get": {
+                "operationId": "getReportSalesTrend",
+                "summary": "Daily sales trend",
+                "description": "Returns continuous chronological daily buckets from from_date to to_date with zero-filled empty days.",
+                "tags": [
+                    "Reports"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-10-01"
+                        },
+                        "description": "Start date of business period (Y-m-d). Required if to_date is provided."
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-10-06"
+                        },
+                        "description": "End date of business period (Y-m-d). Required if from_date is provided. Maximum 366 days after from_date."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Continuous chronological daily sales trend",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportSalesTrendResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Requires view-reports permission (Manager or Admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - Shop timezone not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "message": "The shop timezone is not configured. An administrator must set shop_timezone before generating reports."
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/payment-methods": {
+            "get": {
+                "operationId": "getReportPaymentMethods",
+                "summary": "Payment method breakdown",
+                "description": "Breakdown of settled revenue and order counts grouped by accepted payment tender method (cash, external).",
+                "tags": [
+                    "Reports"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-10-01"
+                        },
+                        "description": "Start date of business period (Y-m-d). Required if to_date is provided."
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-10-06"
+                        },
+                        "description": "End date of business period (Y-m-d). Required if from_date is provided. Maximum 366 days after from_date."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Payment methods breakdown",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportPaymentMethodsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Requires view-reports permission (Manager or Admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - Shop timezone not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "message": "The shop timezone is not configured. An administrator must set shop_timezone before generating reports."
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/top-products": {
+            "get": {
+                "operationId": "getReportTopProducts",
+                "summary": "Top selling products",
+                "description": "Top selling products by revenue and quantity sold across paid orders in the requested period.",
+                "tags": [
+                    "Reports"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-10-01"
+                        },
+                        "description": "Start date of business period (Y-m-d). Required if to_date is provided."
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-10-06"
+                        },
+                        "description": "End date of business period (Y-m-d). Required if from_date is provided. Maximum 366 days after from_date."
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 50,
+                            "default": 10
+                        },
+                        "description": "Maximum number of ranked products to return (1-50, default 10)."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Top selling products ranked list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportTopProductsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Requires view-reports permission (Manager or Admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - Shop timezone not configured",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "message": "The shop timezone is not configured. An administrator must set shop_timezone before generating reports."
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/inventory": {
+            "get": {
+                "operationId": "getReportInventory",
+                "summary": "Current inventory report",
+                "description": "Operational stock report with total and low-stock item counts, filtering, search, and pagination.",
+                "tags": [
+                    "Reports"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "low",
+                                "all"
+                            ],
+                            "default": "low"
+                        },
+                        "description": "Filter items: low (available <= reorder_level) or all."
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 100
+                        },
+                        "description": "Case-insensitive search by name or SKU."
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inventory summary and paginated items",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportInventoryResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Requires view-reports permission (Manager or Admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/reconciliation": {
+            "get": {
+                "operationId": "getReportReconciliation",
+                "summary": "Reconciliation exceptions report",
+                "description": "Lists payments flagged for reconciliation or in unresolved pending/uncertain state, with zero credentials or secrets exposed.",
+                "tags": [
+                    "Reports"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100,
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reconciliation summary and paginated exception payments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReportReconciliationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Requires view-reports permission (Manager or Admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -5917,6 +6489,502 @@
                                 "items": {
                                     "type": "object"
                                 }
+                            }
+                        }
+                    }
+                }
+            },
+            "ReportPeriod": {
+                "type": "object",
+                "required": [
+                    "from_date",
+                    "to_date",
+                    "timezone"
+                ],
+                "properties": {
+                    "from_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-10-01"
+                    },
+                    "to_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-10-06"
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "example": "Asia/Phnom_Penh"
+                    }
+                }
+            },
+            "ReportOverviewResponse": {
+                "type": "object",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "object",
+                        "required": [
+                            "period",
+                            "revenue_minor",
+                            "currency",
+                            "paid_orders",
+                            "average_order_value_minor",
+                            "low_stock_items",
+                            "reconciliation_required"
+                        ],
+                        "properties": {
+                            "period": {
+                                "$ref": "#/components/schemas/ReportPeriod"
+                            },
+                            "revenue_minor": {
+                                "type": "string",
+                                "example": "125450"
+                            },
+                            "currency": {
+                                "type": "string",
+                                "example": "USD"
+                            },
+                            "paid_orders": {
+                                "type": "integer",
+                                "example": 35
+                            },
+                            "average_order_value_minor": {
+                                "type": "string",
+                                "example": "3584"
+                            },
+                            "low_stock_items": {
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "reconciliation_required": {
+                                "type": "integer",
+                                "example": 1
+                            }
+                        }
+                    }
+                }
+            },
+            "ReportSalesTrendBucket": {
+                "type": "object",
+                "required": [
+                    "date",
+                    "revenue_minor",
+                    "paid_orders"
+                ],
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-10-01"
+                    },
+                    "revenue_minor": {
+                        "type": "string",
+                        "example": "25000"
+                    },
+                    "paid_orders": {
+                        "type": "integer",
+                        "example": 8
+                    }
+                }
+            },
+            "ReportSalesTrendResponse": {
+                "type": "object",
+                "required": [
+                    "data",
+                    "period"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReportSalesTrendBucket"
+                        }
+                    },
+                    "period": {
+                        "$ref": "#/components/schemas/ReportPeriod"
+                    }
+                }
+            },
+            "ReportPaymentMethodItem": {
+                "type": "object",
+                "required": [
+                    "method",
+                    "paid_orders",
+                    "amount_minor"
+                ],
+                "properties": {
+                    "method": {
+                        "type": "string",
+                        "enum": [
+                            "cash",
+                            "external"
+                        ],
+                        "example": "cash"
+                    },
+                    "paid_orders": {
+                        "type": "integer",
+                        "example": 24
+                    },
+                    "amount_minor": {
+                        "type": "string",
+                        "example": "85400"
+                    }
+                }
+            },
+            "ReportPaymentMethodsResponse": {
+                "type": "object",
+                "required": [
+                    "data",
+                    "currency",
+                    "period"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReportPaymentMethodItem"
+                        }
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "period": {
+                        "$ref": "#/components/schemas/ReportPeriod"
+                    }
+                }
+            },
+            "ReportTopProductItem": {
+                "type": "object",
+                "required": [
+                    "product_id",
+                    "sku",
+                    "name",
+                    "quantity_sold",
+                    "revenue_minor"
+                ],
+                "properties": {
+                    "product_id": {
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "sku": {
+                        "type": "string",
+                        "example": "ICED-LATTE"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Iced Caffe Latte"
+                    },
+                    "quantity_sold": {
+                        "type": "integer",
+                        "example": 18
+                    },
+                    "revenue_minor": {
+                        "type": "string",
+                        "example": "54000"
+                    }
+                }
+            },
+            "ReportTopProductsResponse": {
+                "type": "object",
+                "required": [
+                    "data",
+                    "currency",
+                    "period"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReportTopProductItem"
+                        }
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "period": {
+                        "$ref": "#/components/schemas/ReportPeriod"
+                    }
+                }
+            },
+            "ReportInventorySummary": {
+                "type": "object",
+                "required": [
+                    "total_items",
+                    "low_stock_items"
+                ],
+                "properties": {
+                    "total_items": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "low_stock_items": {
+                        "type": "integer",
+                        "example": 2
+                    }
+                }
+            },
+            "ReportInventoryItem": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "sku",
+                    "name",
+                    "base_unit",
+                    "on_hand",
+                    "reserved",
+                    "available",
+                    "reorder_level",
+                    "is_low_stock",
+                    "is_active"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "sku": {
+                        "type": "string",
+                        "example": "COFFEE-BEANS-ARABICA"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Arabica Beans (Dark Roast)"
+                    },
+                    "base_unit": {
+                        "type": "string",
+                        "enum": [
+                            "g",
+                            "ml",
+                            "unit"
+                        ],
+                        "example": "g"
+                    },
+                    "on_hand": {
+                        "type": "string",
+                        "example": "1200.0000"
+                    },
+                    "reserved": {
+                        "type": "string",
+                        "example": "400.0000"
+                    },
+                    "available": {
+                        "type": "string",
+                        "example": "800.0000"
+                    },
+                    "reorder_level": {
+                        "type": "string",
+                        "example": "1000.0000"
+                    },
+                    "is_low_stock": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                }
+            },
+            "ReportInventoryResponse": {
+                "type": "object",
+                "required": [
+                    "summary",
+                    "data",
+                    "meta"
+                ],
+                "properties": {
+                    "summary": {
+                        "$ref": "#/components/schemas/ReportInventorySummary"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReportInventoryItem"
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "required": [
+                            "current_page",
+                            "last_page",
+                            "per_page",
+                            "total"
+                        ],
+                        "properties": {
+                            "current_page": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "last_page": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "per_page": {
+                                "type": "integer",
+                                "example": 25
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 1
+                            }
+                        }
+                    }
+                }
+            },
+            "ReportReconciliationSummary": {
+                "type": "object",
+                "required": [
+                    "reconciliation_required_count",
+                    "unresolved_attempts_count"
+                ],
+                "properties": {
+                    "reconciliation_required_count": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "unresolved_attempts_count": {
+                        "type": "integer",
+                        "example": 2
+                    }
+                }
+            },
+            "ReportReconciliationItem": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "order_id",
+                    "order_reference",
+                    "method",
+                    "status",
+                    "expected_amount_minor",
+                    "currency",
+                    "tender_minor",
+                    "change_minor",
+                    "reconciliation_required",
+                    "reconciliation_reason",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 84
+                    },
+                    "order_id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "order_reference": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "ORD-01K8..."
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "external"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "confirmed"
+                    },
+                    "expected_amount_minor": {
+                        "type": "string",
+                        "example": "450"
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "USD"
+                    },
+                    "tender_minor": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": null
+                    },
+                    "change_minor": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": null
+                    },
+                    "reconciliation_required": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "reconciliation_reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "amount_mismatch_settled_override"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ReportReconciliationResponse": {
+                "type": "object",
+                "required": [
+                    "summary",
+                    "data",
+                    "meta"
+                ],
+                "properties": {
+                    "summary": {
+                        "$ref": "#/components/schemas/ReportReconciliationSummary"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ReportReconciliationItem"
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "required": [
+                            "current_page",
+                            "last_page",
+                            "per_page",
+                            "total"
+                        ],
+                        "properties": {
+                            "current_page": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "last_page": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "per_page": {
+                                "type": "integer",
+                                "example": 25
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 1
                             }
                         }
                     }

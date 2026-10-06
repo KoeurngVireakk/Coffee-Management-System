@@ -1,6 +1,6 @@
 # Business rules and access model
 
-Authentication, catalog, unpaid checkout and scoped order reads are implemented. Phase 4 payment attempts/cash/verified acceptance and reconciliation are implemented; Phase 5 inventory/recipes/reservation/consumption/manual cancellation are implemented; provider-specific integration and reports remain planned.
+Authentication, catalog, unpaid checkout and scoped order reads are implemented. Phase 4 payment attempts/cash/verified acceptance and reconciliation are implemented; Phase 5 inventory/recipes/reservation/consumption/manual cancellation are implemented; Phase 6 staff administration, typed settings, and immutable administrative audit are implemented; Phase 7 operational reporting and analytics foundation are implemented; provider-specific integration remains planned.
 
 ## Identity and access
 
@@ -18,7 +18,7 @@ Authentication, catalog, unpaid checkout and scoped order reads are implemented.
 | All shop orders (`view-all-orders`) | No | Yes | Yes | OrderPolicy and scoped history implemented |
 | Stock read (`view-inventory`) | Yes | Yes | Yes | Inventory API implemented |
 | Stock adjustment (`adjust-inventory`) | No | Yes | Yes | Inventory API implemented |
-| Reports (`view-reports`) | No | Yes | Yes | Gate only; endpoint planned |
+| Reports (`view-reports`) | No | Yes | Yes | Implemented endpoints and gate |
 | Staff administration (`manage-staff`) | No | No | Yes | Implemented endpoints and UserPolicy |
 | Operational settings read (`view-settings`) | No | Yes | Yes | Implemented endpoints and SettingPolicy |
 | Settings write (`manage-settings`) | No | No | Yes | Implemented endpoints and SettingPolicy |
@@ -64,7 +64,7 @@ Managers do not inherit staff administration or settings write authority. OrderP
 - BR-STAFF-004: Admin-controlled password reset and token revocation endpoints (`POST /api/v1/staff/{user}/password` and `POST /api/v1/staff/{user}/tokens/revoke`). Password resets require minimum 12 characters and confirmation, hash securely, revoke all tokens, and emit audit events with zero password/hash data. Token revocation immediately removes all tokens and records the audit reason.
 - BR-SET-001: Store settings use an allow-listed typed registry (`shop_name`: string 1..120; `shop_timezone`: valid IANA timezone string). Manager and admin may read settings (`view-settings`); admin only may update settings (`manage-settings`). Arbitrary setting keys and secret keys (`APP_KEY`, `DB_PASSWORD`, `INVENTORY_TRACKING_ENABLED`) are strictly rejected (422). Currency changes cannot be made via settings and cannot alter existing financial records.
 - BR-AUDT-001: Administrative audit events (`audit_events`) are immutable and append-only. Eloquent update and delete operations throw `LogicException`. Events record actor_id (FK RESTRICT), polymorphic subject, action, structured metadata (JSON), and UTC `created_at`. No passwords, tokens, or secrets are ever recorded. Audit log queries are admin-only (`manage-staff`) and support filtering by actor, action, subject, and date ranges.
-- BR-REP-001: reports derive from paid orders and accepted verified payments, with reconciliation exceptions shown separately. Define refund treatment before adding refunds. Stock reports derive from ledger/balances. Use UTC timestamps and explicitly configured shop-day boundaries; never the host timezone.
+- BR-REP-001 (Phase 7 implemented): reports derive strictly from paid orders and accepted verified payments, with reconciliation exceptions shown separately. Date range queries are resolved using the authoritative shop_timezone from settings (missing or invalid timezone returns 409 Conflict). Daily sales trend buckets are contiguous and zero-filled for empty days. Top products aggregate historical line snapshots (revenue DESC, quantity DESC, product_id ASC). Inventory status exposes live availability and low-stock alerts. Reconciliation exception visibility exposes anomalous or unresolved attempts with strict credential/hash sanitization. Report endpoints are strictly read-only and never mutate operational or audit data.
 
 ## Open decisions and blockers
 

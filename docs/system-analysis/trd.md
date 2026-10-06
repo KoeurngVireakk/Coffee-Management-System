@@ -1,6 +1,6 @@
 # TRD: Table Relationship Diagram
 
-This physical design is derived from the [conceptual ERD](erd.md). **Phase 1 added roles, user access columns and personal_access_tokens; Phase 2 adds categories/products; Phase 3 adds orders/order_items; Phase 4 adds payments/payment_evidence and owning-order accepted/active selection.** Phase 5 adds inventory_items, product_ingredients, stock_reservations and stock_movements. Phase 6 adds settings and audit_events with additive migrations 15 and 16. Reports remain planned; their migrations do not exist. Infrastructure users/password reset/sessions/cache/jobs migrations already existed.
+This physical design is derived from the [conceptual ERD](erd.md). **Phase 1 added roles, user access columns and personal_access_tokens; Phase 2 adds categories/products; Phase 3 adds orders/order_items; Phase 4 adds payments/payment_evidence and owning-order accepted/active selection.** Phase 5 adds inventory_items, product_ingredients, stock_reservations and stock_movements. Phase 6 adds settings and audit_events with additive migrations 15 and 16. Phase 7 adds reporting index `orders_status_paid_at_id_index` via additive migration 17 (`2026_10_06_000017_add_reporting_indexes_to_orders_table.php`). Reports derive as read-only projections over authoritative transactional data without secondary datastores. Infrastructure users/password reset/sessions/cache/jobs migrations already existed.
 
 ## Physical relationships
 
@@ -112,3 +112,7 @@ Manual cancellation locks order -> payment state -> sorted inventory -> reservat
 ## Phase 6 staff administration, settings, and audit cutover
 
 Phase 6 introduces migrations 15 (`settings`) and 16 (`audit_events`). Upgrade testing on isolated MySQL verified row-by-row preservation across all 13 prior tables. Staff management requires existing seeded `roles`. The last operational admin invariant prevents accidental lockout under high concurrency via explicit row locking on the `admin` role row. Audit log is append-only and immutable. Setting registry enforces strict allow-listing for `shop_name` and `shop_timezone` while rejecting secrets and deployment configuration overrides. See [Phase 6 verification](phase-6-verification.md).
+
+## Phase 7 operational reporting, indexing, and query plans cutover
+
+Phase 7 introduces additive migration 17 (`2026_10_06_000017_add_reporting_indexes_to_orders_table.php`) creating composite index `orders_status_paid_at_id_index` on `orders(['status', 'paid_at', 'id'])`. All 6 report endpoints query the authoritative primary database directly without introducing separate data warehouses, OLAP databases, or caching layers. Query plans verified via `EXPLAIN FORMAT=TREE` on MySQL 8.0 confirm that the MySQL query optimizer naturally utilizes `orders_status_paid_at_id_index` for index range scans over `(status = 'paid' AND fromUtc <= paid_at < toExclusiveUtc)` without table scans. Inventory queries utilize existing `inventory_items_is_active_name_id_index` and reconciliation queries utilize `payments_reconciliation_required_updated_at_id_index` and `payments_status_updated_at_id_index`. See [Phase 7 verification](phase-7-verification.md).

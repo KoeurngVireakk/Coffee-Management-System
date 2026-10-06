@@ -1,6 +1,6 @@
 # System requirements
 
-Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication, Categories/Products and checkout/order history and cash settlement are executable; provider-neutral external workflows are fake-tested and real provider traffic remains gated. Phase 5 exact inventory/recipes/ledger/reservations/consumption/manual cancellation are executable; Phase 6 staff administration, typed settings, and immutable audit events are executable; other acceptance criteria remain target behavior.
+Status legend: **implemented** means backend behavior exists in this milestone; **foundation** means rules/gates exist but the business endpoint does not; **planned** means design only. Flutter remains scaffolded. Acceptance below specifies the target behavior; authentication, Categories/Products and checkout/order history and cash settlement are executable; provider-neutral external workflows are fake-tested and real provider traffic remains gated. Phase 5 exact inventory/recipes/ledger/reservations/consumption/manual cancellation are executable; Phase 6 staff administration, typed settings, and immutable audit events are executable; Phase 7 operational reporting and analytics endpoints are executable; other acceptance criteria remain target behavior.
 
 ## Functional requirements
 
@@ -30,7 +30,7 @@ Status legend: **implemented** means backend behavior exists in this milestone; 
 | FR-INV-002 | Recipes map products to stock items and positive base-unit quantities; checkout reserves and completion consumes stock if enabled | Implemented Phase 5 backend |
 | FR-INV-003 | Authorized staff sees item available/low-stock information computed from on-hand minus reservations and reorder thresholds | Item API implemented; per-product client availability remains planned |
 | FR-INV-004 | Ledger links sale to order and actor; corrections are compensating movements, never overwritten history | Implemented Phase 5 backend |
-| FR-REP-001 | Manager/admin views paid-sales, payment-method and stock summaries from authoritative records within a bounded date range | Planned |
+| FR-REP-001 | Manager/admin views paid-sales, payment-method and stock summaries from authoritative records within a bounded date range | Implemented Phase 7 backend |
 | FR-SET-001 | Admin updates approved store settings; manager reads operational settings; never store secrets in editable settings | Implemented Phase 6 backend |
 
 Product options/variants are not approved. Phase 3 accepts product and quantity only; a later option model must price and validate selections on Laravel before it can be sold. Refunds/void permissions and lifecycle require approval before exposing those mutations.
@@ -66,3 +66,4 @@ FR-USER-001, FR-SET-001, NFR-AUD-001 -> [staff API](../api/staff.md), [settings 
 FR-CAT/PROD -> [catalog API contract](../api/README.md), `CategorySchemaTest`, `CategoryApiTest`, `ProductSchemaTest`, `ProductApiTest`, `CatalogQueryTest`, `ProductWriteRaceTest`; [Phase 2 verification](phase-2-verification.md) separates SQLite results from MySQL production constraints. Fixed ordering is name+id, page sizes 1-100, bounded literal search, and eager category loading. No caching, Flutter POS or stock capability is implied.
 
 FR-INV-* -> [inventory API](../api/inventory.md), InventorySchemaTest, InventoryApiTest, RecipeApiTest, MovementApiTest, InventoryWorkflowTest, InventoryConcurrencyTest, InventoryConsistencyTest and [Phase 5 verification](phase-5-verification.md). Item availability/low_stock reads, exact ledger/recipes, deployment-gated reservations, paid consumption and safe release are implemented. Per-product catalog availability display and automatic reservation expiry remain future contracts.
+FR-REP-001 -> [reports API](../api/reports.md), ReportApiTest, ReportTimezoneTest, ReportSecurityTest, and [Phase 7 verification](phase-7-verification.md). Overview, daily sales-trend bucketing with zero-filling, payment methods breakdown, top products aggregation, inventory status with low-stock filters, and sanitized reconciliation exception reporting are implemented over authoritative transactional data in shop_timezone.

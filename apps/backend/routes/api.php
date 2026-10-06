@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\RecipeController;
+use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\SettingController;
 use App\Http\Controllers\Api\V1\StaffController;
 use App\Http\Controllers\Api\V1\StockMovementController;
@@ -55,6 +56,15 @@ Route::prefix('v1')->group(function (): void {
         Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
         Route::get('settings/{key}', [SettingController::class, 'show'])->where('key', '[a-zA-Z0-9_]{1,64}')->name('settings.show');
         Route::put('settings/{key}', [SettingController::class, 'update'])->where('key', '[a-zA-Z0-9_]{1,64}')->name('settings.update');
+
+        Route::middleware('can:view-reports')->prefix('reports')->name('reports.')->group(function (): void {
+            Route::get('overview', [ReportController::class, 'overview'])->name('overview');
+            Route::get('sales-trend', [ReportController::class, 'salesTrend'])->name('sales-trend');
+            Route::get('payment-methods', [ReportController::class, 'paymentMethods'])->name('payment-methods');
+            Route::get('top-products', [ReportController::class, 'topProducts'])->name('top-products');
+            Route::get('inventory', [ReportController::class, 'inventory'])->name('inventory');
+            Route::get('reconciliation', [ReportController::class, 'reconciliation'])->name('reconciliation');
+        });
     });
 
     Route::prefix('auth')->name('auth.')->group(function (): void {

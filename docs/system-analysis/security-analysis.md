@@ -1,6 +1,6 @@
 # Security analysis
 
-Scope: local passive analysis, Phase 1 authentication, Phase 2 catalog and Phase 3 orders and Phase 4 payment settlement foundation, Phase 5 inventory integration, and Phase 6 staff management + typed settings + immutable audit. This is not an OWASP compliance claim or provider integration review. Relevant framework behavior was checked against installed Laravel 13 and [official Sanctum documentation](https://laravel.com/framework/docs/13.x/sanctum).
+Scope: local passive analysis, Phase 1 authentication, Phase 2 catalog, Phase 3 orders, Phase 4 payment settlement foundation, Phase 5 inventory integration, Phase 6 staff management + typed settings + immutable audit, and Phase 7 operational reporting and analytics foundation. This is not an OWASP compliance claim or provider integration review. Relevant framework behavior was checked against installed Laravel 13 and [official Sanctum documentation](https://laravel.com/framework/docs/13.x/sanctum).
 
 ## Assets and trust boundaries
 
@@ -24,6 +24,7 @@ Scope: local passive analysis, Phase 1 authentication, Phase 2 catalog and Phase
 | Fake payment / wrong merchant/amount/currency | Unpaid goods / misapplied funds | Exact server/provider fact matching, persisted uncertainty/evidence, review guard before local finalization; injected client proof rejected | Fake-only verification; official provider authentication required before network integration |
 | Concurrent stock changes | Oversell / corrupt ledger | Recipe/product synchronization, sorted stock row locks, exact reservations, unique movement identities, atomic ledger/balance/order updates and 14 MySQL races | Read-only consistency reports drift; no automatic repair/expiry |
 | Secret/debug/log exposure | Token/credential compromise | No seeded users/secrets, ignored .env, token/credential fields never intentionally logged by new code | Production APP_DEBUG=false, HTTPS, redact Authorization/password and provider payloads at proxy/APM/app; review log collectors; secret rotation is separate scope |
+| Financial reporting data leakage / filter abuse | Unauthorized financial disclosure / DoS via unbounded queries | Gate `view-reports` restricts access to managers/admins; date ranges capped at 366 days; unknown parameters rejected (422); reconciliation serialization strictly scrubs attempt keys, hashes, and secrets | Cashiers denied all report routes; missing shop timezone fails closed (409) |
 
 Likelihood depends on public exposure and deployment; impacts on staff identity and future money are material even at shop scale. Rate limits share an IP across shop devices, so an identity/IP limit is complemented by a higher IP cap and avoids permanent account lockout. File-cache counters are a local baseline; review atomic/shared counters under measured concurrency before production expansion. Proxy trust is deliberately not broadened in this milestone.
 
@@ -56,3 +57,13 @@ Last operational admin protection is enforced under row-level database locking (
 Operational settings (`/api/v1/settings`) enforce allow-listing through `SettingRegistry`. Only `shop_name` (string, max 120) and `shop_timezone` (valid IANA timezone) are accepted. Secret keys (`APP_KEY`, `DB_PASSWORD`, `INVENTORY_TRACKING_ENABLED`) and arbitrary schema-free keys return 422. Settings updates are restricted to admins; managers have read-only access; cashiers are denied.
 
 Audit events (`/api/v1/audit-events`) record sensitive administrative actions (`staff.created`, `staff.updated`, `staff.role_changed`, `staff.activated`, `staff.deactivated`, `staff.password_reset`, `staff.tokens_revoked`, `setting.updated`). The `audit_events` table is append-only; the `AuditEvent` Eloquent model registers `updating` and `deleting` hooks that throw `LogicException` on any mutation attempt. Audit metadata is structured JSON that never records passwords, hashes, or secret tokens. Audit logs are queryable only by admins, with indexed filtering by actor, action, subject, and date range. See [Phase 6 verification](phase-6-verification.md).
+
+## Phase 7 reporting and analytics security review
+
+Report endpoints (`/api/v1/reports/*`) are protected by the `view-reports` gate, requiring an active staff account with `manager` or `admin` role. Cashiers, inactive accounts, and unauthenticated callers fail closed (401/403).
+
+All report endpoints are strictly read-only: HTTP mutation verbs (`POST`, `PUT`, `PATCH`, `DELETE`) return `405 Method Not Allowed`, and automated security tests verify that calling reporting endpoints creates zero side effects across `orders`, `payments`, `order_items`, `inventory_items`, `settings`, and `audit_events`.
+
+Query abuse and parameter injection are strictly mitigated: date ranges are validated, required together when filtering, and strictly capped at 366 days max. Unknown query parameters are rejected with `422 Unprocessable Content` across all reporting Form Requests.
+
+Reconciliation reporting enforces strict credential and privacy scrub: fields including `attempt_key`, `request_hash`, `provider`, `external_transaction_id`, `merchant_reference`, `correlation_reference`, `qr_payload`, and `initiated_by` are excluded from API payloads, returning only safe operational and audit identifiers. Timezone handling relies authoritatively on `shop_timezone` in the `settings` table, failing closed with `409 Conflict` if unconfigured rather than leaking host machine time or inferring non-deterministic offsets. See [Phase 7 verification](phase-7-verification.md).
