@@ -26,7 +26,7 @@ class OrderController extends Controller
     public function index(OrderIndexRequest $request): AnonymousResourceCollection
     {
         $input = $request->validated();
-        $query = Order::query()->visibleTo($request->user())->with(['items', 'creator:id,name']);
+        $query = Order::query()->visibleTo($request->user())->with(['items', 'creator:id,name', 'acceptedPayment']);
         if (isset($input['status'])) {
             $query->where('status', $input['status']);
         }
@@ -46,7 +46,7 @@ class OrderController extends Controller
     {
         Gate::authorize('viewAny', Order::class);
         $record = Order::query()->visibleTo($request->user())->where('public_reference', $order)
-            ->with(['items', 'creator:id,name'])->firstOrFail();
+            ->with(['items', 'creator:id,name', 'acceptedPayment'])->firstOrFail();
         Gate::authorize('view', $record);
 
         return new OrderResource($record);

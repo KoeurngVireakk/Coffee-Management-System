@@ -6,7 +6,7 @@ Analysis date: 2026-10-06 (Asia/Bangkok). Scope: a single coffee shop, online st
 
 Before this milestone, inspection found a clean `main`, Laravel 13.34.0, PHP 8.4.4, default framework migrations/User/factory, `/up`, empty `/api/v1`, and three bootstrap tests. Flutter contains feature boundaries and a startup screen. No business modules existed.
 
-Phase 1 implemented backend authentication/access foundations. Phase 2 now implements Categories and Products: role-authorized management, retirement/reactivation, active menu browsing, strict inputs, bounded pagination/search and exact USD-cent prices. Phase 3 adds atomic unpaid checkout and scoped order history: server prices, immutable snapshots, actor-scoped replay and UTC time. These documents distinguish implemented authentication/catalog/unpaid orders from the **proposed** remaining system. See [actual API contract](../api/README.md), [Phase 1 verification](verification.md) and [Phase 2 verification](phase-2-verification.md). Flutter authentication, paid POS settlement/receipts and payment/inventory/report/settings endpoints remain unimplemented.
+Phase 1 implemented backend authentication/access foundations. Phase 2 now implements Categories and Products: role-authorized management, retirement/reactivation, active menu browsing, strict inputs, bounded pagination/search and exact USD-cent prices. Phase 3 adds atomic unpaid checkout and scoped order history: server prices, immutable snapshots, actor-scoped replay and UTC time. Phase 4 adds cash settlement and provider-neutral attempt/verified-evidence/reconciliation workflows with a test-only fake; production external adapter fails closed. These documents distinguish implemented foundations from **provider-specific planned** integration and other future modules. See [actual API contract](../api/README.md), [Phase 1 verification](verification.md) and [Phase 2 verification](phase-2-verification.md). Flutter authentication, real bank/KHQR integration, receipt printing and inventory/report/settings remain unimplemented.
 
 ## Documents
 
@@ -25,6 +25,7 @@ Phase 1 implemented backend authentication/access foundations. Phase 2 now imple
 | [Verification and review](verification.md) | Phase 1 checks, review findings and limits |
 | [Phase 2 verification](phase-2-verification.md) | Incremental catalog checks, approved USD decision, MySQL plans and reviews |
 | [Phase 3 verification](phase-3-verification.md) | Unpaid checkout/history, replay, UTC, real MySQL races and review evidence |
+| [Phase 4 verification](phase-4-verification.md) | Payment/cash/fake-provider proof, reconciliation, MySQL races/upgrade and authorized Git publication |
 
 Mermaid blocks are the diagram source of truth. No renderer or diagram dependency is required. DFD arrows represent data, while flowchart arrows represent execution. The level 2 diagram decomposes level 1 processes 3 and 4 as one checkout boundary, retaining process 5 as an external collaborator.
 

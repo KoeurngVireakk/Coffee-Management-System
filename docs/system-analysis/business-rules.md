@@ -1,6 +1,6 @@
 # Business rules and access model
 
-Authentication, catalog, unpaid checkout and scoped order reads are implemented. Payment transitions, inventory and reports remain future-phase invariants.
+Authentication, catalog, unpaid checkout and scoped order reads are implemented. Phase 4 payment attempts/cash/verified acceptance and reconciliation are implemented; provider-specific integration, inventory and reports remain planned.
 
 ## Identity and access
 
@@ -23,7 +23,7 @@ Authentication, catalog, unpaid checkout and scoped order reads are implemented.
 | Operational settings read (`view-settings`) | No | Yes | Yes | Gate only |
 | Settings write (`manage-settings`) | No | No | Yes | Gate only |
 
-Managers do not inherit staff administration. OrderPolicy now restricts cashier reads by created_by; future payment/admin policies must still protect objects, transitions and properties. Catalog and unpaid orders use enforced action/object scoping; paid transitions and administration remain unimplemented. Planned Phase 4 permissions will allow staff to process cash/KHQR on authorized orders; refunds/voids remain unapproved.
+Managers do not inherit staff administration. OrderPolicy now restricts cashier reads by created_by; future payment/admin policies must still protect objects, transitions and properties. Catalog and unpaid orders use enforced action/object scoping; paid acceptance now uses narrow locked payment workflows; administration remains unimplemented. Staff can process authorized cash payments and the provider-neutral foundation; real KHQR remains gated; refunds/voids remain unapproved.
 
 ## Catalog and money
 
@@ -37,15 +37,19 @@ Managers do not inherit staff administration. OrderPolicy now restricts cashier 
 
 ## Orders and payments
 
-- BR-ORD-001: Phase 3 creates pending_payment only, with 1-50 distinct lines and strict JSON integer quantity 1-99. URI identity is server-generated ORD-ULID; amount snapshots and history are immutable in model/API workflows. No update/delete/cancel/pay/receipt endpoint. The enum/DB allow planned paid/cancelled/expired states, whose transitions belong to later approved workflows. Refunds need a later explicit model.
+- BR-ORD-001: Phase 3 creates pending_payment only, with 1-50 distinct lines and strict JSON integer quantity 1-99. URI identity is server-generated ORD-ULID; amount snapshots and history are immutable in model/API workflows. No arbitrary update/delete/cancel/receipt-printing endpoint. Phase 4 adds separate authorized payment/paid-acceptance routes; The enum/DB allow planned paid/cancelled/expired states, whose paid acceptance now belongs to Phase 4; cancellation/expiry/refund transitions remain later workflows. Refunds need a later explicit model.
 - BR-ORD-002: a unique checkout key per actor plus canonical request hash prevents duplicate orders. Repeated same intent returns original order; changed intent with same key returns 409. Idempotency-Key is a required 8-64-character case-sensitive ASCII header (first alphanumeric; rest alphanumeric/dot/underscore/hyphen), not a body field. Version-1 hash contains sorted product IDs/quantities and USD context, never prices/credentials/options. Reordered input is equivalent; original snapshots replay after catalog changes. Concurrent loser reloads the committed winner after rollback, including catalog-retirement races.
 - BR-PAY-001: orders have multiple payment attempts, but at most one accepted full settlement. Split/partial payments are excluded for now. Pending order has at most one current attempt, enforced by order lock/active_payment_id; decline/expiry permits a new attempt only after uncertainty is resolved.
 - BR-PAY-002: cash tender >= due; change=tender-due in order currency. Cash confirmation and paid order commit together. A chosen method, QR display, client success or screenshot never proves external payment.
-- BR-PAY-003: backend verification matches merchant, order/attempt correlation, exact amount/currency and provider transaction ID. Authenticated callbacks follow selected provider contract; unsigned callbacks are hints requiring server verification.
+- BR-PAY-003: backend verification matches merchant, order/attempt correlation, exact amount/currency and provider transaction ID. No public callback is implemented until a real provider contract is selected. The provider-neutral verifier queries trusted server evidence; future unsigned notifications can only be hints requiring that verification.
 - BR-PAY-004: `(provider, external_transaction_id)` is unique. Repeated callback/poll must have no duplicate payment or stock effect. A second distinct paid attempt becomes a reconciliation exception; do not discard the received funds or pay the order twice.
 - BR-PAY-005: attempt states: initiated -> pending -> confirmed/failed/expired; provider timeout -> uncertain -> verified terminal outcome. Do not retry state-changing remote I/O blindly. Expiry/cancellation requires verified no-settlement or quarantine. A late success after an order expired records settlement and manual-review requirement without automatically changing already released stock.
 
 ## Inventory and reporting
+
+- BR-PAY-006 (Phase 4): cash/external attempt keys are per-order case-sensitive headers, with method/tender semantic hash. Replay precedes paid checks. Order locks precede Payment locks; at most one accepted pointer. Initiator is backend-derived and retained internally. Cash tender is canonical exact cents <=9999999999; change is derived, no stock effects.
+- BR-PAY-007 (Phase 4): append-only payment_evidence preserves normalized provider transaction observations, including wrong facts or extra distinct funds. Global provider/transaction uniqueness prevents double credit. Mismatch/second/late facts require review; pending/failed responses cannot dismiss received-funds evidence. No human clearing/refund/reassignment API yet.
+- BR-PAY-008 (Phase 4): no provider contract approved; default adapter returns 503, fake exists only in tests. Services reject outer transactions before I/O. Persisted initiated/uncertain attempt/correlation supports manual trusted reconciliation, not automatic durability. Verified failure/expiry without evidence releases the active pointer; uncertain/evidence-bearing attempts block new methods. QR expiry only suppresses display, not automatic paid/failed state.
 
 - BR-ORD-003 (Phase 3): all monetary fields use checked integer arithmetic and exact string output; subtotal/total cap 4949995050 cents from existing product cap x 99 x 50. Every creation is pending_payment/untracked. Shared product locks (ascending IDs), then shared category locks (ascending IDs) prevent inconsistent snapshots; transaction retries at most three times on deadlock.
 - BR-ORD-004 (Phase 3): cashier history is scoped to created_by before lookup; manager/admin can see all shop orders, with policy defense. Fixed created_at DESC/id DESC; 25 default, 100 max/page, page max 10000. ISO boundaries require explicit UTC offset and valid calendar/time; normalize to UTC, no business-day inference. Raw query-builder/SQL can bypass model immutability guards and is trusted maintenance, not an API capability.

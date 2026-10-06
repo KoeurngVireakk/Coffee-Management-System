@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Coffee Management API - authentication, catalog and unpaid orders",
-    "version": "1.2.0",
-    "description": "Implemented auth/catalog, atomic unpaid checkout and scoped history. USD cents; zero discount/tax; inventory enforcement off. No payment, cash, KHQR, stock or paid receipt endpoints."
+    "title": "Coffee Management API - payment settlement foundation",
+    "version": "1.3.0",
+    "description": "Auth/catalog/orders plus atomic cash settlement and provider-neutral external verification/reconciliation. External adapter unconfigured by default (503); fake exists only in tests. No real KHQR/bank callbacks, Inventory, refund or split payment."
   },
   "servers": [
     {
@@ -1344,6 +1344,542 @@
           }
         }
       }
+    },
+    "/orders/{order}/payments/cash": {
+      "parameters": [
+        {
+          "name": "order",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^ORD-[0-9A-HJKMNP-TV-Z]{26}$",
+            "description": "Server-generated opaque public ULID reference"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "cashSettlement",
+        "summary": "Authorize and atomically accept cash settlement",
+        "description": "Cashier own; manager/admin shop. Only tender intent; server USD amount/change/status/owner. Order then Payment locks. Same key/tender replay precedes paid check; distinct key cannot settle paid/active external order. No stock I/O.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{7,63}$"
+            },
+            "description": "One actor-authorized, per-order case-sensitive payment key. Same intent replay 200; changed method/tender 409."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashPaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Existing same semantic settlement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "First confirmed cash payment; order paid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing/hidden order or payment outside scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Paid/ineligible order, unresolved active attempt or changed key intent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields/header/query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "30 operations/minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{order}/payments/external": {
+      "parameters": [
+        {
+          "name": "order",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^ORD-[0-9A-HJKMNP-TV-Z]{26}$",
+            "description": "Server-generated opaque public ULID reference"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "initiateExternalPayment",
+        "summary": "Persist external attempt before provider I/O",
+        "description": "Cashier own; manager/admin shop. No provider contract approved: production adapter returns 503 before creating intent. With approved adapter: persist initiated correlation/expected facts and active pointer, commit, then I/O outside all transactions; pending QR is not paid, timeout uncertain. Replay returns stored state without resending initiation.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{7,63}$"
+            },
+            "description": "One actor-authorized, per-order case-sensitive payment key. Same intent replay 200; changed method/tender 409."
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyPaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Existing per-order key/intent result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New pending/uncertain attempt, not proof of payment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing/hidden order or payment outside scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Paid/ineligible/active order or changed method under key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields/header/query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "30 operations/minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          },
+          "503": {
+            "description": "External payments are not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{order}/payments": {
+      "parameters": [
+        {
+          "name": "order",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^ORD-[0-9A-HJKMNP-TV-Z]{26}$",
+            "description": "Server-generated opaque public ULID reference"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "paymentHistory",
+        "summary": "Read scoped payment attempt history",
+        "description": "Cashier own; manager/admin shop. Fixed created_at DESC/id DESC, bounded pages, strict filters. No keys, proof payload, merchant/private authority or credentials serialized.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated attempts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentCollection"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing/hidden order or payment outside scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields/header/query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "30 operations/minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{order}/payments/{payment}/reconcile": {
+      "parameters": [
+        {
+          "name": "order",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^ORD-[0-9A-HJKMNP-TV-Z]{26}$",
+            "description": "Server-generated opaque public ULID reference"
+          }
+        },
+        {
+          "name": "payment",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          }
+        }
+      ],
+      "post": {
+        "operationId": "reconcileExternalPayment",
+        "summary": "Query trusted provider evidence and apply once",
+        "description": "Authorized own/shop POS staff. Empty body; never accepts client transaction/status proof. Current adapter default 503. Verify outside transactions, then lock Order/Payment. Exact provider/merchant/correlation/order/amount/currency matching and global transaction uniqueness. Mismatch/late/second evidence retained and flagged; no double acceptance. Manual recovery is not a durable worker or public callback contract.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmptyPaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verified/current/quarantined persisted outcome",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing/invalid/expired/revoked authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Inactive/unassigned/unknown role, missing staff ability or action permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Missing/hidden order or payment outside scoped order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Cash method cannot use provider reconciliation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/unknown fields/header/query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "30 operations/minute per actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds before retry"
+              }
+            }
+          },
+          "503": {
+            "description": "External payments are not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2086,7 +2622,7 @@
               "cancelled",
               "expired"
             ],
-            "description": "Phase 3 only creates pending_payment; no transitions exposed"
+            "description": "Checkout creates pending_payment; Phase 4 accepted verified/cash settlement transitions to paid. No cancel/refund/void APIs."
           },
           "currency": {
             "type": "string",
@@ -2147,6 +2683,13 @@
             "items": {
               "$ref": "#/components/schemas/OrderItem"
             }
+          },
+          "accepted_payment": {
+            "$ref": "#/components/schemas/Payment"
+          },
+          "paid_at": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -2294,6 +2837,254 @@
             }
           }
         }
+      },
+      "Payment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "method",
+          "status",
+          "expected_amount_minor",
+          "currency",
+          "tender_minor",
+          "change_minor",
+          "provider",
+          "reconciliation_required",
+          "expires_at",
+          "verified_at",
+          "created_at",
+          "qr_payload"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "cash",
+              "external"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "initiated",
+              "pending",
+              "confirmed",
+              "failed",
+              "expired",
+              "uncertain"
+            ]
+          },
+          "expected_amount_minor": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,9})$",
+            "maxLength": 10,
+            "description": "Exact integer USD cents"
+          },
+          "currency": {
+            "type": "string",
+            "const": "USD"
+          },
+          "tender_minor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,9})$",
+                "maxLength": 10,
+                "description": "Exact integer USD cents"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "change_minor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(0|[1-9][0-9]{0,9})$",
+                "maxLength": 10,
+                "description": "Exact integer USD cents"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reconciliation_required": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "qr_payload": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 8192,
+            "description": "Safe display payload only while pending/before expiry; display is not settlement proof. Test fake payload is synthetic, not KHQR."
+          }
+        }
+      },
+      "PaymentResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Payment"
+          }
+        }
+      },
+      "PaymentCollection": {
+        "type": "object",
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Payment"
+            }
+          },
+          "links": {
+            "type": "object",
+            "required": [
+              "first",
+              "last",
+              "prev",
+              "next"
+            ],
+            "properties": {
+              "first": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "last": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "prev": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "next": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "meta": {
+            "type": "object",
+            "required": [
+              "current_page",
+              "from",
+              "last_page",
+              "path",
+              "per_page",
+              "to",
+              "total"
+            ],
+            "properties": {
+              "current_page": {
+                "type": "integer"
+              },
+              "from": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "last_page": {
+                "type": "integer"
+              },
+              "path": {
+                "type": "string"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "to": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "total": {
+                "type": "integer"
+              },
+              "links": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CashPaymentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tender_minor"
+        ],
+        "properties": {
+          "tender_minor": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,9})$",
+            "maxLength": 10,
+            "description": "Exact integer USD cents"
+          }
+        }
+      },
+      "EmptyPaymentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "maxProperties": 0,
+        "description": "No client proof, price, owner, currency/status/provider/transaction/signature fields."
       }
     }
   }

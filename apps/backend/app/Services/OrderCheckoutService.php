@@ -93,7 +93,7 @@ class OrderCheckoutService
             $order = $this->replay($winner, $hash);
         }
 
-        return $order->load(['items', 'creator:id,name']);
+        return $order->load(['items', 'creator:id,name', 'acceptedPayment']);
     }
 
     private function replay(Order $order, string $hash): Order

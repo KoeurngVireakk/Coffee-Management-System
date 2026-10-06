@@ -1,6 +1,6 @@
 # Conceptual / logical entity relationship diagram
 
-Roles and staff identity were implemented in Phase 1; Category and Product are implemented in Phase 2. Order and OrderItem are implemented in Phase 3 for unpaid checkout. Payment/inventory/settings/audit and order payment-selection relationships remain **proposed**, derived from the requirements. This ERD expresses business relationships; [TRD](trd.md) defines physical types, FKs and indexes.
+Roles and staff identity were implemented in Phase 1; Category and Product are implemented in Phase 2. Order and OrderItem are implemented in Phase 3 for unpaid checkout. Phase 4 implements Payment attempts, order payment selection and immutable PaymentEvidence observations. Inventory/settings/audit remain **proposed**, derived from the requirements. This ERD expresses business relationships; [TRD](trd.md) defines physical types, FKs and indexes.
 
 ```mermaid
 erDiagram
@@ -10,6 +10,8 @@ erDiagram
     PRODUCT ||--o{ ORDER_ITEM : historically_references
     ORDER ||--|{ ORDER_ITEM : contains
     ORDER ||--o{ PAYMENT : attempts
+    USER o|--o{ PAYMENT : initiates
+    PAYMENT ||--o{ PAYMENT_EVIDENCE : retains_verified_observations
     ORDER o|--o| PAYMENT : accepts_settlement
     ORDER o|--o| PAYMENT : current_attempt
     PRODUCT ||--o{ RECIPE_COMPONENT : requires
@@ -74,6 +76,15 @@ erDiagram
         money expected_amount
         currency expected_currency
         reference provider_transaction
+    }
+    PAYMENT_EVIDENCE {
+        identifier id PK
+        identifier payment_id FK
+        reference unique_provider_transaction
+        reference observed_order_correlation_merchant
+        money actual_amount
+        currency actual_currency
+        time verified_at
     }
     INVENTORY_ITEM {
         identifier id PK

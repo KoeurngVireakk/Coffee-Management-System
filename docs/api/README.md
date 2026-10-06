@@ -1,6 +1,6 @@
 # Implemented API contract
 
-Versioned base `/api/v1`; send `Accept: application/json` and JSON bodies with `Content-Type: application/json`. Errors under `/api/*` also render JSON when Accept is omitted. Unknown paths, including bare `/api/v1`, return JSON 404. Authentication, Categories/Products and unpaid Orders checkout/history are implemented. No payment/inventory/report/staff-edit/settings endpoints exist. [OpenAPI](openapi.json) describes actual auth/catalog/order/health operations. See [catalog contract](catalog.md) and [Orders/POS contract](orders.md) for full requests, lifecycle, replay and query examples.
+Versioned base `/api/v1`; send `Accept: application/json` and JSON bodies with `Content-Type: application/json`. Errors under `/api/*` also render JSON when Accept is omitted. Unknown paths, including bare `/api/v1`, return JSON 404. Authentication, Categories/Products and unpaid Orders checkout/history are implemented. Payment attempts/cash settlement and external/reconciliation foundation routes now exist; no real bank/KHQR adapter is configured. No inventory/report/staff-edit/settings endpoint exists. [OpenAPI](openapi.json) describes actual auth/catalog/order/health operations. See [catalog contract](catalog.md), [Orders/POS contract](orders.md) and [payment contract](payments.md) for full requests, lifecycle, replay and query examples.
 
 ## Authentication contract
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Middleware\EnsureActiveStaff;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,12 @@ Route::prefix('v1')->group(function (): void {
         Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{order}', [OrderController::class, 'show'])->where('order', 'ORD-[0-9A-HJKMNP-TV-Z]{26}')->name('orders.show');
+        Route::prefix('orders/{order}/payments')->where(['order' => 'ORD-[0-9A-HJKMNP-TV-Z]{26}'])->middleware('throttle:payment-operations')->group(function (): void {
+            Route::post('cash', [PaymentController::class, 'cash'])->name('payments.cash');
+            Route::post('external', [PaymentController::class, 'external'])->name('payments.external');
+            Route::get('/', [PaymentController::class, 'index'])->name('payments.index');
+            Route::post('{payment}/reconcile', [PaymentController::class, 'reconcile'])->whereNumber('payment')->name('payments.reconcile');
+        });
     });
 
     Route::prefix('auth')->name('auth.')->group(function (): void {

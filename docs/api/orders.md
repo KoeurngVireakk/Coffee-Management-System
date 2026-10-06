@@ -1,6 +1,6 @@
 # Implemented Orders / POS checkout API (Phase 3)
 
-Base `/api/v1`. Auth remains the existing Sanctum bearer token with staff ability, active assigned cashier/manager/admin account. Phase 3 creates **unpaid pending orders** and reads scoped history. No payment attempt, cash, KHQR, stock reservation/deduction, cancellation/refund/void, mutation route or paid receipt exists.
+Base `/api/v1`. Auth remains the existing Sanctum bearer token with staff ability, active assigned cashier/manager/admin account. Checkout still creates **unpaid pending orders** and scoped history. Phase 4 now separately implements [payment attempts/cash settlement and verification foundation](payments.md), moving eligible orders to paid. No real KHQR adapter, stock, cancellation/refund/void, generic mutation route or paid receipt printing exists.
 
 ## Operations and permissions
 
@@ -10,7 +10,7 @@ Base `/api/v1`. Auth remains the existing Sanctum bearer token with staff abilit
 | GET `/orders` | Cashier own orders; manager/admin shop orders | History query below; no body | 200 Resource pagination | 401; 403 account/ability/action; 422 invalid/unknown filter |
 | GET `/orders/{order}` | Cashier own only; manager/admin shop orders | ORD-ULID public reference; no body | 200 Order Resource | 401; 403 account/ability/action; 404 unknown/hidden/malformed reference |
 
-GET supports HEAD. Detail lookup scopes the query before checking existence, then applies OrderPolicy; another cashier's reference has the same 404 body as an unknown reference. Numeric order IDs are not public URI keys. No PUT/PATCH/DELETE, payment or receipt endpoints exist.
+GET supports HEAD. Detail lookup scopes the query before checking existence, then applies OrderPolicy; another cashier's reference has the same 404 body as an unknown reference. Numeric order IDs are not public URI keys. No PUT/PATCH/DELETE or receipt-printing endpoint exists. Separate Phase 4 payment routes are documented in payments.md.
 
 ## Checkout contract
 
@@ -77,13 +77,13 @@ Example 201 response (detail/history entries/replay use the same fields):
 }
 ```
 
-All monetary fields are strings of exact cents. Product ID is a retained historical FK; displayed name/SKU/price are stored snapshots, never fetched dynamically from the current product. No numeric order/item ID, checkout_key, request_hash, token, password, email or permissions are serialized. Creator summary is safe within authorized own/shop scope. Order and item instance mutations/deletes are guarded; query-builder/raw SQL bypass Eloquent events and remain trusted maintenance operations, not API capabilities. Cross-row sum consistency is enforced by checkout transaction, not a simple CHECK.
+All monetary fields are strings of exact cents. Product ID is a retained historical FK; displayed name/SKU/price are stored snapshots, never fetched dynamically from the current product. No numeric order/item ID, checkout_key, request_hash, token, password, email or permissions are serialized. Creator summary is safe within authorized own/shop scope. Paid responses additionally include safe accepted_payment and paid_at. Order/item facts and arbitrary instance mutations/deletes remain guarded; query-builder/raw SQL bypass Eloquent events and remain trusted maintenance operations, not API capabilities. Cross-row sum consistency is enforced by checkout transaction, not a simple CHECK.
 
 ## History query
 
 | Parameter | Contract |
 | --- | --- |
-| status | pending_payment/paid/cancelled/expired enum values; Phase 3 only creates pending_payment. Other lifecycle filters normally return no records |
+| status | pending_payment/paid/cancelled/expired enum values; checkout creates pending_payment and Phase 4 settlement creates paid; cancel/expiry transitions remain unimplemented |
 | created_from | Inclusive lower timestamp boundary |
 | created_to | Inclusive upper timestamp boundary, >= created_from |
 | per_page | Integer 1-100, default 25 |

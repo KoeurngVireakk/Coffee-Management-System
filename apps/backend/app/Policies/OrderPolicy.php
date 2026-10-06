@@ -23,4 +23,10 @@ class OrderPolicy
         return $user->can('view-all-orders') || ($user->id === $order->created_by && $user->can('view-own-orders'))
             ? Response::allow() : Response::denyAsNotFound();
     }
+
+    public function pay(User $user, Order $order): Response
+    {
+        return $user->can('process-pos') && $this->view($user, $order)->allowed()
+            ? Response::allow() : Response::denyAsNotFound();
+    }
 }

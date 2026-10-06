@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Enums\StaffRole;
 use App\Models\User;
+use App\Payments\PaymentProvider;
+use App\Payments\UnconfiguredPaymentProvider;
 use App\Policies\UserPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -19,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(PaymentProvider::class, UnconfiguredPaymentProvider::class);
     }
 
     /**
@@ -28,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(User::class, UserPolicy::class);
+        RateLimiter::for('payment-operations', fn (Request $request) => Limit::perMinute(30)->by(
+            'payment:'.($request->user()?->id ?? hash('sha256', $request->ip() ?? '')),
+        ));
 
         foreach (StaffRole::Admin->permissions() as $permission) {
             Gate::define($permission, fn (User $user): bool => in_array($permission, $user->permissions(), true));
