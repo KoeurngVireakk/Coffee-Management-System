@@ -15,4 +15,3 @@ abstract final class AppMotion {
   static const Curve exitCurve = Curves.easeInCubic;
   static const Curve fastOutSlowIn = Curves.fastOutSlowIn;
 }
-

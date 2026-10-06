@@ -56,4 +56,3 @@ abstract final class AppColors {
   static const Color infoDark = Color(0xFF64B5F6);
   static const Color infoSurfaceDark = Color(0xFF102847);
 }
-

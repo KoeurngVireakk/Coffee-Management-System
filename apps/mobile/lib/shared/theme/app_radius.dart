@@ -21,4 +21,3 @@ abstract final class AppRadius {
     Radius.circular(pill),
   );
 }
-

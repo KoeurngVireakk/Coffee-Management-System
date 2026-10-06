@@ -43,4 +43,3 @@ abstract final class Formatters {
     return '$integerPart.$fractionalPart $unit';
   }
 }
-

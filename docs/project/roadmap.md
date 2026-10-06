@@ -13,8 +13,8 @@ Backend Phases 1-7 are complete and frozen. Flutter Phase 1 (Premium Café OS De
 
 ### Flutter Frontend Milestones
 1. **Phase 1 — Premium Café OS Design System + Theme Foundation:** Implemented: 60-25-10-5 color palette tokens, bilingual English + Khmer typography scale with safe line-heights (1.35–1.45), tabular numeric figures, exact minor-unit cents and quantity formatters, accessible minimum 48px touch targets, responsive breakpoints (compact, medium, expanded), core reusable component library (`AppButton`, `AppTextField`, `StatusBadge`, `AppCard`, `AppSectionHeader`, `AppEmptyState`, `AppLoadingIndicator`), ThemeExtensions, and interactive preview page. See [design system documentation](../frontend/design-system.md).
-2. **Phase 2 — Authentication & Session Management:** Planned.
-3. **Phase 3 — Dashboard & Executive Overview:** Planned.
+2. **Phase 2 — Authentication & Session Management:** Implemented: Pure Dart domain entities (`StaffRole`, `AuthUser`, `AuthSession`, `AuthFailure`), secure cross-platform token storage abstraction (`flutter_secure_storage` with Android Keystore & iOS Keychain; Web in-memory RAM only to mitigate XSS), frozen backend endpoint integration (`POST /auth/login`, `GET /auth/me`, `POST /auth/logout`), `AuthController` state machine, accessible bilingual Khmer/English login screen with zero password retention, authenticated session verification view with token redaction, and comprehensive unit/widget test suite. See [auth session documentation](../frontend/auth-session.md).
+3. **Phase 3 — Adaptive App Shell & Role Navigation:** Planned.
 4. **Phase 4 — POS Catalog & Cart:** Planned.
 5. **Phase 5 — Checkout & Payment Flow:** Planned.
 6. **Phase 6 — Order History & Status Tracking:** Planned.

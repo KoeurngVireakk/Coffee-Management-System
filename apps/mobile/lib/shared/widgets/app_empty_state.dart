@@ -65,4 +65,3 @@ class AppEmptyState extends StatelessWidget {
     );
   }
 }
-

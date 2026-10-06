@@ -53,4 +53,3 @@ class AppLoadingIndicator extends StatelessWidget {
     );
   }
 }
-

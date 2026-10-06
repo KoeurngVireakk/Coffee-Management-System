@@ -130,14 +130,57 @@ Fixed roles: `cashier`, `manager`, `admin`.
 
 ### 4.1 Authentication (`/auth`)
 - `POST /api/v1/auth/login`
-  - Body: `{ "email": "staff@example.test", "password": "password123" }`
-  - Response `200`: `{ "token": "...", "user": { "id": 1, "name": "...", "email": "...", "role": "cashier", "permissions": ["view-catalog", "process-pos", "view-own-orders", "view-inventory"] } }`
+  - Rate limit: `throttle:staff-login` (10 per minute per IP).
+  - Body:
+    ```json
+    {
+      "email": "staff@example.test",
+      "password": "password123",
+      "device_name": "Coffee POS Android"
+    }
+    ```
+    - `email`: required, RFC email, max 255 chars, normalized to lowercase/trimmed.
+    - `password`: required string, max 1024 chars.
+    - `device_name`: required string, max 100 chars (human-readable device/client label).
+    - Unknown fields are strictly disallowed (`422 Unprocessable Content`).
+  - Response `200`:
+    ```json
+    {
+      "data": {
+        "id": 1,
+        "name": "Staff User",
+        "email": "staff@example.test",
+        "role": "cashier",
+        "permissions": [
+          "view-catalog",
+          "process-pos",
+          "view-own-orders",
+          "view-inventory"
+        ]
+      },
+      "token": "plain-text-token-returned-once",
+      "token_type": "Bearer",
+      "expires_at": "2026-10-07T01:00:00+00:00"
+    }
+    ```
+  - Response `401`: `{ "message": "The provided credentials are incorrect." }` (on invalid credentials, inactive staff, or unassigned role).
 - `POST /api/v1/auth/logout`
   - Header: `Authorization: Bearer <token>`
-  - Response `204`: No Content (empty response body).
+  - Response `204`: No Content (empty response body). Token is deleted from server.
 - `GET /api/v1/auth/me`
   - Header: `Authorization: Bearer <token>`
-  - Response `200`: `{ "user": { "id": 1, "name": "...", "email": "...", "role": "admin", "permissions": [...] } }`
+  - Response `200`:
+    ```json
+    {
+      "data": {
+        "id": 1,
+        "name": "Staff User",
+        "email": "staff@example.test",
+        "role": "cashier",
+        "permissions": [...]
+      }
+    }
+    ```
 
 ### 4.2 Categories & Products (`/categories`, `/products`)
 - `GET /api/v1/categories`: List categories (`id`, `name`, `is_active`, `created_at`, `updated_at`).

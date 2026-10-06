@@ -1,6 +1,7 @@
-import 'package:coffee_management_mobile/app.dart';
+import 'package:coffee_management_mobile/features/preview/presentation/design_system_preview_page.dart';
 import 'package:coffee_management_mobile/shared/theme/app_breakpoints.dart';
 import 'package:coffee_management_mobile/shared/theme/app_spacing.dart';
+import 'package:coffee_management_mobile/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -100,13 +101,18 @@ void main() {
     });
   });
 
-  group('CoffeeManagementApp responsive & accessibility mounting', () {
+  group('DesignSystemPreviewPage responsive & accessibility mounting', () {
     testWidgets('mounts cleanly on mobile viewport (390x844)', (tester) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(const CoffeeManagementApp());
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.buildLightTheme(),
+          home: const DesignSystemPreviewPage(themeMode: ThemeMode.light),
+        ),
+      );
       await tester.pump();
 
       expect(find.text('Coffee Management System'), findsOneWidget);
@@ -119,7 +125,12 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(const CoffeeManagementApp());
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.buildLightTheme(),
+          home: const DesignSystemPreviewPage(themeMode: ThemeMode.light),
+        ),
+      );
       await tester.pump();
 
       expect(find.text('Coffee Management System'), findsOneWidget);
@@ -133,7 +144,12 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(const CoffeeManagementApp());
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.buildLightTheme(),
+          home: const DesignSystemPreviewPage(themeMode: ThemeMode.light),
+        ),
+      );
       await tester.pump();
 
       expect(find.text('Coffee Management System'), findsOneWidget);
@@ -153,7 +169,10 @@ void main() {
             size: Size(800, 1200),
             textScaler: TextScaler.linear(1.5),
           ),
-          child: const CoffeeManagementApp(),
+          child: MaterialApp(
+            theme: AppTheme.buildLightTheme(),
+            home: const DesignSystemPreviewPage(themeMode: ThemeMode.light),
+          ),
         ),
       );
       await tester.pump();
@@ -169,7 +188,29 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(const CoffeeManagementApp());
+      var mode = ThemeMode.light;
+
+      await tester.pumpWidget(
+        StatefulBuilder(
+          builder: (context, setState) {
+            return MaterialApp(
+              theme: AppTheme.buildLightTheme(),
+              darkTheme: AppTheme.buildDarkTheme(),
+              themeMode: mode,
+              home: DesignSystemPreviewPage(
+                themeMode: mode,
+                onToggleTheme: () {
+                  setState(() {
+                    mode = mode == ThemeMode.light
+                        ? ThemeMode.dark
+                        : ThemeMode.light;
+                  });
+                },
+              ),
+            );
+          },
+        ),
+      );
       await tester.pump();
 
       // Find theme toggle button by tooltip
