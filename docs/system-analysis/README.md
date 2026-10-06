@@ -29,6 +29,7 @@ Phase 1 implemented backend authentication/access foundations. Phase 2 implement
 | [Phase 5 verification](phase-5-verification.md) | Exact inventory, recipes, reservations, consumption, movements, upgrade evidence |
 | [Phase 6 verification](phase-6-verification.md) | Staff provisioning, role/activation management, password reset, token revocation, last-admin protection, typed settings, immutable audit |
 | [Phase 7 verification](phase-7-verification.md) | Operational reporting foundation: overview, sales trend, payment methods, top products, inventory, reconciliation exceptions, store-timezone boundaries |
+| [Backend final audit](backend-final-audit.md) | Comprehensive cross-phase audit, CI repair, MySQL verification, and API contract freeze |
 
 Mermaid blocks are the diagram source of truth. No renderer or diagram dependency is required. DFD arrows represent data, while flowchart arrows represent execution. The level 2 diagram decomposes level 1 processes 3 and 4 as one checkout boundary, retaining process 5 as an external collaborator.
 

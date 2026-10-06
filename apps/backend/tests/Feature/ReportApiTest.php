@@ -105,6 +105,11 @@ class ReportApiTest extends TestCase
 
         if (! empty($items)) {
             foreach ($items as $idx => $itemData) {
+                $quantity = $itemData['quantity'] ?? 1;
+                $unitPriceMinor = $itemData['unit_price_minor'] ?? (int) ($itemData['line_total_minor'] / $quantity);
+                $subtotalMinor = $unitPriceMinor * $quantity;
+                $lineTotalMinor = $subtotalMinor;
+
                 $item = new OrderItem;
                 $item->forceFill([
                     'order_id' => $order->id,
@@ -112,12 +117,12 @@ class ReportApiTest extends TestCase
                     'product_id' => $itemData['product_id'],
                     'product_name' => $itemData['product_name'] ?? 'Product '.$itemData['product_id'],
                     'product_sku' => $itemData['product_sku'] ?? 'SKU-'.$itemData['product_id'],
-                    'unit_price_minor' => $itemData['unit_price_minor'] ?? $itemData['line_total_minor'],
-                    'quantity' => $itemData['quantity'] ?? 1,
-                    'subtotal_minor' => $itemData['line_total_minor'],
+                    'unit_price_minor' => $unitPriceMinor,
+                    'quantity' => $quantity,
+                    'subtotal_minor' => $subtotalMinor,
                     'discount_minor' => 0,
                     'tax_minor' => 0,
-                    'line_total_minor' => $itemData['line_total_minor'],
+                    'line_total_minor' => $lineTotalMinor,
                 ])->save();
             }
         }
@@ -168,6 +173,9 @@ class ReportApiTest extends TestCase
         // Unpaid order inside range
         Order::factory()->create([
             'status' => OrderStatus::PendingPayment,
+            'subtotal_minor' => 9999,
+            'discount_minor' => 0,
+            'tax_minor' => 0,
             'total_minor' => 9999,
             'created_at' => CarbonImmutable::parse('2026-10-03 12:00:00 UTC'),
         ]);
@@ -294,8 +302,8 @@ class ReportApiTest extends TestCase
             CarbonImmutable::parse('2026-10-02 10:00:00 UTC'),
             null,
             [
-                ['product_id' => $prod1->id, 'product_name' => 'Americano', 'product_sku' => 'AME-001', 'quantity' => 2, 'line_total_minor' => 600],
-                ['product_id' => $prod2->id, 'product_name' => 'Latte', 'product_sku' => 'LAT-002', 'quantity' => 1, 'line_total_minor' => 400],
+                ['product_id' => $prod1->id, 'product_name' => 'Americano', 'product_sku' => 'AME-001', 'unit_price_minor' => 300, 'quantity' => 2, 'line_total_minor' => 600],
+                ['product_id' => $prod2->id, 'product_name' => 'Latte', 'product_sku' => 'LAT-002', 'unit_price_minor' => 400, 'quantity' => 1, 'line_total_minor' => 400],
             ]
         );
 
@@ -306,8 +314,8 @@ class ReportApiTest extends TestCase
             CarbonImmutable::parse('2026-10-03 10:00:00 UTC'),
             null,
             [
-                ['product_id' => $prod2->id, 'product_name' => 'Latte', 'product_sku' => 'LAT-002', 'quantity' => 3, 'line_total_minor' => 1200],
-                ['product_id' => $prod3->id, 'product_name' => 'Espresso', 'product_sku' => 'ESP-003', 'quantity' => 1, 'line_total_minor' => 250],
+                ['product_id' => $prod2->id, 'product_name' => 'Latte', 'product_sku' => 'LAT-002', 'unit_price_minor' => 400, 'quantity' => 3, 'line_total_minor' => 1200],
+                ['product_id' => $prod3->id, 'product_name' => 'Espresso', 'product_sku' => 'ESP-003', 'unit_price_minor' => 250, 'quantity' => 1, 'line_total_minor' => 250],
             ]
         );
 
