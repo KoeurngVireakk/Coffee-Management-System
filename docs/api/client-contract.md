@@ -28,7 +28,7 @@ Status: **Frozen Baseline** (Phases 1–7 verified)
    - Token revocation:
      - Explicit sign-out: `POST /api/v1/auth/logout`.
      - Administrative revocation: role changes, deactivation, or password resets invalidate all personal access tokens for that account immediately.
-   - Inactive accounts cannot authenticate (`403 Forbidden` on login; existing tokens fail closed with `403 Forbidden`).
+   - Login rejects invalid credentials and inactive/unassigned accounts with `401 Unauthorized` (`The provided credentials are incorrect.`). Existing active tokens used by accounts subsequently deactivated fail closed with `403 Forbidden` via active-staff authorization middleware.
    - Token hashes, password hashes, and database internal secrets are never returned to clients.
 
 4. **Monetary Precision:**
@@ -79,8 +79,8 @@ Fixed roles: `cashier`, `manager`, `admin`.
 | **Order Cancel** (`POST /orders/{id}/cancel`) | Yes | Yes | Yes | Only pending_payment orders; releases reservations |
 | **Payments** (`POST /payments/cash`, `external`) | Yes | Yes | Yes | Atomic settlement and reservation consumption |
 | **Reconcile** (`POST /payments/{id}/reconcile`) | No | Yes | Yes | Requires `manage-orders` permission |
-| **Inventory Browse** (`GET /inventory/items`) | No | Yes | Yes | Requires `manage-inventory` permission |
-| **Stock Movements** (`POST /inventory/movements`) | No | Yes | Yes | Manual adjustments with audit reasons |
+| **Inventory Browse** (`GET /inventory/items`) | Yes | Yes | Yes | Active staff have `view-inventory` permission |
+| **Stock Movements** (`POST /inventory/movements`) | No | Yes | Yes | Requires `adjust-inventory` permission |
 | **Staff Management** (`/staff/*`) | No | No | Yes | Admin only (`manage-staff`); last admin protected |
 | **Settings Read** (`GET /settings/*`) | No | Yes | Yes | Manager and Admin |
 | **Settings Write** (`PUT /settings/*`) | No | No | Yes | Admin only (`manage-settings`) |
@@ -131,16 +131,16 @@ Fixed roles: `cashier`, `manager`, `admin`.
 ### 4.1 Authentication (`/auth`)
 - `POST /api/v1/auth/login`
   - Body: `{ "email": "staff@example.test", "password": "password123" }`
-  - Response `200`: `{ "token": "...", "user": { "id": 1, "name": "...", "email": "...", "role": "cashier", "is_active": true } }`
+  - Response `200`: `{ "token": "...", "user": { "id": 1, "name": "...", "email": "...", "role": "cashier", "permissions": ["view-catalog", "process-pos", "view-own-orders", "view-inventory"] } }`
 - `POST /api/v1/auth/logout`
   - Header: `Authorization: Bearer <token>`
-  - Response `200`: `{ "message": "Logged out successfully" }`
+  - Response `204`: No Content (empty response body).
 - `GET /api/v1/auth/me`
   - Header: `Authorization: Bearer <token>`
-  - Response `200`: `{ "user": { "id": 1, "name": "...", "email": "...", "role": "admin", "is_active": true } }`
+  - Response `200`: `{ "user": { "id": 1, "name": "...", "email": "...", "role": "admin", "permissions": [...] } }`
 
 ### 4.2 Categories & Products (`/categories`, `/products`)
-- `GET /api/v1/categories`: List categories (`id`, `name`, `slug`, `display_order`, `is_active`).
+- `GET /api/v1/categories`: List categories (`id`, `name`, `is_active`, `created_at`, `updated_at`).
 - `POST /api/v1/categories`: Admin/Manager create category.
 - `PUT /api/v1/categories/{id}`: Admin/Manager update category.
 - `GET /api/v1/products`: List products. Cashier receives only active products in active categories. Supports `category_id`, `search`, `page`, `per_page`.
@@ -160,26 +160,28 @@ Fixed roles: `cashier`, `manager`, `admin`.
     ```
   - Response `201`: Order resource in `pending_payment` status. If inventory tracking is enabled, stock reservations are created.
 - `GET /api/v1/orders`: List orders. Bounded pagination. Scoped by role.
-- `GET /api/v1/orders/{id}`: Order detail with line items, snapshots, and payment history.
-- `POST /api/v1/orders/{id}/cancel`: Cancel unpaid order. Releases stock reservations.
+- `GET /api/v1/orders/{order:public_reference}`: Order detail by public reference (`ORD-<ULID>`), returning line items, snapshots, and payment history.
+- `POST /api/v1/orders/{order:public_reference}/cancel`: Cancel unpaid order by public reference. Releases stock reservations.
 
-### 4.4 Payments (`/orders/{order}/payments`)
-- `POST /api/v1/orders/{order}/payments/cash`
+### 4.4 Payments (`/orders/{order:public_reference}/payments`)
+- `POST /api/v1/orders/{order:public_reference}/payments/cash`
   - Header: `Idempotency-Key: <uuid>`
   - Body: `{ "tender_minor": 1500 }`
   - Response `200`: Settles order. `change_minor` computed (`tender_minor - total_minor`). Consumes reservations and moves stock atomically. Order transitions to `paid`.
-- `POST /api/v1/orders/{order}/payments/external`
+- `POST /api/v1/orders/{order:public_reference}/payments/external`
   - Header: `Idempotency-Key: <uuid>`
-  - Body: `{ "provider": "bakong" }`
-  - Response `200`: Generates external payment attempt with `pending` or `uncertain` state. (Provider adapter tested with fake; real bank integration disabled).
-- `POST /api/v1/orders/{order}/payments/{payment}/reconcile`
+  - Body: `{}` (No request body fields accepted; provider is simulated/fixed; real bank integration disabled).
+  - Response `200`: Generates external payment attempt with `initiated`, `pending`, or `uncertain` state. (Status is never `completed`).
+- `POST /api/v1/orders/{order:public_reference}/payments/{payment}/reconcile`
   - Admin/Manager manual reconciliation for unresolved or mismatched attempts.
 
 ### 4.5 Inventory & Recipes (`/inventory`)
-- `GET /api/v1/inventory/items`: List inventory ingredients/items. Filter by `is_active`, `search`.
+- `GET /api/v1/inventory/items`: List inventory items (`id`, `sku`, `name`, `base_unit`, `on_hand`, `reserved`, `available`, `reorder_level`, `is_active`, `low_stock`, `created_at`, `updated_at`). Filter by `is_active`, `search`.
 - `POST /api/v1/inventory/items`: Create inventory item (`sku`, `name`, `base_unit`, `reorder_level`).
 - `PUT /api/v1/inventory/items/{id}`: Update inventory item.
-- `POST /api/v1/inventory/items/{id}/movements`: Create manual stock adjustment (`quantity` decimal string, `reason`: purchase, restock, waste, audit_adjustment).
+- `POST /api/v1/inventory/items/{id}/movements`: Create manual stock adjustment.
+  - Body: `{ "quantity_delta": "10.0000", "reason": "receipt" }`
+  - Allowed manual reasons: `opening_balance`, `receipt`, `waste`, `adjustment`.
 - `GET /api/v1/products/{product}/recipe`: View recipe ingredients.
 - `PUT /api/v1/products/{product}/recipe`: Replace recipe ingredients (`items: [{ inventory_item_id, quantity }]`).
 

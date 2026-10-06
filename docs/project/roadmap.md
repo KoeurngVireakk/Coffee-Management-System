@@ -1,7 +1,8 @@
 # Implementation roadmap
 
-Backend Phases 1-7 are implemented. Flutter remains scaffolded; frontend UI integration will begin with the planned Premium Café OS dashboard. See [system analysis](../system-analysis/README.md) and [backend implementation plan](../system-analysis/backend-plan.md) for requirements, diagrams and acceptance gates.
+Backend Phases 1-7 are complete and frozen. Flutter Phase 1 (Premium Café OS Design System + Theme Foundation) is implemented. Future frontend milestones will build upon this foundation. See [system analysis](../system-analysis/README.md) and [backend implementation plan](../system-analysis/backend-plan.md) for requirements, diagrams and acceptance gates.
 
+### Backend Milestones (Frozen)
 1. **Auth and access foundations:** backend complete for this milestone: Sanctum bearer login/logout/me, eight-hour expiry, live staff-account checks, fixed roles/gates, user-view policy, validation/resources/throttling and negative-path tests. No staff administration or public registration. Flutter sign-in/session handling, native secure storage, first-party Web cookie/CSRF flow and state-management selection remain planned; cross-app expiry handling is not verified.
 2. **Categories and Products:** backend implemented: schemas, policies, Resources, strict manager/admin management, retirement/reactivation, paginated literal search and exact USD-cent prices. Flutter/tablet browsing remains planned. See [Phase 2 verification](../system-analysis/phase-2-verification.md).
 3. **Orders and POS:** backend unpaid checkout/history implemented: USD cents, zero tax/discount, no options, immutable snapshots, scoped reads and actor-key replay; inventory_tracked=false. Paid settlement and gated stock are implemented in Phases 4-5; receipt printing and Flutter POS remain planned. See [Phase 3 verification](../system-analysis/phase-3-verification.md).
@@ -9,5 +10,14 @@ Backend Phases 1-7 are implemented. Flutter remains scaffolded; frontend UI inte
 5. **Inventory:** implemented exact quantities, recipes, audit ledger/manual movements, deployment-gated reservations, atomic paid consumption, safe cancellation and read-only reconciliation. Automatic expiry and per-product availability display remain future work. See [Phase 5 verification](../system-analysis/phase-5-verification.md).
 6. **Users/Roles and Settings:** backend implemented: admin-only staff provisioning/updates, strict field allow-listing, role resolution, last-operational-admin concurrency protection with row locks, token revocation on role/email changes and deactivations, password resets without secret leakage, allow-listed typed operational settings (`shop_name`, `shop_timezone`), and append-only immutable audit events. Flutter administration UI remains planned. See [Phase 6 verification](../system-analysis/phase-6-verification.md).
 7. **Reports and Analytics Foundation:** backend implemented: executive overview metrics, continuous daily sales trend with zero-filled empty days, payment method distribution, top products by revenue and volume, current inventory report with low-stock filtering, and sanitized reconciliation exception reporting. Date ranges are anchored to authoritative shop_timezone from settings. Composite index `orders_status_paid_at_id_index` and index range scans verified via EXPLAIN on MySQL 8.0. Premium Café OS Flutter dashboard remains planned. See [Phase 7 verification](../system-analysis/phase-7-verification.md).
+
+### Flutter Frontend Milestones
+1. **Phase 1 — Premium Café OS Design System + Theme Foundation:** Implemented: 60-25-10-5 color palette tokens, bilingual English + Khmer typography scale with safe line-heights (1.35–1.45), tabular numeric figures, exact minor-unit cents and quantity formatters, accessible minimum 48px touch targets, responsive breakpoints (compact, medium, expanded), core reusable component library (`AppButton`, `AppTextField`, `StatusBadge`, `AppCard`, `AppSectionHeader`, `AppEmptyState`, `AppLoadingIndicator`), ThemeExtensions, and interactive preview page. See [design system documentation](../frontend/design-system.md).
+2. **Phase 2 — Authentication & Session Management:** Planned.
+3. **Phase 3 — Dashboard & Executive Overview:** Planned.
+4. **Phase 4 — POS Catalog & Cart:** Planned.
+5. **Phase 5 — Checkout & Payment Flow:** Planned.
+6. **Phase 6 — Order History & Status Tracking:** Planned.
+7. **Phase 7 — Inventory & Stock Management:** Planned.
 
 Before expanding POS, decide whether offline checkout, multiple stores, printers, and device-specific peripherals are required. Those choices materially affect architecture and remain open.
