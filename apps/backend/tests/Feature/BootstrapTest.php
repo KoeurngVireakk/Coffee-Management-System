@@ -28,4 +28,25 @@ class BootstrapTest extends TestCase
             ->assertNoContent()
             ->assertHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
     }
+
+    public function test_flutter_web_browser_preflight_is_allowed(): void
+    {
+        $this->withHeaders([
+            'Origin' => 'http://localhost:58221',
+            'Access-Control-Request-Method' => 'POST',
+            'Access-Control-Request-Headers' => 'Authorization, Content-Type',
+        ])->options('/api/v1/auth/login')
+            ->assertNoContent()
+            ->assertHeader('Access-Control-Allow-Origin', 'http://localhost:58221');
+    }
+
+    public function test_untrusted_origin_preflight_is_rejected(): void
+    {
+        $this->withHeaders([
+            'Origin' => 'http://evil.com',
+            'Access-Control-Request-Method' => 'POST',
+            'Access-Control-Request-Headers' => 'Authorization, Content-Type',
+        ])->options('/api/v1/auth/login')
+            ->assertHeaderMissing('Access-Control-Allow-Origin');
+    }
 }
