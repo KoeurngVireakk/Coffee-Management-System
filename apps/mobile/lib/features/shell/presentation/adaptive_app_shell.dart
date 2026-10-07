@@ -11,6 +11,8 @@ import '../../../shared/widgets/status_badge.dart';
 import '../../auth/domain/auth_user.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../../preview/presentation/design_system_preview_page.dart';
+import '../../pos/presentation/pos_controller.dart';
+import '../../pos/presentation/pos_page.dart';
 import 'destination_pages.dart';
 
 /// Primary production authenticated application shell for the Premium Café OS.
@@ -23,12 +25,14 @@ class AdaptiveAppShell extends StatefulWidget {
   const AdaptiveAppShell({
     super.key,
     required this.authController,
+    required this.posController,
     this.onToggleTheme,
     this.currentThemeMode = ThemeMode.light,
     this.initialPath,
   });
 
   final AuthController authController;
+  final PosController? posController;
   final VoidCallback? onToggleTheme;
   final ThemeMode currentThemeMode;
   final String? initialPath;
@@ -549,7 +553,15 @@ class _AdaptiveAppShellState extends State<AdaptiveAppShell> {
       case '/dashboard':
         return const DashboardPlaceholderPage();
       case '/pos':
-        return const PosPlaceholderPage();
+        if (!user.hasPermission('process-pos') ||
+            widget.posController == null) {
+          return const PlaceholderDestinationPage(
+            title: 'POS access denied',
+            icon: Icons.lock_outline,
+            subtitle: 'Contact your manager for access.',
+          );
+        }
+        return PosPage(controller: widget.posController!);
       case '/orders':
         return const OrdersPlaceholderPage();
       case '/products':

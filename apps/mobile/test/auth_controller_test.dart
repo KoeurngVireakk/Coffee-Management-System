@@ -49,6 +49,12 @@ class FakeAuthRepository implements AuthRepository {
       return logoutHandler!(token);
     }
   }
+
+  int invalidSessionClears = 0;
+  @override
+  Future<void> clearInvalidSession() async {
+    invalidSessionClears++;
+  }
 }
 
 void main() {

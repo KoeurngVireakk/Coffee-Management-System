@@ -52,11 +52,30 @@ class AuthController extends ChangeNotifier {
 
   final AuthRepository repository;
   AuthState _state;
+  Future<void>? _invalidSessionCleanup;
 
   AuthState get state => _state;
   bool get isAuthenticated => _state is Authenticated;
   bool get isAuthenticating => _state is Authenticating;
   bool get isInitializing => _state is AuthInitializing;
+
+  /// Invalidates only the session that issued a protected request. A late 401
+  /// from a previous staff session must never sign out a newly signed-in user.
+  Future<void> invalidateSession({required String token}) async {
+    final current = _state;
+    if (current is! Authenticated || current.session.token != token) return;
+    _invalidSessionCleanup = _clearInvalidSession();
+    _setState(const Unauthenticated(SessionExpiredFailure()));
+    await _invalidSessionCleanup;
+  }
+
+  Future<void> _clearInvalidSession() async {
+    try {
+      await repository.clearInvalidSession();
+    } catch (_) {
+      // Authentication stays closed even if OS storage cleanup fails.
+    }
+  }
 
   void _setState(AuthState newState) {
     if (_state == newState) return;
@@ -89,6 +108,8 @@ class AuthController extends ChangeNotifier {
     _setState(const Authenticating());
 
     try {
+      // Delete old credentials before storing a newly authenticated session.
+      await _invalidSessionCleanup;
       final session = await repository.login(email: email, password: password);
       _setState(Authenticated(session));
       return true;

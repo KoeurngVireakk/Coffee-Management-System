@@ -8,6 +8,9 @@ import 'features/auth/data/auth_repository.dart';
 import 'features/auth/data/auth_token_store.dart';
 import 'features/auth/presentation/auth_controller.dart';
 import 'features/auth/presentation/login_page.dart';
+import 'features/pos/data/api_catalog_repository.dart';
+import 'features/pos/domain/catalog_repository.dart';
+import 'features/pos/presentation/pos_controller.dart';
 import 'features/shell/presentation/adaptive_app_shell.dart';
 import 'shared/theme/app_spacing.dart';
 import 'shared/theme/app_theme.dart';
@@ -24,11 +27,13 @@ class CoffeeManagementApp extends StatefulWidget {
   const CoffeeManagementApp({
     super.key,
     this.authController,
+    this.catalogRepository,
     this.initialThemeMode = ThemeMode.light,
   });
 
   /// Injected controller for test isolation and custom mock setups.
   final AuthController? authController;
+  final CatalogRepository? catalogRepository;
   final ThemeMode initialThemeMode;
 
   @override
@@ -39,45 +44,74 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
   late final AuthController _authController;
   late final http.Client? _ownedHttpClient;
   late ThemeMode _themeMode;
+  ApiClient? _apiClient;
+  PosController? _posController;
+  String? _posToken;
+  GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
     super.initState();
     _themeMode = widget.initialThemeMode;
 
-    if (widget.authController != null) {
-      _authController = widget.authController!;
-      _ownedHttpClient = null;
-    } else {
+    if (widget.authController == null || widget.catalogRepository == null) {
       final client = http.Client();
       _ownedHttpClient = client;
-      final apiClient = ApiClient(
-        client: client,
-        baseUrl: AppConfig.apiBaseUrl,
-      );
+      _apiClient = ApiClient(client: client, baseUrl: AppConfig.apiBaseUrl);
+    } else {
+      _ownedHttpClient = null;
+    }
+    if (widget.authController != null) {
+      _authController = widget.authController!;
+    } else {
       final tokenStore = AuthTokenStore.create();
-      final authApi = AuthApi(client: apiClient);
+      final authApi = AuthApi(client: _apiClient!);
       final authRepository = AuthRepository(
         api: authApi,
         tokenStore: tokenStore,
       );
       _authController = AuthController(repository: authRepository);
-      _authController.restoreSession();
     }
+    _authController.addListener(_syncPosSession);
+    _syncPosSession();
+    if (widget.authController == null) _authController.restoreSession();
+  }
+
+  void _syncPosSession() {
+    final state = _authController.state;
+    final token = state is Authenticated ? state.session.token : null;
+    if (_posToken == token) return;
+    _posController?.dispose();
+    _posToken = token;
+    _posController =
+        token == null ||
+            (state is Authenticated && !state.user.hasPermission('process-pos'))
+        ? null
+        : PosController(
+            repository:
+                widget.catalogRepository ??
+                ApiCatalogRepository(client: _apiClient!, token: token),
+            onSessionExpired: () =>
+                _authController.invalidateSession(token: token),
+          );
+    // Session boundaries also dismiss any POS sheets/dialogs from the old user.
+    _navigatorKey = GlobalKey<NavigatorState>();
+    setState(() {});
   }
 
   @override
   void dispose() {
-    if (_ownedHttpClient != null) {
-      _authController.dispose();
-      _ownedHttpClient.close();
-    }
+    _authController.removeListener(_syncPosSession);
+    _posController?.dispose();
+    if (widget.authController == null) _authController.dispose();
+    _ownedHttpClient?.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'Coffee Management System',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.buildLightTheme(),
@@ -102,6 +136,7 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
           if (state is Authenticated) {
             return AdaptiveAppShell(
               authController: _authController,
+              posController: _posController,
               currentThemeMode: _themeMode,
               onToggleTheme: () {
                 setState(() {

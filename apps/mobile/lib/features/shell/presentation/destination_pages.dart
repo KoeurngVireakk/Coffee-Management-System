@@ -64,20 +64,6 @@ class DashboardPlaceholderPage extends StatelessWidget {
   }
 }
 
-/// POS placeholder page.
-class PosPlaceholderPage extends StatelessWidget {
-  const PosPlaceholderPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const PlaceholderDestinationPage(
-      title: 'Point of Sale',
-      icon: Icons.point_of_sale_rounded,
-      subtitle: 'Product catalog and checkout will appear here.',
-    );
-  }
-}
-
 /// Orders placeholder page.
 class OrdersPlaceholderPage extends StatelessWidget {
   const OrdersPlaceholderPage({super.key});

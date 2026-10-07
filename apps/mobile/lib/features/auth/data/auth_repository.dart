@@ -11,6 +11,9 @@ class AuthRepository {
   final AuthApi api;
   final AuthTokenStore tokenStore;
 
+  /// A protected endpoint proved the token unusable; no logout request needed.
+  Future<void> clearInvalidSession() => tokenStore.clearSession();
+
   /// Authenticates with the backend and persists the token in secure storage.
   ///
   /// If writing to secure storage fails, cleans up and throws to fail closed.

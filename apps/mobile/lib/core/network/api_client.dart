@@ -35,9 +35,12 @@ class ApiClient {
     return trimmed.replaceAll(RegExp(r'/+$'), '');
   }
 
-  Uri _buildUri(String path) {
+  Uri _buildUri(String path, [Map<String, String>? queryParameters]) {
     final cleanPath = path.startsWith('/') ? path : '/$path';
-    return Uri.parse('$_baseUrl$cleanPath');
+    final uri = Uri.parse('$_baseUrl$cleanPath');
+    return queryParameters == null
+        ? uri
+        : uri.replace(queryParameters: queryParameters);
   }
 
   Map<String, String> _buildHeaders({
@@ -65,11 +68,12 @@ class ApiClient {
   /// Sends a GET request and decodes the JSON response.
   Future<dynamic> get(
     String path, {
+    Map<String, String>? queryParameters,
     Map<String, String>? headers,
     String? token,
     Duration? timeout,
   }) async {
-    final uri = _buildUri(path);
+    final uri = _buildUri(path, queryParameters);
     final requestHeaders = _buildHeaders(
       customHeaders: headers,
       token: token,

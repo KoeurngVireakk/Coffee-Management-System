@@ -6,6 +6,7 @@ import 'package:coffee_management_mobile/features/auth/presentation/auth_control
 import 'package:flutter_test/flutter_test.dart';
 
 import 'auth_controller_test.dart';
+import 'pos_test_support.dart';
 
 void main() {
   testWidgets('application shell boots to LoginPage when unauthenticated', (
@@ -15,7 +16,12 @@ void main() {
     final controller = AuthController(repository: fakeRepo);
     await controller.restoreSession();
 
-    await tester.pumpWidget(CoffeeManagementApp(authController: controller));
+    await tester.pumpWidget(
+      CoffeeManagementApp(
+        authController: controller,
+        catalogRepository: FakeCatalogRepository(),
+      ),
+    );
     await tester.pump();
 
     expect(find.text('Coffee Management System'), findsOneWidget);
@@ -43,7 +49,12 @@ void main() {
       final controller = AuthController(repository: fakeRepo);
       await controller.restoreSession();
 
-      await tester.pumpWidget(CoffeeManagementApp(authController: controller));
+      await tester.pumpWidget(
+        CoffeeManagementApp(
+          authController: controller,
+          catalogRepository: FakeCatalogRepository(),
+        ),
+      );
       await tester.pump();
 
       expect(find.text('Coffee Management System'), findsOneWidget);

@@ -8,6 +8,25 @@ import 'package:http/testing.dart';
 
 void main() {
   group('ApiClient URL handling', () {
+    test('GET query uses Uri encoding and preserves the API prefix', () async {
+      final transport = MockClient((request) async {
+        expect(request.url.path, '/api/v1/products');
+        expect(request.url.queryParameters, {
+          'search': 'កាហ្វេ &+?#%/ 0',
+          'page': '2',
+        });
+        expect(request.url.fragment, isEmpty);
+        return http.Response('{}', 200);
+      });
+      addTearDown(transport.close);
+      await ApiClient(
+        client: transport,
+        baseUrl: 'https://api.example.test/api/v1/',
+      ).get(
+        '/products',
+        queryParameters: {'search': 'កាហ្វេ &+?#%/ 0', 'page': '2'},
+      );
+    });
     test('normalizes trailing slashes on base URL', () {
       final client = ApiClient(
         client: http.Client(),

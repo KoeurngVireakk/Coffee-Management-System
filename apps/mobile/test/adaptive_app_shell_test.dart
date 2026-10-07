@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'auth_controller_test.dart';
+import 'pos_test_support.dart';
+import 'package:coffee_management_mobile/features/pos/presentation/pos_controller.dart';
 
 void main() {
   const cashierUser = AuthUser(
@@ -83,6 +85,8 @@ void main() {
     tester.view.physicalSize = viewport;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
+    final posController = PosController(repository: FakeCatalogRepository());
+    addTearDown(posController.dispose);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -95,6 +99,7 @@ void main() {
             textScaler: TextScaler.linear(textScaleFactor),
           ),
           child: AdaptiveAppShell(
+            posController: posController,
             authController: controller,
             currentThemeMode: themeMode,
             onToggleTheme: onToggleTheme,
