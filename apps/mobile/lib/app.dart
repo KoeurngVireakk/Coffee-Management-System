@@ -9,7 +9,9 @@ import 'features/auth/data/auth_token_store.dart';
 import 'features/auth/presentation/auth_controller.dart';
 import 'features/auth/presentation/login_page.dart';
 import 'features/pos/data/api_catalog_repository.dart';
+import 'features/pos/data/api_checkout_repository.dart';
 import 'features/pos/domain/catalog_repository.dart';
+import 'features/pos/domain/checkout_repository.dart';
 import 'features/pos/presentation/pos_controller.dart';
 import 'features/shell/presentation/adaptive_app_shell.dart';
 import 'shared/theme/app_spacing.dart';
@@ -28,12 +30,14 @@ class CoffeeManagementApp extends StatefulWidget {
     super.key,
     this.authController,
     this.catalogRepository,
+    this.checkoutRepository,
     this.initialThemeMode = ThemeMode.light,
   });
 
   /// Injected controller for test isolation and custom mock setups.
   final AuthController? authController;
   final CatalogRepository? catalogRepository;
+  final CheckoutRepository? checkoutRepository;
   final ThemeMode initialThemeMode;
 
   @override
@@ -54,7 +58,9 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
     super.initState();
     _themeMode = widget.initialThemeMode;
 
-    if (widget.authController == null || widget.catalogRepository == null) {
+    if (widget.authController == null ||
+        widget.catalogRepository == null ||
+        widget.checkoutRepository == null) {
       final client = http.Client();
       _ownedHttpClient = client;
       _apiClient = ApiClient(client: client, baseUrl: AppConfig.apiBaseUrl);
@@ -88,6 +94,9 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
             (state is Authenticated && !state.user.hasPermission('process-pos'))
         ? null
         : PosController(
+            checkoutRepository:
+                widget.checkoutRepository ??
+                ApiCheckoutRepository(client: _apiClient!, token: token),
             repository:
                 widget.catalogRepository ??
                 ApiCatalogRepository(client: _apiClient!, token: token),

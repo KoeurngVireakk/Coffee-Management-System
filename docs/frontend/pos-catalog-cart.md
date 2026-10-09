@@ -1,5 +1,7 @@
 # Flutter Phase 4 — POS Catalog & Cart
 
+This document records the Phase 4 milestone. Its current checkout/payment extension is documented in [Flutter Phase 5 — Checkout & Payment Flow](checkout-payment-flow.md); the catalog, exact cart rules and session ownership described here remain the foundation.
+
 The `/pos` destination now reads the frozen Laravel catalog and builds an in-memory order preview. Only staff with `process-pos` can mount it; the server still authorizes every request. Dashboard and catalog management destinations retain their existing placeholders. No order or payment is created.
 
 ## Architecture and lifetime

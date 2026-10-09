@@ -15,7 +15,7 @@ class PosProductCard extends StatelessWidget {
   });
   final CatalogProduct product;
   final int quantity;
-  final VoidCallback onAdd;
+  final VoidCallback? onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +24,10 @@ class PosProductCard extends StatelessWidget {
     final price = Formatters.formatCents(product.priceMinor);
     return Semantics(
       button: true,
-      label:
-          'Add ${product.name}, $price USD, ${product.category.name}. $quantity in cart',
+      enabled: onAdd != null,
+      label: onAdd == null
+          ? '${product.name}, $price USD, ${product.category.name}. Selection locked while the order is in progress.'
+          : 'Add ${product.name}, $price USD, ${product.category.name}. $quantity in cart',
       onTap: onAdd,
       excludeSemantics: true,
       child: Material(
@@ -81,14 +83,20 @@ class PosProductCard extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Icon(
-                      quantity > 0
+                      onAdd == null
+                          ? Icons.lock_outline
+                          : quantity > 0
                           ? Icons.check_circle_outline
                           : Icons.add_circle_outline,
-                      color: colors.secondary,
+                      color: onAdd == null
+                          ? colors.onSurfaceVariant
+                          : colors.secondary,
                       size: 24,
                     ),
                     Text(
-                      quantity > 0
+                      onAdd == null
+                          ? 'Order in progress'
+                          : quantity > 0
                           ? '$quantity in order · Add'
                           : 'Add to order',
                       style: AppTypography.label.copyWith(

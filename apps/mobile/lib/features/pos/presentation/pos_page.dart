@@ -43,11 +43,21 @@ class _PosPageState extends State<PosPage> {
       useSafeArea: true,
       showDragHandle: true,
       constraints: const BoxConstraints(maxWidth: AppBreakpoints.compact),
-      builder: (context) => SizedBox(
-        height: MediaQuery.sizeOf(context).height * 0.85,
-        child: PosCartPanel(
-          controller: widget.controller,
-          onClose: () => Navigator.pop(context),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) => SizedBox(
+            height: math.min(
+              MediaQuery.sizeOf(context).height * 0.85,
+              constraints.maxHeight,
+            ),
+            child: PosCartPanel(
+              controller: widget.controller,
+              onClose: () => Navigator.pop(context),
+            ),
+          ),
         ),
       ),
     );
@@ -82,6 +92,7 @@ class _PosPageState extends State<PosPage> {
               );
             }
             final cart = widget.controller.cart;
+            final order = widget.controller.checkout?.state.order;
             return Column(
               children: [
                 Expanded(child: catalog),
@@ -110,9 +121,13 @@ class _PosPageState extends State<PosPage> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           const Icon(Icons.shopping_bag_outlined),
-                          Text('View cart · ${cart.itemCount} items'),
                           Text(
-                            '${Formatters.formatCents(cart.subtotalMinor)} USD',
+                            order == null
+                                ? 'View cart · ${cart.itemCount} items'
+                                : 'View order · ${order.itemCount} items',
+                          ),
+                          Text(
+                            '${Formatters.formatCents(order?.totalMinor ?? cart.subtotalMinor)} USD',
                           ),
                         ],
                       ),
@@ -312,12 +327,15 @@ class _PosPageState extends State<PosPage> {
                                 quantity: controller.cart.quantityFor(
                                   products.items[row * columns + column].id,
                                 ),
-                                onAdd: () => showCartLimit(
-                                  context,
-                                  controller.add(
-                                    products.items[row * columns + column],
-                                  ),
-                                ),
+                                onAdd: !controller.canEditCart
+                                    ? null
+                                    : () => showCartLimit(
+                                        context,
+                                        controller.add(
+                                          products.items[row * columns +
+                                              column],
+                                        ),
+                                      ),
                               ),
                       ),
                     ],

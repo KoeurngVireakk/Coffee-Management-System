@@ -77,11 +77,13 @@ class StatusBadge extends StatelessWidget {
               Icon(icon, size: 13.0, color: fg),
               AppSpacing.gapHorizontalXs,
             ],
-            Text(
-              label,
-              style: AppTypography.small.copyWith(
-                color: fg,
-                fontWeight: FontWeight.w600,
+            Flexible(
+              child: Text(
+                label,
+                style: AppTypography.small.copyWith(
+                  color: fg,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],

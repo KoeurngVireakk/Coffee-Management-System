@@ -1,6 +1,6 @@
 import 'catalog.dart';
 
-enum CartLimit { quantity, lines, unavailable }
+enum CartLimit { quantity, lines, unavailable, checkoutLocked }
 
 class CartLine {
   const CartLine._(this.product, this.quantity);

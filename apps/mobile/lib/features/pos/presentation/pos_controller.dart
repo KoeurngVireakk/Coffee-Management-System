@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import '../domain/cart.dart';
 import '../domain/catalog.dart';
 import '../domain/catalog_repository.dart';
+import '../domain/checkout_repository.dart';
+import 'checkout_controller.dart';
 
 enum CatalogPhase {
   initial,
@@ -38,12 +40,24 @@ class PosController extends ChangeNotifier {
   PosController({
     required this.repository,
     this.onSessionExpired,
+    CheckoutRepository? checkoutRepository,
     this.searchDelay = const Duration(milliseconds: 300),
-  });
+  }) {
+    checkout = checkoutRepository == null
+        ? null
+        : CheckoutController(
+            repository: checkoutRepository,
+            cart: cart,
+            onSessionExpired: onSessionExpired,
+          );
+    checkout?.addListener(_notify);
+  }
   final CatalogRepository repository;
   final VoidCallback? onSessionExpired;
   final Duration searchDelay;
   final Cart cart = Cart();
+  late final CheckoutController? checkout;
+  bool get canEditCart => checkout?.canEditCart ?? true;
   CatalogState<CatalogCategory> _categories = CatalogState();
   CatalogState<CatalogProduct> _products = CatalogState();
   CatalogState<CatalogCategory> get categories => _categories;
@@ -143,7 +157,7 @@ class PosController extends ChangeNotifier {
           for (final product in previous.items) product.id: product,
         for (final product in page.items) product.id: product,
       };
-      cart.updatePreviews(page.items);
+      if (canEditCart) cart.updatePreviews(page.items);
       _products = CatalogState(
         phase: merged.isEmpty ? CatalogPhase.empty : CatalogPhase.ready,
         items: merged.values.toList(),
@@ -224,28 +238,33 @@ class PosController extends ChangeNotifier {
   }
 
   CartLimit? add(CatalogProduct product) {
+    if (!canEditCart) return CartLimit.checkoutLocked;
     final limit = cart.add(product);
     _notify();
     return limit;
   }
 
   CartLimit? increment(int id) {
+    if (!canEditCart) return CartLimit.checkoutLocked;
     final limit = cart.increment(id);
     _notify();
     return limit;
   }
 
   void decrement(int id) {
+    if (!canEditCart) return;
     cart.decrement(id);
     _notify();
   }
 
   void remove(int id) {
+    if (!canEditCart) return;
     cart.remove(id);
     _notify();
   }
 
   void clearCart() {
+    if (!canEditCart) return;
     cart.clear();
     _notify();
   }
@@ -256,6 +275,8 @@ class PosController extends ChangeNotifier {
     _productGeneration++;
     _categoryGeneration++;
     _debounce?.cancel();
+    checkout?.removeListener(_notify);
+    checkout?.dispose();
     super.dispose();
   }
 }
