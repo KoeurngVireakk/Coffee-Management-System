@@ -1,6 +1,6 @@
 # Implementation roadmap
 
-Backend Phases 1-7 are complete and frozen. Flutter Phases 1-5 (Design System, Authentication, Adaptive App Shell, POS Catalog & Cart, and Checkout & Payment Flow) are implemented. Future frontend milestones will build upon this foundation. See [system analysis](../system-analysis/README.md) and [backend implementation plan](../system-analysis/backend-plan.md) for requirements, diagrams and acceptance gates.
+Backend Phases 1-7 are complete and frozen. Flutter Phases 1-7 (Design System, Authentication, Adaptive App Shell, POS Catalog & Cart, Checkout & Payment Flow, Order History & Status Tracking, and Inventory & Stock Management) are implemented. Future frontend milestones will build upon this foundation. See [system analysis](../system-analysis/README.md) and [backend implementation plan](../system-analysis/backend-plan.md) for requirements, diagrams and acceptance gates.
 
 ### Backend Milestones (Frozen)
 1. **Auth and access foundations:** backend complete for this milestone: Sanctum bearer login/logout/me, eight-hour expiry, live staff-account checks, fixed roles/gates, user-view policy, validation/resources/throttling and negative-path tests. No staff administration or public registration. Flutter sign-in/session handling, native secure storage, first-party Web cookie/CSRF flow and state-management selection remain planned; cross-app expiry handling is not verified.
