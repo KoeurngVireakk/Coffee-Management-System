@@ -8,6 +8,9 @@ import 'features/auth/data/auth_repository.dart';
 import 'features/auth/data/auth_token_store.dart';
 import 'features/auth/presentation/auth_controller.dart';
 import 'features/auth/presentation/login_page.dart';
+import 'features/orders/data/api_order_history_repository.dart';
+import 'features/orders/domain/order_history_repository.dart';
+import 'features/orders/presentation/orders_controller.dart';
 import 'features/pos/data/api_catalog_repository.dart';
 import 'features/pos/data/api_checkout_repository.dart';
 import 'features/pos/domain/catalog_repository.dart';
@@ -31,6 +34,7 @@ class CoffeeManagementApp extends StatefulWidget {
     this.authController,
     this.catalogRepository,
     this.checkoutRepository,
+    this.orderHistoryRepository,
     this.initialThemeMode = ThemeMode.light,
   });
 
@@ -38,6 +42,7 @@ class CoffeeManagementApp extends StatefulWidget {
   final AuthController? authController;
   final CatalogRepository? catalogRepository;
   final CheckoutRepository? checkoutRepository;
+  final OrderHistoryRepository? orderHistoryRepository;
   final ThemeMode initialThemeMode;
 
   @override
@@ -51,6 +56,8 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
   ApiClient? _apiClient;
   PosController? _posController;
   String? _posToken;
+  OrdersController? _ordersController;
+  String? _ordersToken;
   GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
@@ -60,7 +67,8 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
 
     if (widget.authController == null ||
         widget.catalogRepository == null ||
-        widget.checkoutRepository == null) {
+        widget.checkoutRepository == null ||
+        widget.orderHistoryRepository == null) {
       final client = http.Client();
       _ownedHttpClient = client;
       _apiClient = ApiClient(client: client, baseUrl: AppConfig.apiBaseUrl);
@@ -78,31 +86,55 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
       );
       _authController = AuthController(repository: authRepository);
     }
-    _authController.addListener(_syncPosSession);
-    _syncPosSession();
+    _authController.addListener(_syncSessions);
+    _syncSessions();
     if (widget.authController == null) _authController.restoreSession();
   }
 
-  void _syncPosSession() {
+  void _syncSessions() {
     final state = _authController.state;
     final token = state is Authenticated ? state.session.token : null;
-    if (_posToken == token) return;
-    _posController?.dispose();
-    _posToken = token;
-    _posController =
-        token == null ||
-            (state is Authenticated && !state.user.hasPermission('process-pos'))
-        ? null
-        : PosController(
-            checkoutRepository:
-                widget.checkoutRepository ??
-                ApiCheckoutRepository(client: _apiClient!, token: token),
-            repository:
-                widget.catalogRepository ??
-                ApiCatalogRepository(client: _apiClient!, token: token),
-            onSessionExpired: () =>
-                _authController.invalidateSession(token: token),
-          );
+
+    // --- POS Session Sync ---
+    if (_posToken != token) {
+      _posController?.dispose();
+      _posToken = token;
+      _posController =
+          token == null ||
+              (state is Authenticated &&
+                  !state.user.hasPermission('process-pos'))
+          ? null
+          : PosController(
+              checkoutRepository:
+                  widget.checkoutRepository ??
+                  ApiCheckoutRepository(client: _apiClient!, token: token),
+              repository:
+                  widget.catalogRepository ??
+                  ApiCatalogRepository(client: _apiClient!, token: token),
+              onSessionExpired: () =>
+                  _authController.invalidateSession(token: token),
+            );
+    }
+
+    // --- Orders Session Sync ---
+    if (_ordersToken != token) {
+      _ordersController?.dispose();
+      _ordersToken = token;
+      final canViewOrders =
+          state is Authenticated &&
+          (state.user.hasPermission('view-own-orders') ||
+              state.user.hasPermission('view-all-orders'));
+      _ordersController = token == null || !canViewOrders
+          ? null
+          : OrdersController(
+              repository:
+                  widget.orderHistoryRepository ??
+                  ApiOrderHistoryRepository(client: _apiClient!, token: token),
+              onSessionExpired: () =>
+                  _authController.invalidateSession(token: token),
+            );
+    }
+
     // Session boundaries also dismiss any POS sheets/dialogs from the old user.
     _navigatorKey = GlobalKey<NavigatorState>();
     setState(() {});
@@ -110,8 +142,9 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
 
   @override
   void dispose() {
-    _authController.removeListener(_syncPosSession);
+    _authController.removeListener(_syncSessions);
     _posController?.dispose();
+    _ordersController?.dispose();
     if (widget.authController == null) _authController.dispose();
     _ownedHttpClient?.close();
     super.dispose();
@@ -146,6 +179,7 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
             return AdaptiveAppShell(
               authController: _authController,
               posController: _posController,
+              ordersController: _ordersController,
               currentThemeMode: _themeMode,
               onToggleTheme: () {
                 setState(() {

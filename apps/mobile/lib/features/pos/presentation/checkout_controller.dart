@@ -529,6 +529,46 @@ class CheckoutController extends ChangeNotifier {
     });
   }
 
+  /// Explicit recovery entry point for an already-persisted order discovered via order history.
+  ///
+  /// Resets prior in-flight/in-memory mutations, adopts the persisted order, and authoritatively
+  /// refreshes its server-side payment attempts and settlement state.
+  Future<void> recoverOrder(String reference) async {
+    if (_disposed || state.busy) return;
+    final generation = ++_generation;
+    _order = null;
+    _intent = null;
+    _unresolved = null;
+    _cashRequest = null;
+    _externalRequest = null;
+    _payments.clear();
+    _latestPayment = null;
+    _paymentPage = null;
+    _cashInput = '';
+    cart.clear();
+    _publish(CheckoutPhase.verifyingOrder);
+    try {
+      final order = await repository.order(reference);
+      if (!_live(generation)) return;
+      _adoptOrder(order);
+      final page = await repository.payments(order.reference);
+      if (!_live(generation)) return;
+      for (final payment in page.items) {
+        _adoptPayment(payment);
+      }
+      _paymentPage = page;
+      _settledView();
+    } on CheckoutFailure catch (error) {
+      if (!_live(generation)) return;
+      if (error.kind == CheckoutFailureKind.sessionExpired) {
+        onSessionExpired?.call();
+        return;
+      }
+      _applyCooldown(error);
+      _publish(CheckoutPhase.refreshRequired, failure: error);
+    }
+  }
+
   void newOrder() {
     if (!canStartNewOrder) return;
     _generation++;
