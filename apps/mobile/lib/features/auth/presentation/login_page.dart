@@ -110,6 +110,7 @@ class _LoginPageState extends State<LoginPage> {
 
                         // --- Login Card ---
                         AppCard(
+                          elevation: 1.0,
                           padding: const EdgeInsets.all(AppSpacing.xxl),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -192,6 +193,7 @@ class _LoginPageState extends State<LoginPage> {
                               // Sign In Button
                               AppButton(
                                 label: 'Sign In',
+                                size: AppButtonSize.large,
                                 isLoading: isLoading,
                                 isFullWidth: true,
                                 leadingIcon: Icons.login_rounded,
