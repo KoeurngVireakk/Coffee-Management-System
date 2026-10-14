@@ -119,6 +119,70 @@ void main() {
       final result = await apiClient.post('/auth/logout', token: 'valid-token');
       expect(result, isNull);
     });
+
+    test('encodes JSON body and sets method for PUT requests', () async {
+      late http.Request capturedRequest;
+
+      final mockClient = MockClient((request) async {
+        capturedRequest = request;
+        return http.Response(jsonEncode({'data': 'updated'}), 200);
+      });
+
+      final apiClient = ApiClient(
+        client: mockClient,
+        baseUrl: 'https://api.example.test/api/v1',
+      );
+
+      final result = await apiClient.put(
+        '/items/1',
+        body: {'name': 'Updated Latte'},
+        token: 'auth-token-123',
+      );
+
+      expect(capturedRequest.method, equals('PUT'));
+      expect(
+        capturedRequest.headers['Content-Type'],
+        equals('application/json'),
+      );
+      expect(
+        capturedRequest.headers['Authorization'],
+        equals('Bearer auth-token-123'),
+      );
+      expect(capturedRequest.body, equals('{"name":"Updated Latte"}'));
+      expect(result, equals({'data': 'updated'}));
+    });
+
+    test('encodes JSON body and sets method for PATCH requests', () async {
+      late http.Request capturedRequest;
+
+      final mockClient = MockClient((request) async {
+        capturedRequest = request;
+        return http.Response(jsonEncode({'data': 'patched'}), 200);
+      });
+
+      final apiClient = ApiClient(
+        client: mockClient,
+        baseUrl: 'https://api.example.test/api/v1',
+      );
+
+      final result = await apiClient.patch(
+        '/items/1',
+        body: {'is_active': false},
+        token: 'auth-token-123',
+      );
+
+      expect(capturedRequest.method, equals('PATCH'));
+      expect(
+        capturedRequest.headers['Content-Type'],
+        equals('application/json'),
+      );
+      expect(
+        capturedRequest.headers['Authorization'],
+        equals('Bearer auth-token-123'),
+      );
+      expect(capturedRequest.body, equals('{"is_active":false}'));
+      expect(result, equals({'data': 'patched'}));
+    });
   });
 
   group('ApiClient error mapping', () {

@@ -8,6 +8,9 @@ import 'features/auth/data/auth_repository.dart';
 import 'features/auth/data/auth_token_store.dart';
 import 'features/auth/presentation/auth_controller.dart';
 import 'features/auth/presentation/login_page.dart';
+import 'features/inventory/data/api_inventory_repository.dart';
+import 'features/inventory/domain/inventory_repository.dart';
+import 'features/inventory/presentation/inventory_controller.dart';
 import 'features/orders/data/api_order_history_repository.dart';
 import 'features/orders/domain/order_history_repository.dart';
 import 'features/orders/presentation/orders_controller.dart';
@@ -35,6 +38,7 @@ class CoffeeManagementApp extends StatefulWidget {
     this.catalogRepository,
     this.checkoutRepository,
     this.orderHistoryRepository,
+    this.inventoryRepository,
     this.initialThemeMode = ThemeMode.light,
   });
 
@@ -43,6 +47,7 @@ class CoffeeManagementApp extends StatefulWidget {
   final CatalogRepository? catalogRepository;
   final CheckoutRepository? checkoutRepository;
   final OrderHistoryRepository? orderHistoryRepository;
+  final InventoryRepository? inventoryRepository;
   final ThemeMode initialThemeMode;
 
   @override
@@ -58,6 +63,8 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
   String? _posToken;
   OrdersController? _ordersController;
   String? _ordersToken;
+  InventoryController? _inventoryController;
+  String? _inventoryToken;
   GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
@@ -68,7 +75,8 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
     if (widget.authController == null ||
         widget.catalogRepository == null ||
         widget.checkoutRepository == null ||
-        widget.orderHistoryRepository == null) {
+        widget.orderHistoryRepository == null ||
+        widget.inventoryRepository == null) {
       final client = http.Client();
       _ownedHttpClient = client;
       _apiClient = ApiClient(client: client, baseUrl: AppConfig.apiBaseUrl);
@@ -135,6 +143,26 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
             );
     }
 
+    // --- Inventory Session Sync ---
+    if (_inventoryToken != token) {
+      _inventoryController?.dispose();
+      _inventoryToken = token;
+      final canViewInventory =
+          state is Authenticated && state.user.hasPermission('view-inventory');
+      _inventoryController = token == null || !canViewInventory
+          ? null
+          : InventoryController(
+              repository:
+                  widget.inventoryRepository ??
+                  ApiInventoryRepository(client: _apiClient!, token: token),
+              catalogRepository:
+                  widget.catalogRepository ??
+                  ApiCatalogRepository(client: _apiClient!, token: token),
+              onSessionExpired: () =>
+                  _authController.invalidateSession(token: token),
+            );
+    }
+
     // Session boundaries also dismiss any POS sheets/dialogs from the old user.
     _navigatorKey = GlobalKey<NavigatorState>();
     setState(() {});
@@ -145,6 +173,7 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
     _authController.removeListener(_syncSessions);
     _posController?.dispose();
     _ordersController?.dispose();
+    _inventoryController?.dispose();
     if (widget.authController == null) _authController.dispose();
     _ownedHttpClient?.close();
     super.dispose();
@@ -180,6 +209,7 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
               authController: _authController,
               posController: _posController,
               ordersController: _ordersController,
+              inventoryController: _inventoryController,
               currentThemeMode: _themeMode,
               onToggleTheme: () {
                 setState(() {

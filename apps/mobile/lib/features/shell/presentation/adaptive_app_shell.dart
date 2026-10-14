@@ -10,6 +10,8 @@ import '../../../shared/theme/cafe_theme_extension.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../auth/domain/auth_user.dart';
 import '../../auth/presentation/auth_controller.dart';
+import '../../inventory/presentation/inventory_controller.dart';
+import '../../inventory/presentation/inventory_page.dart';
 import '../../orders/presentation/orders_controller.dart';
 import '../../orders/presentation/orders_page.dart';
 import '../../preview/presentation/design_system_preview_page.dart';
@@ -29,6 +31,7 @@ class AdaptiveAppShell extends StatefulWidget {
     required this.authController,
     required this.posController,
     this.ordersController,
+    this.inventoryController,
     this.onToggleTheme,
     this.currentThemeMode = ThemeMode.light,
     this.initialPath,
@@ -37,6 +40,7 @@ class AdaptiveAppShell extends StatefulWidget {
   final AuthController authController;
   final PosController? posController;
   final OrdersController? ordersController;
+  final InventoryController? inventoryController;
   final VoidCallback? onToggleTheme;
   final ThemeMode currentThemeMode;
   final String? initialPath;
@@ -586,7 +590,21 @@ class _AdaptiveAppShellState extends State<AdaptiveAppShell> {
         return const ProductsPlaceholderPage();
       case '/inventory':
       case '/stock':
-        return const InventoryPlaceholderPage();
+        if (!user.hasPermission('view-inventory')) {
+          return const PlaceholderDestinationPage(
+            title: 'Inventory access denied',
+            icon: Icons.lock_outline,
+            subtitle: 'Contact your manager for access.',
+          );
+        }
+        if (widget.inventoryController == null) {
+          return const InventoryPlaceholderPage();
+        }
+        return InventoryPage(
+          controller: widget.inventoryController!,
+          authController: widget.authController,
+          catalogRepository: widget.posController?.repository,
+        );
       case '/reports':
         return const ReportsPlaceholderPage();
       case '/staff':

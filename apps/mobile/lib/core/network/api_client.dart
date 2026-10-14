@@ -130,6 +130,74 @@ class ApiClient {
     }
   }
 
+  /// Sends a PUT request with an optional JSON body and decodes the response.
+  Future<dynamic> put(
+    String path, {
+    Object? body,
+    Map<String, String>? headers,
+    String? token,
+    Duration? timeout,
+  }) async {
+    final uri = _buildUri(path);
+    final hasBody = body != null;
+    final requestHeaders = _buildHeaders(
+      customHeaders: headers,
+      token: token,
+      hasBody: hasBody,
+    );
+
+    final encodedBody = hasBody ? jsonEncode(body) : null;
+
+    try {
+      final response = await client
+          .put(uri, headers: requestHeaders, body: encodedBody)
+          .timeout(timeout ?? defaultTimeout);
+
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw const NetworkException('Request timed out. Please try again.');
+    } on http.ClientException catch (e) {
+      throw NetworkException('Network transport error: ${e.message}');
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw NetworkException('Connection error: $e');
+    }
+  }
+
+  /// Sends a PATCH request with an optional JSON body and decodes the response.
+  Future<dynamic> patch(
+    String path, {
+    Object? body,
+    Map<String, String>? headers,
+    String? token,
+    Duration? timeout,
+  }) async {
+    final uri = _buildUri(path);
+    final hasBody = body != null;
+    final requestHeaders = _buildHeaders(
+      customHeaders: headers,
+      token: token,
+      hasBody: hasBody,
+    );
+
+    final encodedBody = hasBody ? jsonEncode(body) : null;
+
+    try {
+      final response = await client
+          .patch(uri, headers: requestHeaders, body: encodedBody)
+          .timeout(timeout ?? defaultTimeout);
+
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw const NetworkException('Request timed out. Please try again.');
+    } on http.ClientException catch (e) {
+      throw NetworkException('Network transport error: ${e.message}');
+    } catch (e) {
+      if (e is ApiException) rethrow;
+      throw NetworkException('Connection error: $e');
+    }
+  }
+
   dynamic _handleResponse(http.Response response) {
     final statusCode = response.statusCode;
 
