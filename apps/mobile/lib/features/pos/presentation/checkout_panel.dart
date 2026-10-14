@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../shared/theme/app_radius.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/theme/formatters.dart';
+import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../domain/order.dart';
 import '../domain/payment.dart';
@@ -205,7 +207,10 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                     excludeSemantics: true,
                     child: SelectableText(
                       order.reference,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
                     ),
                   ),
                   AppSpacing.gapVerticalSm,
@@ -213,7 +218,7 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                   Text(
                     Formatters.formatCents(order.totalMinor),
                     style: AppTypography.priceLarge.copyWith(
-                      color: colors.onSurface,
+                      color: paid ? colors.secondary : colors.onSurface,
                     ),
                   ),
                   if (controller.previewTotalMinor != null &&
@@ -227,6 +232,7 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                     variant: paid
                         ? StatusBadgeVariant.success
                         : StatusBadgeVariant.warning,
+                    isPill: true,
                   ),
                   if (state.phase == CheckoutPhase.review) ...[
                     AppSpacing.gapVerticalMd,
@@ -306,15 +312,37 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                     if (controller.enteredTenderMinor != null &&
                         controller.enteredTenderMinor! >= order.totalMinor) ...[
                       AppSpacing.gapVerticalSm,
-                      Semantics(
-                        liveRegion: true,
-                        child: Text(
-                          'Change preview: ${Formatters.formatCents(controller.enteredTenderMinor! - order.totalMinor)} USD',
+                      Container(
+                        width: double.infinity,
+                        padding: AppSpacing.edgeInsetsMd,
+                        decoration: BoxDecoration(
+                          color: colors.secondaryContainer.withValues(alpha: 0.35),
+                          borderRadius: AppRadius.radiusMd,
+                          border: Border.all(
+                            color: colors.secondary.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            'Change preview: ${Formatters.formatCents(controller.enteredTenderMinor! - order.totalMinor)} USD',
+                            style: AppTypography.title.copyWith(
+                              color: colors.secondary,
+                              fontWeight: FontWeight.w700,
+                              fontFeatures: const [FontFeature.tabularFigures()],
+                            ),
+                          ),
                         ),
                       ),
                     ],
                     AppSpacing.gapVerticalMd,
                     FilledButton(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 52.0),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: AppRadius.radiusLg,
+                        ),
+                      ),
                       onPressed:
                           controller.canChoosePayment &&
                               controller.enteredTenderMinor != null &&
@@ -333,11 +361,23 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                   ] else if (controller.canChoosePayment) ...[
                     AppSpacing.gapVerticalLg,
                     FilledButton(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 52.0),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: AppRadius.radiusLg,
+                        ),
+                      ),
                       onPressed: controller.chooseCash,
                       child: const Text('Cash'),
                     ),
                     AppSpacing.gapVerticalSm,
                     OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 52.0),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: AppRadius.radiusLg,
+                        ),
+                      ),
                       onPressed: controller.external,
                       child: const Text('External payment'),
                     ),
@@ -404,6 +444,12 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                     ),
                   if (controller.canStartNewOrder)
                     FilledButton(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 52.0),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: AppRadius.radiusLg,
+                        ),
+                      ),
                       onPressed: controller.newOrder,
                       child: const Text('New Order'),
                     ),
