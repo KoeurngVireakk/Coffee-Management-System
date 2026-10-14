@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../shared/theme/app_radius.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/theme/formatters.dart';
@@ -141,10 +142,20 @@ class PosCartPanel extends StatelessWidget {
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(
                         double.infinity,
-                        AppSpacing.minTouchTarget,
+                        52.0,
+                      ),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: AppRadius.radiusLg,
                       ),
                     ),
-                    child: const Text('Checkout'),
+                    child: Text(
+                      'Checkout',
+                      style: AppTypography.label.copyWith(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w700,
+                        color: colors.onPrimary,
+                      ),
+                    ),
                   ),
                 ],
               ],
@@ -235,63 +246,107 @@ class _CartLineView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = line.product;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(product.name, style: Theme.of(context).textTheme.titleMedium),
-        AppSpacing.gapVerticalXs,
-        Text(
-          '${Formatters.formatCents(product.priceMinor)} each · ${Formatters.formatCents(line.subtotalMinor)} line subtotal',
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      padding: AppSpacing.edgeInsetsMd,
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: AppRadius.radiusLg,
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.6),
         ),
-        AppSpacing.gapVerticalSm,
-        Wrap(
-          spacing: AppSpacing.sm,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            IconButton(
-              constraints: const BoxConstraints(
-                minWidth: AppSpacing.minTouchTarget,
-                minHeight: AppSpacing.minTouchTarget,
-              ),
-              tooltip: 'Decrease ${product.name} quantity',
-              onPressed: line.quantity > 1
-                  ? () => controller.decrement(product.id)
-                  : null,
-              icon: const Icon(Icons.remove),
-            ),
-            Semantics(
-              label: '${product.name} quantity ${line.quantity}',
-              child: ExcludeSemantics(
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
                 child: Text(
-                  '${line.quantity}',
+                  product.name,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-            ),
-            IconButton(
-              constraints: const BoxConstraints(
-                minWidth: AppSpacing.minTouchTarget,
-                minHeight: AppSpacing.minTouchTarget,
+              IconButton(
+                constraints: const BoxConstraints(
+                  minWidth: AppSpacing.minTouchTarget,
+                  minHeight: AppSpacing.minTouchTarget,
+                ),
+                tooltip: 'Remove ${product.name}',
+                onPressed: () => controller.remove(product.id),
+                icon: Icon(Icons.delete_outline, color: colors.error, size: 20),
               ),
-              tooltip: 'Increase ${product.name} quantity',
-              onPressed: () =>
-                  showCartLimit(context, controller.increment(product.id)),
-              icon: const Icon(Icons.add),
+            ],
+          ),
+          AppSpacing.gapVerticalXs,
+          Text(
+            '${Formatters.formatCents(product.priceMinor)} each · ${Formatters.formatCents(line.subtotalMinor)} line subtotal',
+            style: TextStyle(
+              color: colors.onSurfaceVariant,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
-            IconButton(
-              constraints: const BoxConstraints(
-                minWidth: AppSpacing.minTouchTarget,
-                minHeight: AppSpacing.minTouchTarget,
+          ),
+          AppSpacing.gapVerticalSm,
+          Wrap(
+            spacing: AppSpacing.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              IconButton(
+                constraints: const BoxConstraints(
+                  minWidth: AppSpacing.minTouchTarget,
+                  minHeight: AppSpacing.minTouchTarget,
+                ),
+                tooltip: 'Decrease ${product.name} quantity',
+                onPressed: line.quantity > 1
+                    ? () => controller.decrement(product.id)
+                    : null,
+                icon: const Icon(Icons.remove),
               ),
-              tooltip: 'Remove ${product.name}',
-              onPressed: () => controller.remove(product.id),
-              icon: const Icon(Icons.delete_outline),
+              Semantics(
+                label: '${product.name} quantity ${line.quantity}',
+                child: ExcludeSemantics(
+                  child: Container(
+                    constraints: const BoxConstraints(minWidth: 32.0),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${line.quantity}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                constraints: const BoxConstraints(
+                  minWidth: AppSpacing.minTouchTarget,
+                  minHeight: AppSpacing.minTouchTarget,
+                ),
+                tooltip: 'Increase ${product.name} quantity',
+                onPressed: () =>
+                    showCartLimit(context, controller.increment(product.id)),
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
+          if (line.quantity == Cart.maxQuantity)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Text(
+                '99-item limit reached',
+                style: TextStyle(
+                  color: colors.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-          ],
-        ),
-        if (line.quantity == Cart.maxQuantity)
-          const Text('99-item limit reached'),
-      ],
+        ],
+      ),
     );
   }
 }

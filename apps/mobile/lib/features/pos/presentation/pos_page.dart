@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../shared/theme/app_breakpoints.dart';
 import '../../../shared/theme/app_radius.dart';
+import '../../../shared/theme/app_shadows.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/theme/formatters.dart';
@@ -100,36 +101,55 @@ class _PosPageState extends State<PosPage> {
                   padding: AppSpacing.edgeInsetsLg,
                   child: Semantics(
                     liveRegion: true,
-                    child: FilledButton(
-                      key: const ValueKey('open-cart'),
-                      onPressed: _openCart,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(
-                          context,
-                        ).colorScheme.secondary,
-                        foregroundColor: Theme.of(
-                          context,
-                        ).colorScheme.onSecondary,
-                        minimumSize: const Size(
-                          double.infinity,
-                          AppSpacing.minTouchTarget,
-                        ),
-                        padding: AppSpacing.edgeInsetsLg,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: AppRadius.radiusLg,
+                        boxShadow: Theme.of(context).brightness == Brightness.dark
+                            ? AppShadows.sheetDark
+                            : AppShadows.sheetLight,
                       ),
-                      child: Wrap(
-                        spacing: AppSpacing.md,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Icon(Icons.shopping_bag_outlined),
-                          Text(
-                            order == null
-                                ? 'View cart · ${cart.itemCount} items'
-                                : 'View order · ${order.itemCount} items',
+                      child: FilledButton(
+                        key: const ValueKey('open-cart'),
+                        onPressed: _openCart,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.secondary,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.onSecondary,
+                          minimumSize: const Size(
+                            double.infinity,
+                            52.0,
                           ),
-                          Text(
-                            '${Formatters.formatCents(order?.totalMinor ?? cart.subtotalMinor)} USD',
+                          padding: AppSpacing.edgeInsetsLg,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: AppRadius.radiusLg,
                           ),
-                        ],
+                        ),
+                        child: Wrap(
+                          spacing: AppSpacing.md,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            const Icon(Icons.shopping_bag_outlined),
+                            Text(
+                              order == null
+                                  ? 'View cart · ${cart.itemCount} items'
+                                  : 'View order · ${order.itemCount} items',
+                              style: AppTypography.label.copyWith(
+                                color: Theme.of(context).colorScheme.onSecondary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              '${Formatters.formatCents(order?.totalMinor ?? cart.subtotalMinor)} USD',
+                              style: AppTypography.price.copyWith(
+                                color: Theme.of(context).colorScheme.onSecondary,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -373,16 +393,28 @@ class _PosPageState extends State<PosPage> {
     );
   }
 
-  Widget _categoryChip(BuildContext context, String name, int? id) => Padding(
-    padding: const EdgeInsets.only(right: AppSpacing.sm),
-    child: ChoiceChip(
-      label: Text(name),
-      selected: widget.controller.categoryId == id,
-      showCheckmark: true,
-      materialTapTargetSize: MaterialTapTargetSize.padded,
-      onSelected: (_) => widget.controller.selectCategory(id),
-    ),
-  );
+  Widget _categoryChip(BuildContext context, String name, int? id) {
+    final theme = Theme.of(context);
+    final isSelected = widget.controller.categoryId == id;
+    return Padding(
+      padding: const EdgeInsets.only(right: AppSpacing.sm),
+      child: ChoiceChip(
+        label: Text(name),
+        labelStyle: AppTypography.label.copyWith(
+          color: isSelected
+              ? theme.colorScheme.onSecondaryContainer
+              : theme.colorScheme.onSurface,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+        ),
+        selected: isSelected,
+        showCheckmark: true,
+        selectedColor: theme.colorScheme.secondaryContainer,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusPill),
+        materialTapTargetSize: MaterialTapTargetSize.padded,
+        onSelected: (_) => widget.controller.selectCategory(id),
+      ),
+    );
+  }
 
   Widget _failure(BuildContext context, String message, VoidCallback retry) =>
       Padding(
