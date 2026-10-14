@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_radius.dart';
+import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 
 /// Reusable card surface embodying the Premium Café OS aesthetic:
-/// crisp subtle border, gentle surface color, and generous whitespace.
+/// crisp subtle border, gentle surface color, generous whitespace,
+/// and optional micro-elevation.
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
@@ -15,6 +17,8 @@ class AppCard extends StatelessWidget {
     this.backgroundColor,
     this.borderColor,
     this.borderRadius,
+    this.elevation = 0.0,
+    this.boxShadow,
   });
 
   final Widget child;
@@ -24,26 +28,31 @@ class AppCard extends StatelessWidget {
   final Color? backgroundColor;
   final Color? borderColor;
   final BorderRadius? borderRadius;
+  final double elevation;
+  final List<BoxShadow>? boxShadow;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final effectiveBg = backgroundColor ?? theme.colorScheme.surface;
     final effectiveBorder = borderColor ?? theme.colorScheme.outline;
     final effectiveRadius = borderRadius ?? AppRadius.radiusXl;
 
-    Widget content = Padding(padding: padding, child: child);
-
-    if (onTap != null) {
-      content = Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: effectiveRadius,
-          child: content,
-        ),
-      );
+    List<BoxShadow>? effectiveShadow = boxShadow;
+    if (effectiveShadow == null && elevation > 0) {
+      if (elevation <= 1.0) {
+        effectiveShadow = isDark
+            ? AppShadows.cardRestingDark
+            : AppShadows.cardRestingLight;
+      } else {
+        effectiveShadow = isDark
+            ? AppShadows.cardElevatedDark
+            : AppShadows.cardElevatedLight;
+      }
     }
+
+    final content = Padding(padding: padding, child: child);
 
     return Container(
       margin: margin,
@@ -51,8 +60,21 @@ class AppCard extends StatelessWidget {
         color: effectiveBg,
         borderRadius: effectiveRadius,
         border: Border.all(color: effectiveBorder, width: 1.0),
+        boxShadow: effectiveShadow,
       ),
-      child: ClipRRect(borderRadius: effectiveRadius, child: content),
+      child: ClipRRect(
+        borderRadius: effectiveRadius,
+        child: Material(
+          color: Colors.transparent,
+          child: onTap != null
+              ? InkWell(
+                  onTap: onTap,
+                  borderRadius: effectiveRadius,
+                  child: content,
+                )
+              : content,
+        ),
+      ),
     );
   }
 }

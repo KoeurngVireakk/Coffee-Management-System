@@ -7,6 +7,8 @@ import 'app_loading_indicator.dart';
 
 enum AppButtonVariant { primary, secondary, outline, destructive, text }
 
+enum AppButtonSize { standard, large }
+
 /// Reusable accessible button conforming to the Premium Café OS design tokens.
 ///
 /// Ensures a minimum 48x48 touch target, distinct visual states for default,
@@ -17,6 +19,7 @@ class AppButton extends StatelessWidget {
     required this.label,
     this.onPressed,
     this.variant = AppButtonVariant.primary,
+    this.size = AppButtonSize.standard,
     this.isLoading = false,
     this.leadingIcon,
     this.trailingIcon,
@@ -26,6 +29,7 @@ class AppButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final AppButtonVariant variant;
+  final AppButtonSize size;
   final bool isLoading;
   final IconData? leadingIcon;
   final IconData? trailingIcon;
@@ -62,11 +66,26 @@ class AppButton extends StatelessWidget {
         foregroundColor = colorScheme.primary;
     }
 
+    final minHeight = size == AppButtonSize.large ? 56.0 : AppSpacing.minTouchTarget;
+    final padding = size == AppButtonSize.large
+        ? const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.md + 2,
+          )
+        : const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          );
+
+    final textStyle = size == AppButtonSize.large
+        ? AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w700)
+        : AppTypography.label.copyWith(fontWeight: FontWeight.w600);
+
     final buttonStyle = ButtonStyle(
       minimumSize: WidgetStateProperty.all(
         Size(
           isFullWidth ? double.infinity : AppSpacing.huge,
-          AppSpacing.minTouchTarget,
+          minHeight,
         ),
       ),
       backgroundColor: WidgetStateProperty.resolveWith((states) {
@@ -105,26 +124,19 @@ class AppButton extends StatelessWidget {
       shape: WidgetStateProperty.all(
         const RoundedRectangleBorder(borderRadius: AppRadius.radiusLg),
       ),
-      padding: WidgetStateProperty.all(
-        const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
-        ),
-      ),
-      textStyle: WidgetStateProperty.all(
-        AppTypography.label.copyWith(fontWeight: FontWeight.w600),
-      ),
+      padding: WidgetStateProperty.all(padding),
+      textStyle: WidgetStateProperty.all(textStyle),
     );
 
     Widget content;
     if (isLoading) {
       content = AppLoadingIndicator(
-        size: 20.0,
+        size: size == AppButtonSize.large ? 24.0 : 20.0,
         color:
             variant == AppButtonVariant.outline ||
-                variant == AppButtonVariant.text
-            ? colorScheme.primary
-            : foregroundColor,
+                    variant == AppButtonVariant.text
+                ? colorScheme.primary
+                : foregroundColor,
       );
     } else {
       content = Row(
@@ -132,7 +144,7 @@ class AppButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (leadingIcon != null) ...[
-            Icon(leadingIcon, size: 18.0),
+            Icon(leadingIcon, size: size == AppButtonSize.large ? 20.0 : 18.0),
             AppSpacing.gapHorizontalSm,
           ],
           Flexible(
@@ -145,7 +157,7 @@ class AppButton extends StatelessWidget {
           ),
           if (trailingIcon != null) ...[
             AppSpacing.gapHorizontalSm,
-            Icon(trailingIcon, size: 18.0),
+            Icon(trailingIcon, size: size == AppButtonSize.large ? 20.0 : 18.0),
           ],
         ],
       );

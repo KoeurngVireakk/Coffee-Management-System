@@ -22,6 +22,13 @@ abstract final class AppColors {
   static const Color borderLight = Color(0xFFE5DDD5);
   static const Color borderSubtleLight = Color(0xFFEFE8E1);
 
+  // --- Surface Hierarchy Tokens (Light) ---
+  static const Color surfaceLowestLight = Color(0xFFFFFFFF);
+  static const Color surfaceLowLight = Color(0xFFF9F6F1);
+  static const Color surfaceLightDefault = Color(0xFFFAF7F2);
+  static const Color surfaceHighLight = Color(0xFFF1E9E1);
+  static const Color surfaceHighestLight = Color(0xFFE8DDD2);
+
   // --- Functional Status Tokens (Light) ---
   static const Color successLight = Color(0xFF2E7D32);
   static const Color successSurfaceLight = Color(0xFFEDF7ED);
@@ -45,6 +52,13 @@ abstract final class AppColors {
   static const Color textSecondaryDark = Color(0xFFC8BBB2);
   static const Color borderDark = Color(0xFF3B322D);
   static const Color borderSubtleDark = Color(0xFF2F2722);
+
+  // --- Surface Hierarchy Tokens (Dark) ---
+  static const Color surfaceLowestDark = Color(0xFF14100E);
+  static const Color surfaceLowDark = Color(0xFF1B1614);
+  static const Color surfaceDarkDefault = Color(0xFF211B18);
+  static const Color surfaceHighDark = Color(0xFF2A231F);
+  static const Color surfaceHighestDark = Color(0xFF362D28);
 
   // --- Functional Status Tokens (Dark) ---
   static const Color successDark = Color(0xFF81C784);
