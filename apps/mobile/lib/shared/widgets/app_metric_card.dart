@@ -108,4 +108,3 @@ class AppMetricCard extends StatelessWidget {
     );
   }
 }
-

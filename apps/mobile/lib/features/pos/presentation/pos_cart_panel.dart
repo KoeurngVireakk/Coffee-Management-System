@@ -140,10 +140,7 @@ class PosCartPanel extends StatelessWidget {
                   FilledButton(
                     onPressed: checkout.canCheckout ? checkout.checkout : null,
                     style: FilledButton.styleFrom(
-                      minimumSize: const Size(
-                        double.infinity,
-                        52.0,
-                      ),
+                      minimumSize: const Size(double.infinity, 52.0),
                       shape: const RoundedRectangleBorder(
                         borderRadius: AppRadius.radiusLg,
                       ),
@@ -254,9 +251,7 @@ class _CartLineView extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: AppRadius.radiusLg,
-        border: Border.all(
-          color: colors.outlineVariant.withValues(alpha: 0.6),
-        ),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,9 +310,9 @@ class _CartLineView extends StatelessWidget {
                     child: Text(
                       '${line.quantity}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                            fontWeight: FontWeight.w700,
-                          ),
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),

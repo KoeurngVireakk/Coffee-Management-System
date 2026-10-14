@@ -12,15 +12,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AppCard Modernization', () {
-    testWidgets('renders with elevation and custom shadow without error', (tester) async {
+    testWidgets('renders with elevation and custom shadow without error', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.buildLightTheme(),
           home: const Scaffold(
-            body: AppCard(
-              elevation: 2.0,
-              child: Text('Elevated Card'),
-            ),
+            body: AppCard(elevation: 2.0, child: Text('Elevated Card')),
           ),
         ),
       );
@@ -54,7 +53,9 @@ void main() {
   });
 
   group('AppMetricCard', () {
-    testWidgets('renders KPI label, tabular value, badge and subtitle', (tester) async {
+    testWidgets('renders KPI label, tabular value, badge and subtitle', (
+      tester,
+    ) async {
       var tapped = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -86,7 +87,9 @@ void main() {
   });
 
   group('AppSearchField', () {
-    testWidgets('handles typing, shows clear button, and clears text', (tester) async {
+    testWidgets('handles typing, shows clear button, and clears text', (
+      tester,
+    ) async {
       String changedText = '';
       var cleared = false;
       final controller = TextEditingController();
@@ -167,7 +170,9 @@ void main() {
   });
 
   group('AppFeedbackBanner', () {
-    testWidgets('renders all banner variants and handles action and dismiss', (tester) async {
+    testWidgets('renders all banner variants and handles action and dismiss', (
+      tester,
+    ) async {
       var actionFired = false;
       var dismissed = false;
 
@@ -203,13 +208,13 @@ void main() {
   });
 
   group('AppSkeletonCard', () {
-    testWidgets('renders pulsing skeleton card without exception', (tester) async {
+    testWidgets('renders pulsing skeleton card without exception', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.buildLightTheme(),
-          home: const Scaffold(
-            body: AppSkeletonCard(),
-          ),
+          home: const Scaffold(body: AppSkeletonCard()),
         ),
       );
 
@@ -218,4 +223,3 @@ void main() {
     });
   });
 }
-

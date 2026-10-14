@@ -35,9 +35,10 @@ class _AppSkeletonBoxState extends State<AppSkeletonBox>
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.35, end: 0.85).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _animation = Tween<double>(
+      begin: 0.35,
+      end: 0.85,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -109,7 +110,11 @@ class AppSkeletonCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               AppSkeletonBox(width: 70, height: 22),
-              AppSkeletonBox(width: 32, height: 32, borderRadius: AppRadius.radiusSm),
+              AppSkeletonBox(
+                width: 32,
+                height: 32,
+                borderRadius: AppRadius.radiusSm,
+              ),
             ],
           ),
         ],
@@ -117,4 +122,3 @@ class AppSkeletonCard extends StatelessWidget {
     );
   }
 }
-

@@ -41,8 +41,8 @@ class InventoryCard extends StatelessWidget {
             borderColor: isSelected
                 ? theme.colorScheme.primary
                 : (item.lowStock
-                    ? AppColors.warningLight.withValues(alpha: 0.5)
-                    : null),
+                      ? AppColors.warningLight.withValues(alpha: 0.5)
+                      : null),
             backgroundColor: isSelected
                 ? theme.colorScheme.primaryContainer.withValues(alpha: 0.25)
                 : null,

@@ -45,7 +45,9 @@ class PosProductCard extends StatelessWidget {
         ),
         child: Material(
           color: quantity > 0
-              ? colors.secondaryContainer.withValues(alpha: isDark ? 0.35 : 0.25)
+              ? colors.secondaryContainer.withValues(
+                  alpha: isDark ? 0.35 : 0.25,
+                )
               : cafe.surfaceElevated,
           shape: RoundedRectangleBorder(
             borderRadius: AppRadius.radiusXl,
@@ -103,7 +105,9 @@ class PosProductCard extends StatelessWidget {
                   AppSpacing.gapVerticalLg,
                   Text(
                     product.name,
-                    style: AppTypography.title.copyWith(color: colors.onSurface),
+                    style: AppTypography.title.copyWith(
+                      color: colors.onSurface,
+                    ),
                   ),
                   AppSpacing.gapVerticalXs,
                   Text(

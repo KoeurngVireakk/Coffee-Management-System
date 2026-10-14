@@ -92,10 +92,7 @@ class AppFeedbackBanner extends StatelessWidget {
                 ],
                 Text(
                   message,
-                  style: AppTypography.body.copyWith(
-                    color: fg,
-                    fontSize: 13.5,
-                  ),
+                  style: AppTypography.body.copyWith(color: fg, fontSize: 13.5),
                 ),
                 if (actionLabel != null && onAction != null) ...[
                   AppSpacing.gapVerticalSm,
@@ -142,4 +139,3 @@ class AppFeedbackBanner extends StatelessWidget {
     );
   }
 }
-

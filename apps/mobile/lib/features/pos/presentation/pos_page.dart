@@ -104,7 +104,8 @@ class _PosPageState extends State<PosPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: AppRadius.radiusLg,
-                        boxShadow: Theme.of(context).brightness == Brightness.dark
+                        boxShadow:
+                            Theme.of(context).brightness == Brightness.dark
                             ? AppShadows.sheetDark
                             : AppShadows.sheetLight,
                       ),
@@ -118,10 +119,7 @@ class _PosPageState extends State<PosPage> {
                           foregroundColor: Theme.of(
                             context,
                           ).colorScheme.onSecondary,
-                          minimumSize: const Size(
-                            double.infinity,
-                            52.0,
-                          ),
+                          minimumSize: const Size(double.infinity, 52.0),
                           padding: AppSpacing.edgeInsetsLg,
                           shape: const RoundedRectangleBorder(
                             borderRadius: AppRadius.radiusLg,
@@ -137,14 +135,18 @@ class _PosPageState extends State<PosPage> {
                                   ? 'View cart · ${cart.itemCount} items'
                                   : 'View order · ${order.itemCount} items',
                               style: AppTypography.label.copyWith(
-                                color: Theme.of(context).colorScheme.onSecondary,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSecondary,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             Text(
                               '${Formatters.formatCents(order?.totalMinor ?? cart.subtotalMinor)} USD',
                               style: AppTypography.price.copyWith(
-                                color: Theme.of(context).colorScheme.onSecondary,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSecondary,
                                 fontSize: 16.0,
                               ),
                             ),

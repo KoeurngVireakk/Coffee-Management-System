@@ -66,7 +66,9 @@ class AppButton extends StatelessWidget {
         foregroundColor = colorScheme.primary;
     }
 
-    final minHeight = size == AppButtonSize.large ? 56.0 : AppSpacing.minTouchTarget;
+    final minHeight = size == AppButtonSize.large
+        ? 56.0
+        : AppSpacing.minTouchTarget;
     final padding = size == AppButtonSize.large
         ? const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl,
@@ -83,10 +85,7 @@ class AppButton extends StatelessWidget {
 
     final buttonStyle = ButtonStyle(
       minimumSize: WidgetStateProperty.all(
-        Size(
-          isFullWidth ? double.infinity : AppSpacing.huge,
-          minHeight,
-        ),
+        Size(isFullWidth ? double.infinity : AppSpacing.huge, minHeight),
       ),
       backgroundColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
@@ -134,9 +133,9 @@ class AppButton extends StatelessWidget {
         size: size == AppButtonSize.large ? 24.0 : 20.0,
         color:
             variant == AppButtonVariant.outline ||
-                    variant == AppButtonVariant.text
-                ? colorScheme.primary
-                : foregroundColor,
+                variant == AppButtonVariant.text
+            ? colorScheme.primary
+            : foregroundColor,
       );
     } else {
       content = Row(

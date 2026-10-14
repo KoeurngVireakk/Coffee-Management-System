@@ -207,9 +207,9 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                     child: SelectableText(
                       order.reference,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: colors.onSurfaceVariant,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
+                        color: colors.onSurfaceVariant,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ),
                   AppSpacing.gapVerticalSm,
@@ -315,7 +315,9 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                         width: double.infinity,
                         padding: AppSpacing.edgeInsetsMd,
                         decoration: BoxDecoration(
-                          color: colors.secondaryContainer.withValues(alpha: 0.35),
+                          color: colors.secondaryContainer.withValues(
+                            alpha: 0.35,
+                          ),
                           borderRadius: AppRadius.radiusMd,
                           border: Border.all(
                             color: colors.secondary.withValues(alpha: 0.5),
@@ -328,7 +330,9 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
                             style: AppTypography.title.copyWith(
                               color: colors.secondary,
                               fontWeight: FontWeight.w700,
-                              fontFeatures: const [FontFeature.tabularFigures()],
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                             ),
                           ),
                         ),
