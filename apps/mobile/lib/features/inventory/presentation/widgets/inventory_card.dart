@@ -37,7 +37,12 @@ class InventoryCard extends StatelessWidget {
           ),
           child: AppCard(
             onTap: onTap,
-            borderColor: isSelected ? theme.colorScheme.primary : null,
+            elevation: isSelected ? 2.0 : (item.lowStock ? 1.0 : 0.0),
+            borderColor: isSelected
+                ? theme.colorScheme.primary
+                : (item.lowStock
+                    ? AppColors.warningLight.withValues(alpha: 0.5)
+                    : null),
             backgroundColor: isSelected
                 ? theme.colorScheme.primaryContainer.withValues(alpha: 0.25)
                 : null,
@@ -106,6 +111,7 @@ class InventoryCard extends StatelessWidget {
                         item.available.formatWithUnit(item.baseUnit.value),
                         style: AppTypography.body.copyWith(
                           fontWeight: FontWeight.w700,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                           color: item.lowStock
                               ? AppColors.warningDark
                               : theme.colorScheme.primary,
@@ -125,6 +131,7 @@ class InventoryCard extends StatelessWidget {
                           'Reserved: ${item.reserved.formatWithUnit(item.baseUnit.value)}',
                           style: AppTypography.small.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
+                            fontFeatures: const [FontFeature.tabularFigures()],
                           ),
                         ),
                       if (item.reorderLevel.isPositive)
@@ -132,6 +139,7 @@ class InventoryCard extends StatelessWidget {
                           'Reorder: ${item.reorderLevel.formatWithUnit(item.baseUnit.value)}',
                           style: AppTypography.small.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
+                            fontFeatures: const [FontFeature.tabularFigures()],
                           ),
                         ),
                     ],

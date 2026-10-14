@@ -4,7 +4,6 @@ import '../../../shared/theme/app_radius.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/theme/formatters.dart';
-import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../domain/order.dart';
 import '../domain/payment.dart';

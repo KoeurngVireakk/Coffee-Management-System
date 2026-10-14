@@ -72,6 +72,7 @@ class OrderCard extends StatelessWidget {
                   : null,
             ),
             child: AppCard(
+              elevation: isSelected ? 2.0 : 0.5,
               padding: AppSpacing.edgeInsetsLg,
               backgroundColor: isSelected
                   ? theme.colorScheme.primaryContainer.withValues(alpha: 0.25)
@@ -129,6 +130,7 @@ class OrderCard extends StatelessWidget {
                           formattedTime,
                           style: AppTypography.small.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
+                            fontFeatures: const [FontFeature.tabularFigures()],
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
