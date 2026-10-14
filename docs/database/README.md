@@ -1,6 +1,8 @@
 # Database setup and conventions
 
-The catalog now requires MySQL 8.0.16+ with enforced CHECK constraints. The example environment uses `127.0.0.1:3306`, database `coffee_management`, and a dedicated `coffee_management` account. No real credentials are committed.
+Windows teammates can use the root `setup.ps1` to enter local credentials securely, create a missing database after confirmation, apply pending migrations, seed roles, and optionally create the first local admin with a chosen password. It preserves existing users/keys and never resets tables or changes MySQL accounts. See [guided local development](../project/local-development.md). MySQL itself and an account with the required grants must already exist.
+
+The catalog requires MySQL 8.0.16+ with enforced CHECK constraints. The example environment uses `127.0.0.1:3306`, database `coffee_management_system`, and `root` as a local convenience. A dedicated application account is recommended. The manual SQL below uses a separate example database/account named `coffee_management`; put the names you actually choose in `.env`. No real credentials are committed.
 
 Connect as your local database administrator (`mysql -u root -p`, adjusting host/port if needed). For a new local development database, run the following after replacing the example password locally:
 

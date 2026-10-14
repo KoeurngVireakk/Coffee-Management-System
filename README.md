@@ -79,6 +79,17 @@ See [architecture](docs/architecture/README.md), [API boundaries](docs/api/READM
 
 This backend is API-only and has no Node/Vite build step. See the official [Laravel installation guide](https://laravel.com/framework/docs/13.x/installation) and [Flutter Android setup](https://docs.flutter.dev/platform-integration/android/setup) for SDK installation.
 
+## Guided Windows setup and runner
+
+After installing the prerequisites above, teammates can run these from the repository root:
+
+```powershell
+.\setup.ps1         # Guided MySQL credentials, .env, dependencies, migrations and optional first local admin
+.\run.ps1           # Laravel API + Flutter in Chrome
+```
+
+For Android, use `.\setup.ps1 -Target android`, then `.\run.ps1 -Target android -DeviceId emulator-5554` (use your device ID from `flutter devices`). The runner can cold boot a named emulator with `-Emulator <name>`. Existing local configuration and accounts are preserved; setup confirms the local database before migrations. See [the teammate setup guide](docs/project/local-development.md) for prerequisites, options and error-specific fixes. The manual commands below remain available.
+
 ## Run the backend
 
 From the repository root, in PowerShell:

@@ -33,3 +33,6 @@ Desktop.ini
 # Local browser verification artifacts.
 /.playwright-cli/
 /output/playwright/
+
+# Local development runner logs.
+/.dev/
