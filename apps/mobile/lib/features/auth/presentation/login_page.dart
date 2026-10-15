@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/brand/luna_brand.dart';
 import '../../../shared/theme/app_breakpoints.dart';
-import '../../../shared/theme/app_colors.dart';
 import '../../../shared/theme/app_radius.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
@@ -77,7 +77,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cafeExt = CafeThemeExtension.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final horizontalPadding = AppBreakpoints.horizontalPadding(context);
 
     return Scaffold(
@@ -105,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // --- Brand Header ---
-                        _buildBrandHeader(context, cafeExt, isDark),
+                        _buildBrandHeader(context),
                         AppSpacing.gapVerticalXl,
 
                         // --- Login Card ---
@@ -207,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                         // --- Footer / Security Note ---
                         Center(
                           child: Text(
-                            'Authorized Staff Only • Secured via Laravel Sanctum',
+                            'Staff access • Use your assigned account',
                             style: AppTypography.small.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -226,38 +225,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildBrandHeader(
-    BuildContext context,
-    CafeThemeExtension cafeExt,
-    bool isDark,
-  ) {
+  Widget _buildBrandHeader(BuildContext context) {
     final theme = Theme.of(context);
 
     return Column(
       children: [
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkElevated : AppColors.latte,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: cafeExt.accentCaramel.withValues(alpha: 0.4),
-              width: 1.5,
-            ),
-          ),
-          child: Icon(
-            Icons.local_cafe_rounded,
-            size: 32,
-            color: cafeExt.accentCaramel,
-          ),
-        ),
-        AppSpacing.gapVerticalMd,
-        Text(
-          'Coffee Management System',
-          style: AppTypography.h2.copyWith(color: theme.colorScheme.onSurface),
-          textAlign: TextAlign.center,
-        ),
+        const LunaBrandLockup(),
         AppSpacing.gapVerticalXs,
         // Khmer bilingual line
         Text(

@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
 
-/// Semantic and palette color tokens for the Premium Café OS design system.
-///
-/// Palette follows the 60-25-10-5 visual proportions:
-/// - 60% Warm Cream / Light Surface
-/// - 25% Espresso
-/// - 10% Forest Green
-/// - 5% Caramel Accent
+/// Luna Cafe palette within the existing Material 3 design system.
+/// Antique gold is decorative; strong gold is safe for foreground accents.
+/// Functional success/warning/error/info tokens stay distinct from branding.
 abstract final class AppColors {
   // --- Core Brand Tokens (Light) ---
-  static const Color espresso = Color(0xFF3A2618);
+  static const Color coffeeBrown = Color(0xFF2B1B0F);
+  static const Color espressoBrown = Color(0xFF4B3626);
+  static const Color antiqueGold = Color(0xFFC9A96A);
+  static const Color strongGold = Color(0xFF806127);
+  static const Color warmBeige = Color(0xFFDCCEB7);
+  static const Color espresso = coffeeBrown;
   static const Color forestGreen = Color(0xFF2F6B4F);
-  static const Color caramel = Color(0xFFD68A3A);
-  static const Color warmCream = Color(0xFFFAF7F2);
+  static const Color caramel = strongGold;
+  static const Color warmCream = Color(0xFFF8F3EA);
   static const Color white = Color(0xFFFFFFFF);
-  static const Color latte = Color(0xFFF1E9E1);
+  static const Color latte = Color(0xFFF0E6D6);
 
   // --- Text & Neutral Tokens (Light) ---
-  static const Color textPrimaryLight = Color(0xFF211A16);
+  static const Color textPrimaryLight = coffeeBrown;
   static const Color textSecondaryLight = Color(0xFF756A63);
   static const Color borderLight = Color(0xFFE5DDD5);
   static const Color borderSubtleLight = Color(0xFFEFE8E1);
 
   // --- Surface Hierarchy Tokens (Light) ---
   static const Color surfaceLowestLight = Color(0xFFFFFFFF);
-  static const Color surfaceLowLight = Color(0xFFF9F6F1);
-  static const Color surfaceLightDefault = Color(0xFFFAF7F2);
-  static const Color surfaceHighLight = Color(0xFFF1E9E1);
+  static const Color surfaceLowLight = warmCream;
+  static const Color surfaceLightDefault = warmCream;
+  static const Color surfaceHighLight = latte;
   static const Color surfaceHighestLight = Color(0xFFE8DDD2);
 
   // --- Functional Status Tokens (Light) ---
@@ -43,9 +44,9 @@ abstract final class AppColors {
   static const Color darkBackground = Color(0xFF171311);
   static const Color darkSurface = Color(0xFF211B18);
   static const Color darkElevated = Color(0xFF2A231F);
-  static const Color darkPrimaryWarm = Color(0xFFE1C3AD);
+  static const Color darkPrimaryWarm = Color(0xFFF8F3EA);
   static const Color darkSecondaryGreen = Color(0xFF8FC9A9);
-  static const Color darkAccentCaramel = Color(0xFFE7AD72);
+  static const Color darkAccentCaramel = antiqueGold;
 
   // --- Text & Neutral Tokens (Dark) ---
   static const Color textPrimaryDark = Color(0xFFF5EFEA);

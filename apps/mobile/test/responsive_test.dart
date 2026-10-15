@@ -115,7 +115,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('Coffee Management System'), findsOneWidget);
+      expect(find.text('Luna Cafe'), findsOneWidget);
       expect(find.text('Confirm Order (0)'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
@@ -133,7 +133,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('Coffee Management System'), findsOneWidget);
+      expect(find.text('Luna Cafe'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -152,7 +152,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('Coffee Management System'), findsOneWidget);
+      expect(find.text('Luna Cafe'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -177,7 +177,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('Coffee Management System'), findsOneWidget);
+      expect(find.text('Luna Cafe'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 

@@ -35,7 +35,7 @@ class AuthenticatedPlaceholderPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Coffee Management System'),
+        title: const Text('Luna Cafe'),
         actions: [
           IconButton(
             tooltip: 'Sign Out',

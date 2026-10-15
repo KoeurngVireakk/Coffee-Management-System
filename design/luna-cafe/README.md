@@ -19,6 +19,8 @@ This package contains 10 newly generated high-resolution **concept/reference boa
 
 ## Important implementation notes
 
+Phase 8A uses the owner-selected `design/Luna_Cafe_Vector_Logo_Kit`, with a [kit/application comparison](artwork/supplied-kit/REVIEW.md), [native phone/tablet captures](previews/phase-8a/README.md) and [asset integration guide](../../docs/frontend/luna-cafe-asset-integration.md). Supplied geometry is preserved; the earlier candidate redraw is removed. The current Phase 8 scope is Flutter Android/iOS phone and tablet UI; board 10 remains visual reference only.
+
 1. These are AI-generated **visual concept sheets**, not editable vector logos, licensed fonts, or production-ready individual drink photographs. They can contain tiny text, illustrative prices, or nonfunctional UI details. **Do not treat them as a menu price list or specifications.**
 2. To make production app icons and logos, redraw/refine the selected LC monogram into original scalable SVG, with transparent-background output and light/dark variants. Obtain approval before declaring the redrawn logo final. Do not merely crop tiny icons from the boards.
 3. Respect the Khmer-inspired ornamental design but keep the daily POS interface efficient, readable, accessible, and low-distraction.

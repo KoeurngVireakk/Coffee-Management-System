@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/brand/luna_brand.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/widgets/app_empty_state.dart';
@@ -183,6 +184,16 @@ class MorePage extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: Row(
+                  children: [
+                    LunaBrandMark(size: 40),
+                    AppSpacing.gapHorizontalSm,
+                    Expanded(child: LunaWordmark(fontSize: 22)),
+                  ],
+                ),
+              ),
               // --- User identity header ---
               Padding(
                 padding: const EdgeInsets.symmetric(

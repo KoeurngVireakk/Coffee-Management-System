@@ -19,10 +19,10 @@ abstract final class AppTheme {
       onSecondary: AppColors.white,
       secondaryContainer: AppColors.successSurfaceLight,
       onSecondaryContainer: AppColors.forestGreen,
-      tertiary: AppColors.caramel,
-      onTertiary: AppColors.textPrimaryLight,
-      tertiaryContainer: AppColors.warningSurfaceLight,
-      onTertiaryContainer: AppColors.warningLight,
+      tertiary: AppColors.strongGold,
+      onTertiary: AppColors.white,
+      tertiaryContainer: AppColors.latte,
+      onTertiaryContainer: AppColors.strongGold,
       error: AppColors.errorLight,
       onError: AppColors.white,
       errorContainer: AppColors.errorSurfaceLight,
@@ -95,6 +95,8 @@ abstract final class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Inter',
+      fontFamilyFallback: AppTypography.fontFallback,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: scaffoldBackground,
       textTheme: textTheme,

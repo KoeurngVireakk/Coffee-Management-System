@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Luna Cafe square light app icon">
+<title>Luna Cafe square light app icon</title>
+<defs>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+    <stop offset="0" stop-color="#8C591F"/><stop offset="0.19" stop-color="#EED9A5"/>
+    <stop offset="0.43" stop-color="#B98138"/><stop offset="0.66" stop-color="#F6E0A6"/>
+    <stop offset="0.86" stop-color="#C4934C"/><stop offset="1" stop-color="#815120"/>
+  </linearGradient>
+  <linearGradient id="darkBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#362216"/><stop offset="1" stop-color="#170E09"/></linearGradient>
+  <linearGradient id="creamBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FCF7EF"/><stop offset="1" stop-color="#F4E9D9"/></linearGradient>
+  <radialGradient id="halo" cx="50%" cy="43%" r="70%"><stop offset="0" stop-color="#8E603C" stop-opacity=".24"/><stop offset="1" stop-color="#100700" stop-opacity="0"/></radialGradient>
+ </defs>
+<rect x="12" y="12" width="1000" height="1000" rx="235" fill="#F8F3EA"/><g transform="translate(35 16) scale(.97)"><g id="luna-emblem" fill="#4B2A15" fill-rule="nonzero">
+  <g id="khmer-kbach-phni-inspired" transform="translate(-25 55) scale(.88)"><path d="M259 648 C198 607 181 535 217 477 C230 455 252 432 253 398 C293 433 307 472 285 511 C261 546 264 564 302 591 C316 601 329 610 346 613 C313 626 280 647 259 648 Z"/><path d="M238 552 C214 523 223 476 250 447 C248 483 267 489 261 514 C255 529 243 543 238 552 Z"/><path d="M309 636 C263 614 258 582 272 548 C290 513 329 497 361 512 C393 528 389 570 359 581 C342 586 323 580 317 562 C328 575 349 565 345 549 C341 532 317 539 308 562 C295 589 309 603 340 609 C371 613 398 595 408 574 C413 608 385 648 341 655 Z"/><path d="M327 684 C305 663 311 633 334 620 C352 608 382 611 400 627 C416 641 419 663 406 682 C396 695 379 700 368 692 C357 685 362 670 372 669 C369 680 381 680 388 672 C400 659 391 643 376 640 C357 636 342 647 343 661 C344 674 352 681 359 688 Z"/><path d="M399 703 C373 674 386 638 420 620 C465 596 513 623 526 657 C536 684 526 707 512 725 C513 693 489 673 467 676 C443 680 437 705 458 713 C470 717 481 711 484 701 C490 730 468 750 440 744 C418 740 406 727 399 703 Z"/><path d="M449 606 C456 564 486 541 514 538 C548 536 565 557 572 577 C544 570 515 573 493 589 C477 602 470 616 466 632 Z"/><path d="M504 752 C538 713 575 709 609 732 C622 740 632 751 647 751 C625 766 590 773 567 766 C548 760 527 753 504 752 Z"/><path d="M550 746 C566 721 566 690 554 673 C578 685 606 705 604 727 C603 744 589 751 579 755 Z"/><path d="M269 686 C251 662 221 651 197 657 C214 634 237 626 261 637 C280 646 288 666 283 688 Z"/><path d="M306 516 C299 481 316 449 335 429 C338 460 355 480 352 503 C348 520 331 530 318 532 Z"/><path d="M379 590 C388 554 411 530 437 524 C426 553 429 579 412 598 Z"/><path d="M474 644 C481 617 505 598 532 601 C518 622 515 640 496 651 Z"/></g>
+  <g id="initial-L"><path d="M570 239C567 172 545 120 506 83C493 70 473 59 446 49C420 39 398 34 380 34L227 31V658H321V689H44V658H138V31H44V0H589L602 239Z" transform="translate(312.34767 709.00000) scale(0.6057348 -0.8490566)"/></g>
+  <g id="initial-C"><path d="M585 128C546 89 511 62 478 47C438 28 390 19 334 20C277 21 232 52 198 111C165 171 148 249 148 344C148 559 213 669 342 675C462 680 508 627 517 512H547V669C513 682 489 690 474 693C440 700 395 704 339 704C253 704 181 672 123 607C63 540 33 452 32 344C31 245 61 160 121 89C181 19 254 -16 339 -16C398 -16 446 -7 484 10C526 29 564 63 599 112Z" transform="translate(365.01821 732.11111) scale(0.7812718 -0.6180556)"/></g>
+  <path id="inner-crescent" d="M687 357 C622 352 558 397 542 466 C525 543 575 616 649 617 C686 617 721 600 743 579 C714 639 655 657 604 646 C524 629 487 570 504 481 C520 397 594 349 687 357 Z"/>
+  <path id="moon-star" d="M755 456 Q763 479 786 486 Q763 492 755 516 Q746 493 725 486 Q745 480 755 456 Z"/>
+ </g></g>
+</svg>

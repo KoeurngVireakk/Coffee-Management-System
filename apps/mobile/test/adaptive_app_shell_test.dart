@@ -127,7 +127,7 @@ void main() {
           viewport: const Size(1024, 768),
         );
 
-        expect(find.text('Coffee Management System'), findsOneWidget);
+        expect(find.text('Luna Cafe'), findsOneWidget);
         expect(find.text('ប្រព័ន្ធគ្រប់គ្រងហាងកាហ្វេ'), findsOneWidget);
         expect(find.text('Cashier Sophea'), findsOneWidget);
         expect(find.text('sophea@example.test'), findsOneWidget);

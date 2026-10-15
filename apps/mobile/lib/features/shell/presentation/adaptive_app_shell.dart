@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/brand/luna_brand.dart';
 import '../../../shared/navigation/app_destinations.dart';
 import '../../../shared/theme/app_breakpoints.dart';
 import '../../../shared/theme/app_colors.dart';
@@ -157,7 +158,7 @@ class _AdaptiveAppShellState extends State<AdaptiveAppShell> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Coffee Management System'),
+        title: const LunaWordmark(fontSize: 18),
         actions: [
           StatusBadge(
             label: user.role.label.toUpperCase(),
@@ -271,31 +272,13 @@ class _AdaptiveAppShellState extends State<AdaptiveAppShell> {
                       padding: const EdgeInsets.all(AppSpacing.lg),
                       child: Row(
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary,
-                              borderRadius: AppRadius.radiusMd,
-                            ),
-                            child: Icon(
-                              Icons.coffee_rounded,
-                              color: theme.colorScheme.onPrimary,
-                              size: 24,
-                            ),
-                          ),
+                          const LunaBrandMark(size: 40),
                           AppSpacing.gapHorizontalMd,
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Coffee Management System',
-                                  style: AppTypography.label.copyWith(
-                                    color: theme.colorScheme.onSurface,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
+                                const LunaWordmark(fontSize: 20),
                                 Text(
                                   'ប្រព័ន្ធគ្រប់គ្រងហាងកាហ្វេ',
                                   style: AppTypography.small.copyWith(

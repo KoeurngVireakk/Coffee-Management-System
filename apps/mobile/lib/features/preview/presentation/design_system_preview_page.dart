@@ -57,7 +57,7 @@ class _DesignSystemPreviewPageState extends State<DesignSystemPreviewPage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Coffee Management System'),
+            const Text('Luna Cafe'),
             Text(
               'Premium Café OS • Design System',
               style: AppTypography.small.copyWith(

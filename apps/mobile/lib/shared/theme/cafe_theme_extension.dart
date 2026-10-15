@@ -48,7 +48,7 @@ class CafeThemeExtension extends ThemeExtension<CafeThemeExtension> {
     borderSubtle: AppColors.borderSubtleLight,
     surfaceElevated: AppColors.white,
     accentCaramel: AppColors.caramel,
-    onAccentCaramel: AppColors.textPrimaryLight,
+    onAccentCaramel: AppColors.white,
     priceColor: AppColors.espresso,
   );
 

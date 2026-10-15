@@ -1,0 +1,20 @@
+{
+  "source": "design/Luna_Cafe_Vector_Logo_Kit",
+  "selection": "Owner requested supplied kit on 2026-10-15",
+  "geometry": "Unmodified supplied PNG equivalents of the original SVG masters",
+  "rights": "Owner-supplied commissioned project artwork; see kit guides/README.md",
+  "files": [
+    {
+      "source": "png/logo_stacked_transparent_1200x1390.png",
+      "runtime": "logo_stacked_transparent.png"
+    },
+    {
+      "source": "png/monogram_gold_transparent_512x512.png",
+      "runtime": "monogram_gold.png"
+    },
+    {
+      "source": "png/monogram_espresso_transparent_1024x1024.png",
+      "runtime": "monogram_espresso.png"
+    }
+  ]
+}

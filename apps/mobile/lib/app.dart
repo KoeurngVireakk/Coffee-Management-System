@@ -183,7 +183,7 @@ class _CoffeeManagementAppState extends State<CoffeeManagementApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: _navigatorKey,
-      title: 'Coffee Management System',
+      title: 'Luna Cafe',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.buildLightTheme(),
       darkTheme: AppTheme.buildDarkTheme(),

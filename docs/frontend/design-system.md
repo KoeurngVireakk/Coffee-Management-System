@@ -1,5 +1,7 @@
 # Premium Café OS — Design System & Theme Foundation
 
+> Phase 8A extends this existing system with the Luna Cafe palette, local UI fonts and owner-selected vector-logo kit's PNG exports. The historical palette below describes the earlier milestone. Current tokens, asset fidelity and contrast decisions are documented in the [Luna Cafe asset integration guide](luna-cafe-asset-integration.md). Operational numeric typography and semantic status colors are preserved.
+
 ## 1. Overview & Visual Philosophy
 
 The **Premium Café OS** design system defines the visual language, interaction patterns, and design tokens for the Coffee Management System mobile and tablet client (`apps/mobile`).

@@ -4,6 +4,7 @@ import 'package:coffee_management_mobile/features/auth/domain/auth_user.dart';
 import 'package:coffee_management_mobile/features/auth/domain/staff_role.dart';
 import 'package:coffee_management_mobile/features/auth/presentation/auth_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
 
 import 'auth_controller_test.dart';
 import 'pos_test_support.dart';
@@ -24,7 +25,12 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Coffee Management System'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is Image && widget.semanticLabel == 'Luna Cafe',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Staff Sign In'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -57,7 +63,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('Coffee Management System'), findsOneWidget);
+      expect(find.text('Luna Cafe'), findsOneWidget);
       expect(find.text('Barista Sreymom'), findsOneWidget);
       expect(find.text('CASHIER'), findsOneWidget);
       expect(tester.takeException(), isNull);

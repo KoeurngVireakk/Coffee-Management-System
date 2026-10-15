@@ -1,5 +1,7 @@
 # Premium Café OS — Manager Mobile Dashboard Specification
 
+> Implementation status: planned (Phase 8B), pending the Phase 8A review gate. The JSON below is illustrative and differs from the frozen backend. Use the [verified Phase 8 contract audit](luna-cafe-phase-8-audit.md) and current Laravel requests/services, including integer-string amounts, max-50 top products and date-independent reconciliation pagination. Label accepted paid revenue accurately; the external payment adapter is disabled and these examples do not establish live KHQR/Card support.
+
 ## 1. Executive Summary & Architecture
 
 This specification defines the mobile and tablet user experience for the **Manager Dashboard & Operational Analytics** in the Coffee Management System (`apps/mobile`).

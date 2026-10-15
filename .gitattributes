@@ -9,3 +9,6 @@
 *.bat text eol=crlf
 gradlew text eol=lf
 gradlew.bat text eol=crlf
+# Keep bundled font provenance hashes reproducible on Windows and Unix clones.
+/apps/mobile/assets/fonts/**/OFL.txt text eol=lf
+/apps/mobile/assets/fonts/**/METADATA.pb text eol=lf

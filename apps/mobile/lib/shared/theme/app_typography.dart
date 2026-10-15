@@ -10,6 +10,7 @@ abstract final class AppTypography {
   ];
 
   static const TextStyle display = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 32.0,
     fontWeight: FontWeight.w700,
     height: 1.3,
@@ -18,6 +19,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle h1 = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 28.0,
     fontWeight: FontWeight.w700,
     height: 1.35,
@@ -26,6 +28,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle h2 = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 24.0,
     fontWeight: FontWeight.w600,
     height: 1.35,
@@ -34,6 +37,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle h3 = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 20.0,
     fontWeight: FontWeight.w600,
     height: 1.4,
@@ -41,6 +45,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle title = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 18.0,
     fontWeight: FontWeight.w600,
     height: 1.4,
@@ -48,6 +53,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle bodyLarge = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 16.0,
     fontWeight: FontWeight.w400,
     height: 1.45,
@@ -55,6 +61,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle body = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 14.0,
     fontWeight: FontWeight.w400,
     height: 1.45,
@@ -62,6 +69,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle label = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 13.0,
     fontWeight: FontWeight.w500,
     height: 1.4,
@@ -69,6 +77,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle small = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 11.5,
     fontWeight: FontWeight.w400,
     height: 1.35,
@@ -77,6 +86,7 @@ abstract final class AppTypography {
 
   // --- Financial & Scannable Numeric Typography ---
   static const TextStyle price = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 24.0,
     fontWeight: FontWeight.w700,
     height: 1.25,
@@ -86,6 +96,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle priceLarge = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 32.0,
     fontWeight: FontWeight.w700,
     height: 1.2,
@@ -95,6 +106,7 @@ abstract final class AppTypography {
   );
 
   static const TextStyle kpi = TextStyle(
+    fontFamily: 'Inter',
     fontSize: 28.0,
     fontWeight: FontWeight.w700,
     height: 1.25,
