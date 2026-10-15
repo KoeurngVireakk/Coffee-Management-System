@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+
+import '../../../shared/theme/app_motion.dart';
 import '../../../shared/theme/app_radius.dart';
-import '../../../shared/theme/app_shadows.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/theme/cafe_theme_extension.dart';
 import '../../../shared/theme/formatters.dart';
 import '../domain/catalog.dart';
+import 'pos_category_art.dart';
 
-class PosProductCard extends StatelessWidget {
+/// Text-first menu tile with one add action and an exact, immediate unit price.
+class PosProductCard extends StatefulWidget {
   const PosProductCard({
     super.key,
     required this.product,
@@ -19,17 +22,24 @@ class PosProductCard extends StatelessWidget {
   final VoidCallback? onAdd;
 
   @override
+  State<PosProductCard> createState() => _PosProductCardState();
+}
+
+class _PosProductCardState extends State<PosProductCard> {
+  bool _focused = false;
+  CatalogProduct get product => widget.product;
+  int get quantity => widget.quantity;
+  VoidCallback? get onAdd => widget.onAdd;
+
+  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final colors = theme.colorScheme;
+    final colors = Theme.of(context).colorScheme;
     final cafe = CafeThemeExtension.of(context);
     final price = Formatters.formatCents(product.priceMinor);
-
-    final cardShadow = quantity > 0
-        ? (isDark ? AppShadows.cardElevatedDark : AppShadows.cardElevatedLight)
-        : (isDark ? AppShadows.cardRestingDark : AppShadows.cardRestingLight);
-
+    final selected = quantity > 0;
+    final categoryColor = selected
+        ? colors.onPrimaryContainer
+        : colors.onSurfaceVariant;
     return Semantics(
       button: true,
       enabled: onAdd != null,
@@ -38,119 +48,146 @@ class PosProductCard extends StatelessWidget {
           : 'Add ${product.name}, $price USD, ${product.category.name}. $quantity in cart',
       onTap: onAdd,
       excludeSemantics: true,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: AppRadius.radiusXl,
-          boxShadow: cardShadow,
+      child: Material(
+        color: selected ? colors.primaryContainer : colors.surface,
+        animationDuration: AppMotion.respectingPreferences(
+          context,
+          AppMotion.tabSelection,
         ),
-        child: Material(
-          color: quantity > 0
-              ? colors.secondaryContainer.withValues(
-                  alpha: isDark ? 0.35 : 0.25,
-                )
-              : cafe.surfaceElevated,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.radiusXl,
-            side: BorderSide(
-              color: quantity > 0 ? colors.secondary : cafe.borderSubtle,
-              width: quantity > 0 ? 1.5 : 1.0,
-            ),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadius.radiusXl,
+          side: BorderSide(
+            color: selected || _focused
+                ? colors.primary
+                : colors.outlineVariant,
+            width: 1.5,
           ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onAdd,
-            focusColor: colors.secondary.withValues(alpha: 0.2),
-            child: Padding(
-              padding: AppSpacing.edgeInsetsLg,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: AppSpacing.edgeInsetsMd,
-                        decoration: BoxDecoration(
-                          color: colors.secondaryContainer,
-                          borderRadius: AppRadius.radiusMd,
-                        ),
-                        // Presentation only; the catalog has no product image contract.
-                        child: Icon(
-                          Icons.local_cafe_outlined,
-                          color: colors.onSecondaryContainer,
-                          size: 28,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onAdd,
+          onFocusChange: (value) {
+            if (_focused != value) setState(() => _focused = value);
+          },
+          focusColor: colors.primary.withValues(alpha: .18),
+          hoverColor: colors.primary.withValues(alpha: .06),
+          child: Padding(
+            padding: AppSpacing.edgeInsetsMd,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      posCategoryIcon(product.category.name),
+                      size: 22,
+                      color: categoryColor,
+                    ),
+                    AppSpacing.gapHorizontalSm,
+                    Expanded(
+                      child: Text(
+                        product.category.name,
+                        style: AppTypography.small.copyWith(
+                          fontSize: 12,
+                          color: categoryColor,
                         ),
                       ),
-                      if (quantity > 0)
-                        Container(
+                    ),
+                    if (selected) ...[
+                      const SizedBox(width: AppSpacing.s),
+                      AnimatedSwitcher(
+                        key: ValueKey('product-quantity-${product.id}'),
+                        duration: AppMotion.respectingPreferences(
+                          context,
+                          AppMotion.hoverFocus,
+                        ),
+                        child: Container(
+                          key: ValueKey(quantity),
+                          constraints: const BoxConstraints(minWidth: 24),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm + 2,
+                            horizontal: AppSpacing.s,
                             vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
-                            color: colors.secondary,
-                            borderRadius: AppRadius.radiusPill,
+                            color: colors.primary,
+                            borderRadius: AppRadius.radiusSm,
                           ),
                           child: Text(
                             '$quantity',
-                            style: AppTypography.small.copyWith(
-                              color: colors.onSecondary,
-                              fontWeight: FontWeight.w700,
+                            textAlign: TextAlign.center,
+                            style: AppTypography.label.copyWith(
+                              color: colors.onPrimary,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                  AppSpacing.gapVerticalLg,
-                  Text(
-                    product.name,
-                    style: AppTypography.title.copyWith(
-                      color: colors.onSurface,
-                    ),
-                  ),
-                  AppSpacing.gapVerticalXs,
-                  Text(
-                    product.category.name,
-                    style: AppTypography.body.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                  AppSpacing.gapVerticalMd,
-                  Text(
-                    price,
-                    style: AppTypography.price.copyWith(color: cafe.priceColor),
-                  ),
-                  AppSpacing.gapVerticalSm,
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Icon(
-                        onAdd == null
-                            ? Icons.lock_outline
-                            : quantity > 0
-                            ? Icons.check_circle_outline
-                            : Icons.add_circle_outline,
-                        color: onAdd == null
-                            ? colors.onSurfaceVariant
-                            : colors.secondary,
-                        size: 24,
                       ),
+                    ],
+                  ],
+                ),
+                AppSpacing.gapVerticalMd,
+                Text(
+                  product.name,
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Spacer(),
+                AppSpacing.gapVerticalSm,
+                SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.s,
+                    children: [
                       Text(
-                        onAdd == null
-                            ? 'Order in progress'
-                            : quantity > 0
-                            ? '$quantity in order · Add'
-                            : 'Add to order',
-                        style: AppTypography.label.copyWith(
-                          color: colors.onSurface,
+                        price,
+                        style: AppTypography.price.copyWith(
+                          fontSize: 20,
+                          color: cafe.priceColor,
+                        ),
+                      ),
+                      Container(
+                        width: AppSpacing.minTouchTarget,
+                        height: AppSpacing.minTouchTarget,
+                        decoration: BoxDecoration(
+                          color: onAdd == null
+                              ? colors.outlineVariant
+                              : colors.primaryContainer,
+                          borderRadius: AppRadius.radiusLg,
+                          border: Border.all(
+                            color: onAdd == null
+                                ? colors.outlineVariant
+                                : colors.primary,
+                          ),
+                        ),
+                        child: Icon(
+                          onAdd == null ? Icons.lock_outline : Icons.add,
+                          color: onAdd == null
+                              ? colors.onSurfaceVariant
+                              : colors.onPrimaryContainer,
+                          size: 22,
                         ),
                       ),
                     ],
                   ),
+                ),
+                if (onAdd == null) ...[
+                  AppSpacing.gapVerticalXs,
+                  Text(
+                    'Order in progress',
+                    style: AppTypography.small.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
         ),

@@ -4,9 +4,10 @@
 /// persistent token storage, or successful write/payment operation.
 /// Run: `flutter run -d DEVICE_ID -t tool/luna_audit_preview.dart`
 /// Defines: AUDIT_ROLE=cashier|manager|admin|login, AUDIT_THEME=light|dark,
-/// AUDIT_STATE=data|empty|error. Query overrides are for existing debug tooling.
+/// AUDIT_STATE=data|empty|error|loading. Query overrides are for debug tooling.
 library;
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:coffee_management_mobile/app.dart';
@@ -84,6 +85,7 @@ Future<({Widget widget, VoidCallback dispose})> createAuditPreview({
   final role = _permissions.containsKey(requestedRole)
       ? requestedRole
       : 'cashier';
+  final pendingFixtures = <Completer<http.Response>>[];
   final transport = MockClient((request) async {
     if (request.method != 'GET') {
       return _response({
@@ -102,6 +104,11 @@ Future<({Widget widget, VoidCallback dispose})> createAuditPreview({
           'permissions': _permissions[role],
         },
       });
+    }
+    if (mode == 'loading') {
+      final pending = Completer<http.Response>();
+      pendingFixtures.add(pending);
+      return pending.future;
     }
     if (mode == 'error') {
       return _response({'message': 'Synthetic service outage for audit.'}, 503);
@@ -182,6 +189,11 @@ Future<({Widget widget, VoidCallback dispose})> createAuditPreview({
   await auth.restoreSession();
   return (
     dispose: () {
+      for (final pending in pendingFixtures) {
+        if (!pending.isCompleted) {
+          pending.complete(_response({'message': 'Fixture closed'}, 503));
+        }
+      }
       auth.dispose();
       transport.close();
     },

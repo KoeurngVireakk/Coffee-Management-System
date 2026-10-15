@@ -197,7 +197,7 @@ void main() {
       );
       tester.view.physicalSize = const Size(375, 812);
       await tester.pumpAndSettle();
-      expect(find.text('View cart · 1 items'), findsOneWidget);
+      expect(find.text('View cart · 1 item'), findsOneWidget);
       tester.view.physicalSize = const Size(1440, 900);
       await tester.pumpAndSettle();
       expect(find.text('Current Order'), findsOneWidget);

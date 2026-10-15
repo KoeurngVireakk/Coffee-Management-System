@@ -203,3 +203,11 @@ It provides live interactive verification of:
 - Interactive card tap ripple and empty state illustrations.
 - Responsive layout adaptation across Compact, Medium, and Expanded viewports.
 
+## 9. Luna Cafe POS vertical slice (8B.1)
+
+The [UX audit](luna-mobile-ux-rescue-audit.md) and [verification](luna-mobile-ux-rescue-verification.md) define the scoped POS extension of the existing Material 3 system. The owner-approved brand assets, fonts and semantic colors remain unchanged; no new theme or dependency is introduced.
+
+Use 16dp screen padding, 12dp product gaps/padding, full 16px semibold product names, 20px tabular unit prices and 48dp native controls. Category glyphs are decorative beside real API labels. Selected product labels use `onPrimaryContainer`, which meets normal-text contrast on the selected surface. The 56dp compact review action occupies its own space below the catalog; large type wraps the count/total. At an allocated width of at least 720dp × text scale and height of 480dp, the existing POS uses a ~300dp persistent cart. Narrower/high-text allocations keep the review sheet. Quantity steppers stay inline and short/high-text reviews scroll through Checkout.
+
+New POS count/selection feedback uses native 150–180ms transitions and `AppMotion.respectingPreferences` for either accessibility motion preference. Exact money is immediate. Static catalog placeholders have an accessible loading message and no repeating shimmer. Equal category/product failures share one retry with both recovery paths; distinct failures remain separate. The [capture gallery](../../design/luna-cafe/previews/phase-8b1/README.md) covers four native widget sizes, both themes, 1×/2× text and data/empty/error. Whole-app propagation remains behind the owner's 8B.2 review gate.
+

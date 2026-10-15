@@ -231,7 +231,7 @@ void main() {
       await tester.pump();
       expect(find.text(r'$3.25'), findsWidgets);
       await pumpPos(tester, size: const Size(390, 844), dark: true);
-      expect(find.text('View cart · 1 items'), findsOneWidget);
+      expect(find.text('View cart · 1 item'), findsOneWidget);
       expect(repository.productRequests.length, 1);
       await openCart(tester);
       expect(find.byTooltip('Increase Cappuccino quantity'), findsOneWidget);

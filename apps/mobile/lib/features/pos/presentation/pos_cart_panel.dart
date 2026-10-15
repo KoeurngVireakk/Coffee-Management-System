@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../shared/theme/app_radius.dart';
+import '../../../shared/theme/app_motion.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/theme/formatters.dart';
@@ -74,7 +75,7 @@ class PosCartPanel extends StatelessWidget {
             children: [
               Text(
                 'Current Order',
-                style: AppTypography.h3.copyWith(color: colors.onSurface),
+                style: AppTypography.title.copyWith(color: colors.onSurface),
               ),
               if (cart.distinctCount > 0)
                 TextButton(
@@ -102,10 +103,10 @@ class PosCartPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  '${cart.itemCount} items · ${cart.distinctCount} products',
+                  '${cart.itemCount} ${cart.itemCount == 1 ? 'item' : 'items'} · ${cart.distinctCount} ${cart.distinctCount == 1 ? 'product' : 'products'}',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                AppSpacing.gapVerticalSm,
+                AppSpacing.gapVerticalXs,
                 Wrap(
                   alignment: WrapAlignment.spaceBetween,
                   spacing: AppSpacing.md,
@@ -140,7 +141,7 @@ class PosCartPanel extends StatelessWidget {
                   FilledButton(
                     onPressed: checkout.canCheckout ? checkout.checkout : null,
                     style: FilledButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 52.0),
+                      minimumSize: const Size(double.infinity, 56.0),
                       shape: const RoundedRectangleBorder(
                         borderRadius: AppRadius.radiusLg,
                       ),
@@ -177,9 +178,8 @@ class PosCartPanel extends StatelessWidget {
                 // the whole review so neither Checkout nor item controls are clipped.
                 final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
                 final needsScroll =
-                    checkout != null &&
                     constraints.maxHeight <
-                        AppSpacing.minTouchTarget * 10 * scale;
+                    AppSpacing.minTouchTarget * 10 * scale;
                 if (needsScroll) {
                   return ListView(
                     children: [
@@ -210,12 +210,8 @@ class PosCartPanel extends StatelessWidget {
                           : ListView.separated(
                               padding: AppSpacing.edgeInsetsLg,
                               itemCount: lines.length,
-                              separatorBuilder: (_, _) => const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: AppSpacing.md,
-                                ),
-                                child: Divider(),
-                              ),
+                              separatorBuilder: (_, _) =>
+                                  AppSpacing.gapVerticalMd,
                               itemBuilder: (context, index) => _CartLineView(
                                 line: lines[index],
                                 controller: controller,
@@ -249,9 +245,8 @@ class _CartLineView extends StatelessWidget {
     return Container(
       padding: AppSpacing.edgeInsetsMd,
       decoration: BoxDecoration(
-        color: colors.surface,
+        color: colors.primaryContainer.withValues(alpha: .35),
         borderRadius: AppRadius.radiusLg,
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.6)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,7 +258,10 @@ class _CartLineView extends StatelessWidget {
               Expanded(
                 child: Text(
                   product.name,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               IconButton(
@@ -280,7 +278,7 @@ class _CartLineView extends StatelessWidget {
           AppSpacing.gapVerticalXs,
           Text(
             '${Formatters.formatCents(product.priceMinor)} each · ${Formatters.formatCents(line.subtotalMinor)} line subtotal',
-            style: TextStyle(
+            style: AppTypography.label.copyWith(
               color: colors.onSurfaceVariant,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
@@ -305,13 +303,24 @@ class _CartLineView extends StatelessWidget {
                 label: '${product.name} quantity ${line.quantity}',
                 child: ExcludeSemantics(
                   child: Container(
-                    constraints: const BoxConstraints(minWidth: 32.0),
+                    width: 56,
+                    constraints: const BoxConstraints(minHeight: 48),
                     alignment: Alignment.center,
-                    child: Text(
-                      '${line.quantity}',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                        fontWeight: FontWeight.w700,
+                    child: AnimatedSwitcher(
+                      duration: AppMotion.respectingPreferences(
+                        context,
+                        AppMotion.hoverFocus,
+                      ),
+                      child: Text(
+                        '${line.quantity}',
+                        key: ValueKey(line.quantity),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                     ),
                   ),

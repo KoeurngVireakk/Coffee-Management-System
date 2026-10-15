@@ -215,7 +215,7 @@ void main() {
       await tester.tap(find.byTooltip('Close order panel'));
       await tester.pumpAndSettle();
       expect(find.text(r'$4.50 USD'), findsOneWidget);
-      expect(find.text('View order · 1 items'), findsOneWidget);
+      expect(find.text('View order · 1 item'), findsOneWidget);
     },
   );
   testWidgets('loading prevents duplicate checkout and retains preview', (

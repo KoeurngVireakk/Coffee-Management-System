@@ -1,0 +1,50 @@
+{
+    "date":  "2026-10-15",
+    "entrypoint":  "tool/luna_pos_profile.dart",
+    "device":  "Pixel_10_Pro_XL API 37.2 x86_64 emulator-5554",
+    "renderer":  "Impeller OpenGLES, SwiftShader software GPU",
+    "physical_pixels":  "1344x2992",
+    "density_dpi":  480,
+    "logical_pixels":  "448x997.3",
+    "interactions":  "catalog swipes and add taps through ADB; read-only HTTP fixtures",
+    "memory_snapshot":  "TOTAL PSS:   118397            TOTAL RSS:   236700      TOTAL SWAP (KB):        0",
+    "metrics":  {
+                    "window_seconds":  60.002,
+                    "all":  {
+                                "frames":  449,
+                                "build":  {
+                                              "p50_ms":  2.012,
+                                              "p95_ms":  8.808,
+                                              "max_ms":  41.629
+                                          },
+                                "raster":  {
+                                               "p50_ms":  51.677,
+                                               "p95_ms":  75.525,
+                                               "max_ms":  406.611
+                                           },
+                                "total_span":  {
+                                                   "p50_ms":  99.252,
+                                                   "p95_ms":  142.088,
+                                                   "max_ms":  525.872
+                                               }
+                            },
+                    "after_first_5_seconds":  {
+                                                  "frames":  447,
+                                                  "build":  {
+                                                                "p50_ms":  2.012,
+                                                                "p95_ms":  8.773,
+                                                                "max_ms":  39.968
+                                                            },
+                                                  "raster":  {
+                                                                 "p50_ms":  51.665,
+                                                                 "p95_ms":  74.863,
+                                                                 "max_ms":  374.233
+                                                             },
+                                                  "total_span":  {
+                                                                     "p50_ms":  99.235,
+                                                                     "p95_ms":  140.168,
+                                                                     "max_ms":  422.364
+                                                                 }
+                                              }
+                }
+}
